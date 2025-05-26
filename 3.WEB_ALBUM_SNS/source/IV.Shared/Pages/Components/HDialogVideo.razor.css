@@ -1,0 +1,94 @@
+﻿/* 마스크(오버레이) 영역 */
+.h-video-dialog-mask {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    display: block;
+}
+
+/* 닫기(X) 버튼 */
+.h-video-dialog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* 비디오 스타일 (화면 중앙 정렬 및 크기 조절) */
+.h-video-dialog-element {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 85%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    background-color: black;
+}
+
+/* 비디오가 없을 때 메시지 스타일 */
+.no-video-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    background: transparent;
+}
+
+/* 버튼 내비게이션 영역 */
+.h-video-dialog-navigation {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+}
+
+/* 내비게이션 버튼 스타일 */
+.nav-button {
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: #0091ea;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.nav-button:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}
+
+.nav-button:active {
+    transform: scale(0.9);
+    transition: transform 0.1s;
+}
+
+/* 삭제 버튼 특별 스타일 */
+.delete-button {
+    background-color: #cc3333;
+}
+
+/* 비활성화된 버튼 스타일 */
+.nav-button:disabled {
+    background-color: #666666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}

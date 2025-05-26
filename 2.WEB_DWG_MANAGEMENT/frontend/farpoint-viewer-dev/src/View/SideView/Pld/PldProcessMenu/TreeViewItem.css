@@ -1,0 +1,64 @@
+.PldProcessMenu .TreeViewItem {
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+    --TreeView-Indent-Width: 15px;
+}
+.PldProcessMenu .TreeViewItem .Image1,
+.Image2 {
+    position: absolute;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+}
+.PldProcessMenu .TreeViewItem .Image1 {
+    transition: all 0.2s;
+}
+
+.PldProcessMenu .TreeViewItem .Text {
+    position: relative;
+    top: 0px;
+    height: 100%;
+    font-size: 12px;
+    overflow: hidden;
+    /* text center align */
+    display: flex;
+    align-items: center;
+    color: var(--Stroke-Normal);
+}
+
+.PldProcessMenu .TreeViewItem .Label {
+    border-radius: 10px;
+    width: 100%;
+}
+.PldProcessMenu .TreeViewItem .Label:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.PldProcessMenu .TreeViewItem .Label:active {
+    background-color: var(--Background-Normal-Active);
+}
+.PldProcessMenu .TreeViewItem .SelectedLabel {
+    background-color: var(--Background-Highlight);
+}
+.PldProcessMenu .TreeViewItem .SelectedLabel:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.PldProcessMenu .TreeViewItem .SelectedLabel:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.CloseButton .CloseIcon {
+    position: relative;
+    margin-top: 8px;
+    right: 0px;
+    --CloseIcon-Fill: #e7ebf6;
+    --CloseIcon-Stroke: #666;
+}
+.CloseButton .CloseIcon:hover {
+    --CloseIcon-Fill: #fff;
+    --CloseIcon-Stroke: #666;
+}
+.CloseButton .CloseIcon:active {
+    --CloseIcon-Fill: #c7cbd6;
+    --CloseIcon-Stroke: #444;
+}

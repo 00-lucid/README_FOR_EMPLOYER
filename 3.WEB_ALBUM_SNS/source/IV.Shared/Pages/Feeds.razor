@@ -1,0 +1,486 @@
+﻿@page "/feeds"
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using SchemaLens.Client.Utils
+@inject IFeedService FeedService
+@inject IUserService UserService
+@inject IAlarmService AlarmService
+@inject NavigationManager NavigationManager
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div class="search-container">
+    <input type="text" class="search-input" placeholder="새로운 사람을 검색해보세요!"
+           @oninput="OnInputChange"
+           @onkeydown="HandleKeyPress" />
+
+    <!-- 모바일 사용자를 위한 검색 버튼 -->
+    <button class="search-button" @onclick="HandleSearchClick">검색</button>
+
+    @if (_searchResults?.Count > 0)
+    {
+        <!-- 드롭다운 형태의 검색 결과 리스트 -->
+        <div class="search-results-dropdown">
+            <ul>
+                @foreach (var user in _searchResults)
+                {
+                    <li class="search-result-item" @onclick="@(() => NavigateToProfile(user.UserId))">
+                        @user.Username (@user.Email)
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+</div>
+
+<div class="feed-container">
+    @if (_feedModels.Count == 0)
+    {
+        <!-- _feedModels가 비어있을 경우 표시 -->
+        <HNotingText Title="(o^^)o" SubTitle="피드가 존재하지 않습니다" Compare="@_feedModels" />
+    }
+    else
+    {
+        @foreach (var item in _feedModels)
+        {
+            <section class="feed-item">
+                <header class="feed-item-header">
+                    <HRow AlignItems="center" Gap="0.5rem">
+                        <div class="profile-pic">
+                            <img src=@(item.CreatorUserProfileImage + "?" + Configuration.GetConnectionString("BlobStorageToken")) alt="profile"/>
+                        </div>
+                        <HTextButton Type="HTextButton.ButtonType.Secondary"
+                                 OnClick="@(() => NavigateToProfile(item.CreatorUserId))">
+                            @item.Username
+                        </HTextButton>
+                    </HRow>
+                </header>
+
+                <div class="feed-item-image"
+                     @onmousedown="@((e) => OnMouseDown(item, e))"
+                     @onmousemove="@((e) => OnMouseMove(item, e))"
+                     @onmouseup="@((e) => OnMouseUp(item, e))"
+                     @ontouchstart="@((e) => OnTouchStart(item, e))"
+                     @ontouchmove="@((e) => OnTouchMove(item, e))"
+                     @ontouchmove:preventDefault="true"
+                     @ontouchend="@((e) => OnTouchEnd(item, e))">
+
+                    @if (item.Medias?.Count > 0)
+                    {
+                        var currentMedia = item.Medias[item.CurrentMediaIndex];
+
+                        @if (currentMedia.MediaType == "photo")
+                        {
+                            <img src="@(currentMedia.Url + "?" + Configuration.GetConnectionString("BlobStorageToken"))"
+                                 alt="피드 이미지"
+                                 style="
+                                     transform: translateX(@feedDragOffset[item.FeedId]px);
+                                 transition: @(isDragging[item.FeedId] ? "none" : "0.3s");
+                                 " />
+                        }
+                        else if (currentMedia.MediaType == "short")
+                        {
+                            <video width="100%" controls
+                                   @key="@currentMedia.Url"
+                                   style="
+                                       transform: translateX(@feedDragOffset[item.FeedId]px);
+                                   transition: @(isDragging[item.FeedId] ? "none" : "0.3s");
+                                   ">
+                                <source src="@(currentMedia.Url + "?" + Configuration.GetConnectionString("ShortBlobStorageToken"))"
+                                        type="video/mp4" />
+                                동영상을 재생할 수 없습니다.
+                            </video>
+                        }
+
+                        <!-- 미디어 인디케이터 -->
+                        <div class="image-controls">
+                            <span>@($"{item.CurrentMediaIndex + 1} / {item.Medias.Count}")</span>
+                        </div>
+                    }
+                </div>
+
+                <footer class="feed-item-footer">
+                    <div class="feed-actions">
+                        <HTextButton Type="@(item.IsLiked
+                                               ? HTextButton.ButtonType.Danger
+                                               : HTextButton.ButtonType.Secondary)"
+                                     OnClick="@(() => HandleLike(item))">
+                            @item.LikeCount 좋아요
+                        </HTextButton>
+                        <HTextButton
+                            Type="HTextButton.ButtonType.Secondary"
+                            OnClick="@(() => ToggleComments(item.FeedId))">
+                            @item.CountComment 댓글
+                        </HTextButton>
+                    </div>
+                    <!-- 본문(캡션)을 보여주는 부분 -->
+                    @if (!string.IsNullOrWhiteSpace(item.Body))
+                    {
+                        <div class="feed-caption-container">
+                            <HText TextType="HText.HTextType.Body1" TextColorType="HText.HTextColorType.Base">@item.Body</HText>
+                        </div>
+                    }
+                </footer>   
+
+                <!-- 댓글 목록 표시부 -->
+                @if (_feedComments.TryGetValue(item.FeedId, out var comments))
+                {
+                    if (comments.Count == 0)
+                    {
+                        <!-- 댓글이 없는 경우 -->
+                        <HNotingText Title="(;-;)" SubTitle="No comment found!" Compare="@comments"/>
+                    }
+                    else
+                    {
+                        <!-- 댓글이 있는 경우 -->
+                        <HColumn Border="none; border-top: 1px solid #dbdbdb;" Padding="1rem" Gap="0.5rem">
+                            @foreach (var comment in comments)
+                            {
+                                <HRow Gap="0.5rem">
+                                    <div class="profile-pic">
+                                        <img src=@(comment.ProfileImage + "?" + Configuration.GetConnectionString("BlobStorageToken")) alt="profile"/>
+                                    </div>
+                                    <HColumn>
+                                        <HTextButton Type="HTextButton.ButtonType.Secondary"
+                                                     OnClick="@(() => NavigateToProfile(item.CreatorUserId))">
+                                            @comment.Username
+                                        </HTextButton>
+                                        <HText TextType="HText.HTextType.Caption" TextColorType="HText.HTextColorType.Disabled">@Common.GetTimeElapsedText(comment.CreatedAt)</HText>
+                                    </HColumn>
+                                    <HText TextType="HText.HTextType.Body1">@comment.Content</HText>
+                                </HRow>
+                            }
+                        </HColumn>
+                    }
+
+                    <!-- 댓글 추가 UI -->
+                    <HRow Padding="1rem" Gap="0.5rem">
+                        <HTextInput PlaceHolder="댓글 입력" @bind-Value="@_commentText">
+                            <HTextButton OnClick="@(() => HandleSubmitComment(item.FeedId))">등록</HTextButton>
+                        </HTextInput>
+                    </HRow>
+                }
+            </section>
+        }
+    }
+</div>
+
+<HAlertContainer @ref="_alertContainer" />
+
+@code {
+    private int _userId;
+    private string _username;
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthState { get; set; }
+    
+    private List<FeedModel> _feedModels = new();
+    private string _searchText = "";
+    private List<UserModel> _searchResults = new();
+
+    private string _commentText = "";
+    private HAlertContainer? _alertContainer;
+    
+    // 드래그 상태 처리용
+    private bool _isDragging;
+    private double _startX;
+    private double _currentX;
+    
+    // 드래그 중에 보여줄 오프셋(translateX에 사용)
+    private double _dragOffset;
+
+    // 실제 피드목록에서 이미지 인덱스를 관리하는 방식(예: item.CurrentImageIndex 등)
+    // 여기서는 단일 예시를 위해 currentImageIndex만 사용
+    private int currentImageIndex = 0;
+    
+    // (가정) 이미지 목록
+    private Dictionary<long, List<string>> feedPhotoUrls = new();
+    private Dictionary<long, List<string>> feedShortUrls = new();
+
+    // 현재 인덱스, 드래그 상태 등을 피드별로 저장
+    private Dictionary<long, int> feedCurrentIndex = new();
+    private Dictionary<long, bool> isDragging = new();
+    private Dictionary<long, double> startX = new();
+    private Dictionary<long, double> currentX = new();
+    private Dictionary<long, double> feedDragOffset = new();
+
+    
+    // 각 피드 ID별로 댓글 리스트를 저장하는 딕셔너리
+    private Dictionary<int, List<FeedCommentModel>> _feedComments = new();
+    
+    // 날아오를 하트 리스트를 관리하는 모델
+    private record FlyingHeartInfo(int Id, double LeftPercentage, double AnimationDuration);
+
+    // 실제로 하트를 그릴 리스트
+    private List<FlyingHeartInfo> hearts = new();
+    private int _heartIdCounter = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _userId = Convert.ToInt32(await Common.GetClaimValueAsync(AuthState, "sid") ?? "0");
+        _username = await Common.GetClaimValueAsync(AuthState, "name") ?? "잘못된사용자";
+
+        await base.OnInitializedAsync();
+        _feedModels = await FeedService.GetFeedsBySubscription(_userId);
+        
+        // TODO _feedModels를 기반으로 feedPhotoUrls를 만든다
+        
+        // feedPhotoUrls를 초기화
+        feedPhotoUrls = new Dictionary<long, List<string>>();
+        feedShortUrls = new Dictionary<long, List<string>>();
+        
+        // 각 피드별 IsLiked, 댓글 수, PhotoUrls 등을 가져온 후 feedPhotoUrls에 저장
+        foreach (var feed in _feedModels)
+        {
+            bool isLiked = await FeedService.GetLikeFeedAsync(_userId, feed.FeedId);
+            feed.IsLiked = isLiked;
+            feed.CountComment = await FeedService.GetFeedCommentCountAsync(feed.FeedId);
+        
+            // 앨범 사진 목록 가져오기
+            feed.PhotoUrls = await FeedService.GetFeedsAlbumPhotoAsync(feed.FeedId);
+            
+            // 앨범 쇼츠 목록 가져오기
+            feed.ShortUrls = await FeedService.GetFeedsAlbumShortAsync(feed.FeedId);
+        
+            // TODO: _feedModels를 기반으로 feedPhotoUrls를 만든다
+            //      → feedPhotoUrls[피드ID] = 피드의 사진 목록
+            feedPhotoUrls[feed.FeedId] = feed.PhotoUrls ?? new List<string>();
+            feedShortUrls[feed.FeedId] = feed.ShortUrls ?? new List<string>();
+
+            feed.Medias = await FeedService.GetFeedMediasAsync(feed.FeedId);
+        }
+        
+        foreach (var feedId in feedPhotoUrls.Keys)
+        {
+            feedCurrentIndex[feedId] = 0;
+            isDragging[feedId] = false;
+            startX[feedId] = 0;
+            currentX[feedId] = 0;
+            feedDragOffset[feedId] = 0;
+        }
+        
+    }
+
+    private void OnInputChange(ChangeEventArgs e)
+    {
+        // 사용자가 입력한 텍스트를 직접 변수에 대입
+        _searchText = e.Value?.ToString() ?? "";
+
+        // 이후 원하는 로직(예: 검색, 필터링 등)을 직접 호출
+        // SearchUsers(_searchText);
+    }
+    
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                // 검색 결과 처리
+                _searchResults = await UserService.SearchUsersAsync(_searchText);
+            }
+            else
+            {
+                _searchResults.Clear();
+            }
+        }
+    }
+    
+    private async Task HandleSearchClick()
+    {
+        if (!string.IsNullOrWhiteSpace(_searchText))
+        {
+            _searchResults = await UserService.SearchUsersAsync(_searchText);
+        }
+        else
+        {
+            _searchResults.Clear();
+        }
+    }
+    
+    private void NavigateToProfile(int userId)
+    {
+        // 클릭 시 /profile/{userId} 형식의 경로로 이동
+        NavigationManager.NavigateTo($"/profile/{userId}");
+    }
+    
+    // 예시로, 좋아요 버튼을 클릭하면 하트가 날아오르도록 하는 메서드
+    private async void HandleLike(FeedModel feed)
+    {
+        // 토글 전 상태 저장
+        bool wasLiked = feed.IsLiked;
+       
+        // 서버 API 호출(예: 좋아요 추가/삭제) - 실제 구현은 FeedService 등에서 진행
+        await FeedService.ToggleLikeFeedAsync(_userId, feed.FeedId);
+       
+        // 토글 처리
+        feed.IsLiked = !wasLiked;
+       
+        // LikeCount 변경
+        if (feed.IsLiked)
+        {
+            feed.LikeCount++;
+        }
+        else
+        {
+            feed.LikeCount--;
+        }
+        
+        // 토글 후 다시 좋아요 여부 확인
+        feed.IsLiked = await FeedService.GetLikeFeedAsync(_userId, feed.FeedId);
+
+        if (feed.IsLiked)
+        {
+            await AlarmService.CreateAlarm(feed.CreatorUserId,"LIKE", $"{_username} 님이 사진을 좋아합니다.");
+        }
+        
+        StateHasChanged();
+    }
+    
+    private async Task ToggleComments(int feedId)
+    {
+        // 이미 해당 피드 댓글을 불러왔다면 다시 불러오지 않음(필요하면 항상 재조회 가능).
+        if (!_feedComments.ContainsKey(feedId))
+        {
+            var comments = await FeedService.GetFeedCommentsAsync(feedId);
+            _feedComments[feedId] = comments;
+        }
+        else
+        {
+            _feedComments.Remove(feedId);
+        }
+    }
+
+    private async Task HandleSubmitComment(int feedId)
+    {
+        if (String.IsNullOrEmpty(_commentText))
+        {
+            _alertContainer?.ShowAlert(new HAlertModel
+            {
+                Title = "댓글 등록 실패",
+                Subtitle = "댓글 내용이 없습니다.",
+                Type = HAlert.AlertType.Error
+            });
+
+            return;
+        }
+        
+        // 기존에 키가 없을 수도 있으므로 확인 후 새로 생성
+        if (!_feedComments.TryGetValue(feedId, out var commentList))
+        {
+            commentList = new List<FeedCommentModel>();
+            _feedComments[feedId] = commentList;
+        }
+
+        bool isSuccess = await FeedService.AddFeedCommentAsync(feedId, _commentText, _userId);
+
+        if (isSuccess)
+        {
+            List<FeedCommentModel> newComments = await FeedService.GetFeedCommentsAsync(feedId);
+            _feedComments[feedId] = newComments;
+            
+            _alertContainer.ShowAlert(new HAlertModel 
+            {
+                Title = "등록", 
+                Subtitle = "등록이 성공적으로 처리되었습니다.", 
+                Type = HAlert.AlertType.Success 
+            });
+
+            _commentText = string.Empty;
+            
+            StateHasChanged();
+        }
+        else
+        {
+            _alertContainer?.ShowAlert(new HAlertModel
+            {
+                Title = "댓글 등록 실패",
+                Subtitle = "댓글을 등록 수 없습니다.",
+                Type = HAlert.AlertType.Error
+            });
+        }
+    }
+    
+    private void MoveToPrevMedia(FeedModel item)
+    {
+        if (item.CurrentMediaIndex > 0)
+            item.CurrentMediaIndex--;
+    }
+
+
+    private void MoveToNextMedia(FeedModel item)
+    {
+        if (item.CurrentMediaIndex < item.Medias.Count - 1)
+            item.CurrentMediaIndex++;
+    }
+    
+    // 마우스 다운 시점에 시작좌표 기록
+    private void OnMouseDown(FeedModel feed, MouseEventArgs e)
+    {
+        isDragging[feed.FeedId] = true;
+        startX[feed.FeedId] = e.ClientX;
+        currentX[feed.FeedId] = e.ClientX;
+        feedDragOffset[feed.FeedId] = 0;
+    }
+
+    // 마우스 이동 시 오프셋 계산
+    private void OnMouseMove(FeedModel feed, MouseEventArgs e)
+    {
+        if (!isDragging[feed.FeedId]) return;
+
+        currentX[feed.FeedId] = e.ClientX;
+        feedDragOffset[feed.FeedId] = currentX[feed.FeedId] - startX[feed.FeedId];
+    }
+
+    // 마우스 업 시점에 최종 인덱스 계산
+    private void OnMouseUp(FeedModel feed, MouseEventArgs e)
+    {
+        if (!isDragging[feed.FeedId]) return;
+
+        isDragging[feed.FeedId] = false;
+        var totalDelta = currentX[feed.FeedId] - startX[feed.FeedId];
+
+        // 드래그 거리가 50px 이상이면 이전/다음 이미지
+        if (totalDelta > 50)
+        {
+            // 이전
+            MoveToPrevMedia(feed);
+            // if (feedCurrentIndex[feed.FeedId] > 0) feedCurrentIndex[feed.FeedId]--;
+        }
+        else if (totalDelta < -50)
+        {
+            // 다음
+            MoveToNextMedia(feed);
+            // if (feedCurrentIndex[feed.FeedId] < (feedPhotoUrls[feed.FeedId].Count - 1)) 
+            //     feedCurrentIndex[feed.FeedId]++;
+        }
+
+        // 오프셋 복원
+        feedDragOffset[feed.FeedId] = 0;
+        StateHasChanged();
+    }
+
+    // 터치 이벤트도 동일한 논리
+    private void OnTouchStart(FeedModel feed, TouchEventArgs e)
+    {
+        isDragging[feed.FeedId] = true;
+        startX[feed.FeedId] = e.Touches[0].ClientX;
+        currentX[feed.FeedId] = e.Touches[0].ClientX;
+        feedDragOffset[feed.FeedId] = 0;
+    }
+
+    private void OnTouchMove(FeedModel feed, TouchEventArgs e)
+    {
+        if (!isDragging[feed.FeedId]) return;
+
+        currentX[feed.FeedId] = e.Touches[0].ClientX;
+        feedDragOffset[feed.FeedId] = currentX[feed.FeedId] - startX[feed.FeedId];
+    }
+
+    private void OnTouchEnd(FeedModel feed, TouchEventArgs e)
+    {
+        OnMouseUp(feed, null); // 로직 재활용
+    }
+}

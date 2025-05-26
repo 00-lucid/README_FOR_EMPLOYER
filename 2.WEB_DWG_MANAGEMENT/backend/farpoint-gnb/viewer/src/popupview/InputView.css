@@ -1,0 +1,111 @@
+.InputViewFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: visible;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}
+
+.InputView {
+    position: absolute;
+    left: calc((100% - 380px) / 2);
+    top: calc((100% - 210px) / 2);
+    width: 380px;
+    height: 160px;
+    background-color: var(--Dialogue-background);
+    border-radius: 6px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    padding-bottom: 10px;
+    pointer-events: all;
+    color: var(--Text-Normal);
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.InputView .Titlebar {
+    background-color: var(--Dialogue-Titlebar-background);
+    position: relative;
+    height: 30px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: 6px 0px 0px 0px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.3);
+}
+
+.InputView .Text {
+    top: 0px;
+    width: 100%;
+    text-align: center;
+}
+
+.InputView .CancelButton {
+    position: absolute;
+    top: 110px;
+    left: 10px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    color: var(--Text-Normal);
+}
+.InputView .CancelButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.InputView .CancelButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.InputView .SaveButton {
+    position: absolute;
+    top: 110px;
+    left: 196px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.InputView .DisabledSaveButton {
+    position: absolute;
+    top: 110px;
+    left: 196px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Button-Disable);
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+
+.InputView .SaveButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.InputView .SaveButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.InputView .SelectedLabel {
+    color: var(--Text-Normal);
+}
+
+.InputView .NormalLabel {
+    color: var(--Text-Normal);
+}
+
+.InputView #InputView {
+    position: absolute;
+    top: 45px;
+    left: 15px;
+    width: 348px;
+    height: 40px;
+}

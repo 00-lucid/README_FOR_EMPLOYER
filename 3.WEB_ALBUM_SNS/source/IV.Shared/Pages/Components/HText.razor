@@ -1,0 +1,206 @@
+﻿@inherits ComponentBase
+
+<!-- 
+   사용 예시:
+   <HText TextType="HTextType.Heading1" 
+          TextAlign="HTextAlign.Center"
+          TextColorType="HTextColorType.Primary"
+          TextTransform="HTextTransform.Uppercase"
+          TextWrap="HTextWrap.Truncate">
+     게시물 제목
+   </HText>
+-->
+
+<div class="@ClassName">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// 글자 스타일 종류
+    /// </summary>
+    public enum HTextType
+    {
+        Heading1,
+        Heading2,
+        Heading3,
+        Heading4,
+        Heading5,
+        Heading6,
+        Subtitle1,
+        Subtitle2,
+        Body1,
+        Body2,
+        Button,
+        Caption,
+        Overline,
+        Display1,
+        Display2,
+        Display3,
+        Display4,
+        Display5,
+        Display6
+    }
+
+    /// <summary>
+    /// 정렬 방법
+    /// </summary>
+    public enum HTextAlign
+    {
+        Center,
+        Left,
+        Right,
+        Start,
+        End,
+        Justify
+    }
+
+    /// <summary>
+    /// 색상 종류
+    /// </summary>
+    public enum HTextColorType
+    {
+        Primary,
+        Secondary,
+        Base,
+        Tertiary,
+        Disabled,
+        Constrast,
+        Info,
+        Success,
+        Error,
+        Warning
+    }
+
+    /// <summary>
+    /// 글자 변환 (대소문자)
+    /// </summary>
+    public enum HTextTransform
+    {
+        Capitalized,
+        Uppercase,
+        Lowercase
+    }
+
+    /// <summary>
+    /// 텍스트 줄바꿈 옵션
+    /// </summary>
+    public enum HTextWrap
+    {
+        Wrap,
+        NotWrap,
+        Truncate
+    }
+
+    /// <summary>
+    /// 글자 스타일 파라미터
+    /// </summary>
+    [Parameter] public HTextType TextType { get; set; } = HTextType.Body1;
+
+    /// <summary>
+    /// 정렬 파라미터
+    /// </summary>
+    [Parameter] public HTextAlign TextAlign { get; set; } = HTextAlign.Left;
+
+    /// <summary>
+    /// 색상 타입 파라미터
+    /// </summary>
+    [Parameter] public HTextColorType TextColorType { get; set; } = HTextColorType.Base;
+
+    /// <summary>
+    /// 텍스트 변환 파라미터
+    /// </summary>
+    [Parameter] public HTextTransform TextTransform { get; set; } = HTextTransform.Capitalized;
+
+    /// <summary>
+    /// 텍스트 줄바꿈 파라미터
+    /// </summary>
+    [Parameter] public HTextWrap TextWrap { get; set; } = HTextWrap.Wrap;
+
+    /// <summary>
+    /// 추가로 스타일이나 CSS 클래스를 더 붙이고 싶을 때
+    /// </summary>
+    [Parameter] public string? CustomClass { get; set; }
+
+    /// <summary>
+    /// 내부 렌더링할 블록(텍스트 등)
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 새롭게 추가될 공통 Class 파라미터
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+    
+    /// <summary>
+    /// 전체 클래스명 결정
+    /// </summary>
+    private string ClassName
+        => $"{GetTextTypeClass(TextType)} {GetTextAlignClass(TextAlign)} {GetTextColorClass(TextColorType)} {GetTextTransformClass(TextTransform)} {GetTextWrapClass(TextWrap)} {CustomClass} {Class}".Trim();
+
+    private string GetTextTypeClass(HTextType type) => type switch
+    {
+        HTextType.Heading1  => "htxt-heading1",
+        HTextType.Heading2  => "htxt-heading2",
+        HTextType.Heading3  => "htxt-heading3",
+        HTextType.Heading4  => "htxt-heading4",
+        HTextType.Heading5  => "htxt-heading5",
+        HTextType.Heading6  => "htxt-heading6",
+        HTextType.Subtitle1 => "htxt-subtitle1",
+        HTextType.Subtitle2 => "htxt-subtitle2",
+        HTextType.Body1     => "htxt-body1",
+        HTextType.Body2     => "htxt-body2",
+        HTextType.Button    => "htxt-button",
+        HTextType.Caption   => "htxt-caption",
+        HTextType.Overline  => "htxt-overline",
+        HTextType.Display1  => "htxt-display1",
+        HTextType.Display2  => "htxt-display2",
+        HTextType.Display3  => "htxt-display3",
+        HTextType.Display4  => "htxt-display4",
+        HTextType.Display5  => "htxt-display5",
+        HTextType.Display6  => "htxt-display6",
+        _                   => "htxt-body1"
+    };
+
+    private string GetTextAlignClass(HTextAlign align) => align switch
+    {
+        HTextAlign.Center  => "t-align-center", 
+        HTextAlign.Left    => "t-align-left",
+        HTextAlign.Right   => "t-align-right",
+        HTextAlign.Start   => "t-align-start",
+        HTextAlign.End     => "t-align-end",
+        HTextAlign.Justify => "t-align-justify",
+        _                  => "t-align-left"
+    };
+
+    private string GetTextColorClass(HTextColorType color) => color switch
+    {
+        HTextColorType.Primary   => "t-color-primary",
+        HTextColorType.Secondary => "t-color-secondary",
+        HTextColorType.Base      => "t-color-base",
+        HTextColorType.Tertiary  => "t-color-tertiary",
+        HTextColorType.Disabled  => "t-color-disabled",
+        HTextColorType.Constrast => "t-color-constrast",
+        HTextColorType.Info      => "t-color-info",
+        HTextColorType.Success   => "t-color-success",
+        HTextColorType.Error     => "t-color-error",
+        HTextColorType.Warning   => "t-color-warning",
+        _                        => "t-color-base"
+    };
+
+    private string GetTextTransformClass(HTextTransform transform) => transform switch
+    {
+        HTextTransform.Capitalized => "t-text-capitalized",
+        HTextTransform.Uppercase   => "t-text-uppercase",
+        HTextTransform.Lowercase   => "t-text-lowercase",
+        _                          => ""
+    };
+
+    private string GetTextWrapClass(HTextWrap wrap) => wrap switch
+    {
+        HTextWrap.Wrap    => "t-wrap",
+        HTextWrap.NotWrap => "t-not-wrap",
+        HTextWrap.Truncate => "t-truncate",
+        _                 => "t-wrap"
+    };
+}

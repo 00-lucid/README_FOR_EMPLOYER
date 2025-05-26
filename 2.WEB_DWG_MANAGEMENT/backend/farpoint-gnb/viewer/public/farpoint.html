@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="/crypto-js.min.js"></script>
+        <script>
+            function encrypt(source) {
+                const secret = CryptoJS.enc.Utf8.parse('d4g7u2db7g0l2r1dhy3svgt871segu09')
+
+                const opt = { iv: CryptoJS.enc.Utf8.parse(''), padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
+                const encrypted = CryptoJS.AES.encrypt(source, secret, opt).toString()
+
+                return encodeURIComponent(encrypted)
+            }
+        </script>
+    </head>
+    <body>
+        <script>
+            const urlParams = new URLSearchParams(window.location.search)
+            const userId = urlParams.get('userId')
+
+            if (userId === null) {
+                alert('userId is Null')
+            } else {
+                window.location.href = '/index.html?user=' + encrypt(userId)
+            }
+        </script>
+    </body>
+</html>

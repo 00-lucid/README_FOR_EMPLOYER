@@ -1,0 +1,57 @@
+﻿@using System
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Model
+@inject IAlarmService AlarmService
+
+@* 필요하다면 감싸는 컨테이너 하나를 추가 *@
+<div class="alarm-container">
+    <h3 class="alarm-header">알림</h3>
+    <div class="alarm-list">
+        @if (Alarms == null || !Alarms.Any())
+        {
+            <div class="alarm-empty">새로운 알림이 없습니다.</div>
+        }
+        else
+        {
+            @foreach (var alarm in Alarms)
+            {
+                <div class="alarm-item">
+                    <div class="alarm-title">@alarm.Message</div>
+                    <div class="alarm-timestamp">
+                        @alarm.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        foreach (AlarmModel alarm in Alarms)
+        {
+            if (!alarm.IsRead)
+            {
+                await AlarmService.UpdateAlarmReadByAlarmId(alarm.AlarmId);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 상위에서 전달받은 알람 목록을 렌더링합니다.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<AlarmModel>? Alarms { get; set; }
+
+    // 필요하다면 서비스 주입 등을 통해 알람 데이터를 직접 불러올 수도 있습니다.
+    // [Inject]
+    // IAlarmService? AlarmService { get; set; }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     // 예: if (AlarmService is not null)
+    //     //         Alarms = await AlarmService.GetAlarmsAsync();
+    // }
+}

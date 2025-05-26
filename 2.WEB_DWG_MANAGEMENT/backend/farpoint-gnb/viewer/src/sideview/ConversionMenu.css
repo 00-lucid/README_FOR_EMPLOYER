@@ -1,0 +1,25 @@
+.view {
+    color: #464646;
+}
+
+.pld {
+    color: white;
+}
+
+.view.bottom-right {
+    background: linear-gradient(-45deg, transparent 9px, #f4f6fc 0);
+}
+.pld.bottom-right {
+    background: linear-gradient(-45deg, transparent 9px, #2d688f 0);
+}
+
+.side-button {
+    font-size: 0.5rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 70px;
+    cursor: pointer;
+}

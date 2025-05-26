@@ -1,0 +1,26 @@
+.TextField > input {
+    position: absolute;
+    width: calc(100% - 20px);
+    height: 100%;
+    border-radius: 8px;
+    border: solid 1px var(--Component-Border);
+    background-color: var(--Component-Background);
+    font-size: 14px;
+    color: var(--Component-Stroke);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.TextField > input:hover {
+    background-color: var(--Component-Background-Hover);
+}
+.TextField > input:active {
+    background-color: var(--Component-Background-Active);
+}
+.TextField > input:focus {
+    border: solid 2px var(--Component-Active);
+    outline: none;
+}
+.TextField > input::placeholder {
+    color: var(--Component-Disable);
+}

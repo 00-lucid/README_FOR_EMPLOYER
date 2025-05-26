@@ -1,0 +1,9 @@
+.form-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.error-message {
+    color: var(--error-color); /* 에러 메시지 색상 수정 */
+    font-weight: bold;
+}

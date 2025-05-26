@@ -1,0 +1,205 @@
+﻿@page "/credit-recharge"
+@using IV.Shared.Pages.Components
+
+<!-- 
+   1. 상단 배너 (필요 시 해제)
+   2. 사용자 정보 (프로필, 보유 크레딧, 내역 보기 - 필요 시 해제)
+   3. 상품 목록
+   4. 결제 모달
+   5. 하단 참고 안내
+-->
+
+<HLayoutScroll>
+    <HColumn IsBottomSpace="true">
+    <div class="page-container">
+        <!-- 예시) 상단 배너 
+        <section class="banner">
+            <img src="이벤트이미지.jpg" alt="이벤트 배너" />
+            <div class="banner-text">
+                <h2>한정 이벤트 추가 20% 증정!</h2>
+            </div>
+        </section>
+        -->
+
+        <section class="user-credit-section">
+            <div class="user-profile">
+                @* <img src="사용자프로필.jpg" alt="프로필 이미지" class="profile-image" /> *@
+                <div>
+                    <p class="username">@UserName</p>
+                    <p>보유: <strong>@CurrentCredit 개</strong></p>
+                </div>
+            </div>
+            <button @onclick="OpenChargeHistory" class="history-button">내역 보기</button>
+        </section>
+
+        <!-- 블루스타 상품 목록 -->
+        <section class="product-list">
+            @if (MixedProducts != null && MixedProducts.Count > 0)
+            {
+                @foreach (var item in VisibleProducts)
+                {
+                    <div class="product-card @(item.IsPopular ? "popular-product" : "") @GetBackgroundClass(item)
+                 @(IsSelectedProduct(item) ? " selected-product-card" : "")"
+                         @onclick="@(() => SelectProduct(item))">
+                        <div class="product-header">
+                            <h4>@item.Name</h4>
+                            @if (item.IsPopular)
+                            {
+                                <span class="badge">인기</span>
+                            }
+                        </div>
+                        <p class="price">@item.Price.ToString("N0") 원</p>
+                    </div>
+                }
+            }
+        </section>
+
+        @if (HasMoreToLoad)
+        {
+            <button class="more-button" @onclick="LoadMoreProducts">더보기</button>
+        }
+
+        <!-- 선택한 상품 정보 및 결제 버튼 섹션 -->
+        @if (SelectedProduct != null)
+        {
+            <section class="selected-product-info">
+                <h3>선택한 상품: @SelectedProduct.Name</h3>
+                <p>가격: @SelectedProduct.Price.ToString("N0") 원</p>
+                
+                <HAccordion Items="PaymentAccordionItems" IsSingleSelection="true"/>
+                
+                <button @onclick="ConfirmPayment">결제하기</button>
+            </section>
+        }
+
+
+        <!-- 하단 정보 -->
+        <footer class="footer-info">
+            <p>
+                충전된 크레딧은 환불이 제한될 수 있으며, 자세한 내용은
+                <a href="/terms" target="_blank">이용약관</a>을 참고하세요.
+            </p>
+            <p>
+                문의 사항이 있으시면 <a href="/faq" target="_blank">FAQ</a> 또는 고객센터를 이용하세요.
+            </p>
+        </footer>
+    </div>
+    </HColumn>
+</HLayoutScroll>
+@code {
+    // (예시) 사용자 정보
+    private string UserName = "홍길동";
+    private string UserRank = "VIP";
+    private decimal CurrentCredit = 3200;
+
+    // 상품 컬렉션
+    private List<BSProduct> MixedProducts { get; set; } = new();
+    private Product? SelectedProduct;
+    private bool ShowOtherPayOptions = false;
+    private string SelectedPaymentMethod = "Card";
+
+    private List<HAccordion.AccordionItem> PaymentAccordionItems { get; set; } = new();
+    
+    // 처음 표시할 개수
+    private int MaxVisibleCount = 10; // 예: 초기 10개까지만 표시
+
+    // 표시 대상
+    private IEnumerable<BSProduct> VisibleProducts => MixedProducts.Take(MaxVisibleCount);
+
+    // 추가 로딩 여부 확인
+    private bool HasMoreToLoad => MixedProducts.Count > MaxVisibleCount;
+
+    protected override void OnInitialized()
+    {
+        // 블루스타 상품 데이터 (표를 참고)
+        MixedProducts = new List<BSProduct>
+        {
+            new BSProduct { Name = "BS 100개",    Price =  1900,    IsPopular = false }, // 19원 * 100
+            new BSProduct { Name = "BS 1,000개",  Price = 18500,    IsPopular = true  }, // ~3% 할인
+            new BSProduct { Name = "BS 3,000개",  Price = 54000,    IsPopular = false }, // ~5% 할인
+            new BSProduct { Name = "BS 6,000개",  Price = 105000,   IsPopular = false }, // ~8% 할인
+            new BSProduct { Name = "BS 12,000개", Price = 204000,   IsPopular = true  }, // ~11% 할인
+        };
+
+        SelectedProduct = MixedProducts.FirstOrDefault(p => p.Name == "BS 1,000개");
+        
+        // 예시로 세 개의 섹션(신용카드∙간편결제∙휴대폰결제)을 준비
+        PaymentAccordionItems = new List<HAccordion.AccordionItem>() {
+            new HAccordion.AccordionItem {
+                Title = "신용카드",
+                Content = @<div>신용카드 결제 옵션, 카드번호 입력창 등</div>
+            },
+            new HAccordion.AccordionItem {
+                Title = "간편결제",
+                Content = @<div>카카오페이, 네이버페이 등 간편결제 관련 정보</div>
+            },
+            new HAccordion.AccordionItem {
+                Title = "휴대폰결제",
+                Content = @<div>휴대폰 소액 결제 관련 정보, 인증 과정 등</div>
+            }
+        };
+        
+        base.OnInitialized();
+    }
+
+    private string GetBackgroundClass(BSProduct product)
+    {
+        // 상품 개수에 따른 분기(예시)
+        return product.Name switch
+        {
+            "BS 100개"    => "bs-100",
+            "BS 1,000개"  => "bs-1000",
+            "BS 3,000개"  => "bs-3000",
+            "BS 6,000개"  => "bs-6000",
+            "BS 12,000개" => "bs-12000",
+            _ => ""
+        };
+    }
+    
+    // 더 보기 버튼
+    private void LoadMoreProducts()
+    {
+        // 3개씩 추가 로딩
+        MaxVisibleCount += 3;
+    }
+    
+    private void SelectProduct(Product item)
+    {
+        SelectedProduct = item;
+    }
+
+    // 내역 보기 (선택)
+    private void OpenChargeHistory()
+    {
+        // 내역 보기 로직
+    }
+
+    // 부모 클래스
+    public class Product
+    {
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; } = 0;
+        public bool IsEvent { get; set; } = false;
+    }
+
+    // 블루스타 상품
+    public class BSProduct : Product
+    {
+        public bool IsPopular { get; set; }
+    }
+    
+    private void ConfirmPayment()
+    {
+        if (SelectedProduct == null) return;
+
+        // 실 결제 처리 로직 (예: API 호출) ...
+        
+        // 예시) 결제 완료 후 처리
+        SelectedProduct = null;  // 선택 상품 해제
+    }
+    
+    private bool IsSelectedProduct(BSProduct product)
+    {
+        return SelectedProduct == product;
+    }
+}

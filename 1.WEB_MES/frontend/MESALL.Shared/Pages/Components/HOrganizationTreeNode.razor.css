@@ -1,0 +1,204 @@
+﻿/* 조직 트리 노드 스타일 */
+.org-tree-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.organization-chart.horizontal .org-tree-node {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+/* 조직 카드 스타일 */
+.org-card {
+    width: 220px !important; /* 고정 너비 설정 및 우선순위 부여 */
+    height: 150px !important; /* 고정 높이 설정 및 우선순위 부여 */
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: all 0.3s;
+    margin: 1rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* 테두리와 패딩을 너비/높이에 포함시킴 */
+    min-width: 220px !important; /* 최소 너비 설정 및 우선순위 부여 */
+    min-height: 150px !important; /* 최소 높이 설정 및 우선순위 부여 */
+    max-width: 220px !important; /* 최대 너비 설정 및 우선순위 부여 */
+    max-height: 150px !important; /* 최대 높이 설정 및 우선순위 부여 */
+    flex: 0 0 auto !important; /* flex-grow: 0, flex-shrink: 0, flex-basis: auto 설정 */
+}
+
+.org-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    border-color: var(--primary-color);
+}
+
+.org-card.deleting {
+    border: 2px dashed var(--error-color);
+    opacity: 0.7;
+}
+
+.org-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--gray-300, #e2e8f0);
+    flex-shrink: 0; /* 축소되지 않도록 설정 */
+}
+
+.org-name {
+    font-weight: 500;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.org-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0; /* 축소되지 않도록 설정 */
+}
+
+.org-card-content {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden; /* 내용이 넘치면 숨김 */
+}
+
+.org-members-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.org-members-count i {
+    color: var(--primary-color);
+}
+
+.add-org-btn {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.organization-chart.horizontal .add-org-btn {
+    bottom: 50%;
+    left: auto;
+    right: -12px;
+    transform: translateY(50%);
+}
+
+.add-org-btn:hover {
+    background-color: var(--primary-600, #0056b3);
+}
+
+/* 자식 조직 컨테이너 */
+.org-children {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+    position: relative;
+    margin-top: 2rem;
+    width: auto; /* 너비를 자동으로 설정하여 자식 요소 크기에 맞춤 */
+}
+
+/* 수평 배치일 때 */
+.org-children.horizontal {
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 0;
+    margin-left: 2rem;
+    width: auto; /* 너비를 자동으로 설정하여 자식 요소 크기에 맞춤 */
+}
+
+.org-child-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 0 0 auto; /* flex-grow, flex-shrink를 0으로 설정 */
+}
+
+.org-children.horizontal .org-child-container {
+    flex-direction: row;
+    flex: 0 0 auto; /* flex-grow, flex-shrink를 0으로 설정 */
+}
+
+/* 버튼 스타일 */
+.icon-btn {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--disabled-color);
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background-color: var(--light-color);
+}
+
+.delete-btn:hover {
+    color: var(--error-color);
+}
+
+/* 삭제 중인 조직의 자식 노드도 삭제 상태로 표시 */
+.org-tree-node:has(> .org-card.deleting) .org-children .org-card {
+    border: 2px dashed var(--error-color);
+    opacity: 0.7;
+}
+
+/* 삭제 상태 카드의 툴팁 관련 스타일 */
+.org-card.deleting + .tooltip-content .tooltip-title {
+    color: var(--error-color);
+}
+
+.tooltip-container:has(.org-card.deleting) .tooltip-content {
+    border-color: var(--error-color);
+}
+
+.tooltip-container:has(.org-card.deleting) .tooltip-arrow {
+    border-color: var(--error-color);
+}
+
+/* 되돌리기 버튼 스타일 */
+.restore-btn {
+    color: var(--primary-color);
+}
+
+.restore-btn:hover {
+    color: var(--primary-600);
+    background-color: var(--primary-100);
+}

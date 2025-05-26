@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\IV.Shared\IV.Shared.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Azure.AI.Vision.Face" Version="1.0.0-beta.2" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="wwwroot\_content\IV.Shared\images\8ff05791-5079-46f9-bb87-2e8bd7098d4e_다운로드 (2).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\8ca3a6e1-21bc-4710-954c-65b96d3c642f_images (12).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\74fe670b-d254-4e30-ac40-7a5548d87a11_images.jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\629a656f-af01-4559-8044-0040387b0091_images (11).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\565013d1-39fb-4e48-8378-c30ac95b69f0_다운로드 (1).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\34d0d8e4-db21-4ca0-a184-ad7d27d0affd_images (2).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\01397bd1-b00d-4206-adca-72398781cdce_다운로드 (4).jpg" />
+      <Content Remove="wwwroot\_content\IV.Shared\images\d1bbaa76-3833-41a7-8926-d20d6a119fc6_다운로드 (3).jpg" />
+    </ItemGroup>
+
+</Project>

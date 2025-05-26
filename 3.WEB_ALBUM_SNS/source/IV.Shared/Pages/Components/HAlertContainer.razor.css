@@ -1,0 +1,11 @@
+﻿.alert-container {
+    position: fixed; /* 화면 고정 위치 결정 */
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+
+    /* 여러 개의 알림을 세로로 쌓이게 */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

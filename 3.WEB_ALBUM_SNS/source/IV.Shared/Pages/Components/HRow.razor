@@ -1,0 +1,40 @@
+@inherits LayoutComponentBase
+
+<div class="@Class" style="@InlineStyle">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string Gap { get; set; } = "0"; // 자식 요소 간 거리 (기본값: 0px)
+
+    [Parameter]
+    public string AlignItems { get; set; } = "stretch"; // align-items 기본값
+
+    [Parameter]
+    public string JustifyContent { get; set; } = "flex-start"; // justify-content 기본값
+
+    [Parameter]
+    public bool IsWrapped { get; set; } = false; // flex-wrap 옵션 추가
+
+    [Parameter]
+    public string Padding { get; set; } = "0"; // 패딩 옵션 추가
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } // 자식 요소
+
+    [Parameter]
+    public string? Class { get; set; }
+    
+    private string InlineStyle => string.Join(" ", new string?[]
+    {
+        "display: flex;",
+        "width: 100%;",
+        "flex-direction: row;",
+        $"flex-wrap: {(IsWrapped ? "wrap" : "nowrap")};",
+        $"gap: {Gap};",
+        $"align-items: {AlignItems};",
+        $"justify-content: {JustifyContent};",
+        $"padding: {Padding};" // 패딩 스타일 추가
+    }.Where(style => !string.IsNullOrEmpty(style)));
+}

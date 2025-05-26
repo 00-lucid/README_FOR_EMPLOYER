@@ -1,0 +1,24 @@
+.NotiorderTreeViewComponent {
+    position: absolute;
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.NotiorderTreeViewComponent::-webkit-scrollbar {
+    display: none;
+}
+
+.NotiorderTreeViewComponent .TreeViewItem {
+    position: absolute;
+    width: 100%;
+    transition: all 0.2s ease-out;
+}
+
+.NotiorderTreeViewComponent .TreeViewItem .Children {
+    position: absolute;
+    overflow: hidden;
+    transition: all 0.2s ease-out, background-color 0s;
+    width: 100%;
+}

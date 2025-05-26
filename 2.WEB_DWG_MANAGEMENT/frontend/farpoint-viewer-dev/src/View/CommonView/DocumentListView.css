@@ -1,0 +1,31 @@
+.ListView .CommonComponent {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 40px;
+}
+
+.ListView .checkBoxItem {
+    height: 30px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ListView .checkBoxItem span {
+    margin-left: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 270px;
+}
+
+.ListView .checkBoxItem.popup {
+    height: 50px;
+}
+
+.ListView .checkBoxItem.popup span {
+    width: 410px;
+}

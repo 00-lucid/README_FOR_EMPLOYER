@@ -1,0 +1,104 @@
+sid : 사번
+pass : 패스워드
+sFunc : 태그
+sEquip : 설비번호
+
+gubun(LOGGUBUN)
+102 : 패스워드값이 없는 경우 (SSO)
+101 : 패스워드 있는 경우
+112 : 기능위치나 설비번호 값이 있는 경우
+
+====================================
+
+clientIp : Local IP
+
+//이력 있는지 체크
+select * from IDS_LOGIN_LOG where USERID=? and LOGDT =to_char(sysdate,'yyyy-MM-dd') and PLANTCODE=?
+
+//있음 업데이트
+update IDS_LOGIN_LOG set LOGCNT = LOGCNT+1
+where USERID=? and LOGDT=to_char(sysdate,'yyyy-MM-dd') and PLANTCODE=?
+
+//없음 인서트
+insert into IDS_LOGIN_LOG(USERID, LOGDT, LOGCNT, PLANTCODE, PLANTNM, GUBUN) values
+(?,to_char(sysdate,'yyyy-MM-dd'),1,?,?,?)
+
+insert into IDS_USER_HISTORY(USERID, LOGDT,LOGTIME, LOGGUBUN, LOGIP, PLANTCODE, PLANTNM) values
+(?,to_char(sysdate,'yyyy-MM-dd'),to_char(sysdate,'hh24:mi:ss'),?,?,?,?)
+
+================================================
+
+select A.USERID as USERID, A.PLV_ID as PLV_ID, B.PLV_NM as PLV_NM, A.MGRCD as MGRCD, A.ACLNO, A.USERNM as USERNM, A.START_DATE, A.END_DATE,
+C.DEPT_CODE as DEPT_CODE, C.DEPT_NAME as DEPT_NAME
+from IDS_USER A, IDS_PLV_M B, PT_INSA C where A.PLV_ID = B.PLV_ID and A.USERID = TRIM(C.PERNR)
+and A.USERID = ?
+
+================================================
+
+select a.PERNR,a.NAME as NAME, a.DEPT_CODE as TYPE, a.DEPT_CODE as DEPT_CODE,
+(select c.DEPT_NAME from PT_JOJIK c where c.DEPT_CODE=b.UP_CODE)||' '||b.DEPT_NAME as DEPT_NAME,
+a.JIKWI as JIKWI, a.CEL_TEL as CEL_TEL
+from PT_INSA a, PT_JOJIK b where a.DEPT_CODE = b.DEPT_CODE and  a.PERNR=?
+
+================================================
+
+DeptCode : PT_INSA테이블의 DEPT_CODE
+sAllPathDeptCode : 전체 부서 코드
+sAllSiteNM : 마지막 부서명(사업소명)
+
+        private void FullDeptCode(OleDbConnection conn, string DeptCode)
+        {
+            string sDept_Code = "", sUp_Code = "", sDept_Name = "";
+            sql = new StringBuilder();
+            sql.Append("select DEPT_CODE, UP_CODE, DEPT_NAME from PT_JOJIK where DEPT_CODE = '" + DeptCode + "' ");
+
+            using (OleDbCommand com = new OleDbCommand())
+            {
+                com.Connection = conn;
+                com.CommandText = sql.ToString();
+                com.Transaction = transaction;
+
+                using (OleDbDataReader reader = com.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        sDept_Code = reader["DEPT_CODE"].ToString();
+                        sUp_Code = reader["UP_CODE"].ToString();
+                        sDept_Name = reader["DEPT_NAME"].ToString();
+
+                        if (sUp_Code == "A000" || sUp_Code == "0000" || sUp_Code == "")
+                        {
+                            sAllPathDeptCode = sDept_Code + sAllPathDeptCode;
+                            sAllSiteNM = sDept_Name;
+                        }
+                        else
+                        {
+                            sAllPathDeptCode = sDept_Code + sAllPathDeptCode; ;
+                            FullDeptCode(conn, sUp_Code);
+                        }
+                    }
+                    else
+                    {
+                        sAllPathDeptCode = "9288";
+                        sAllSiteNM = "외부업무지원";
+                    }
+                }
+            }
+        }
+
+===================================================================
+
+//Seed 암호화
+//쿠키
+
+CK_User_ID : 사번
+CK_User_Name : 이름
+CK_PLV_ID : 사업소 조회 권한 ID
+CK_PLV_NM : 권한명
+CK_MGR : 관리자 권한
+CK_AUTHO : PLV_ID
+CK_SITE_ID : 사업소 ID
+CK_SITE_NM : 사업소명
+CK_DEPT_ID : 부서 ID
+CK_DEPT_NM : 부서명
+CK_Node : ACLNO

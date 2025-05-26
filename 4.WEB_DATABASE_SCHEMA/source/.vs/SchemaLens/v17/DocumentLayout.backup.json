@@ -1,0 +1,841 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\databaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\databaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\recommend.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\recommend.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\peersgroupdetail.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\peersgroupdetail.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\layout\\topmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\layout\\topmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\interfaces\\iauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\interfaces\\iauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\customauthenticationstateprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\customauthenticationstateprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\peerexamine.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\peerexamine.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\peeritemsection.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\peeritemsection.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\recommend.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\recommend.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\layout\\topmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\layout\\topmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\layout\\mainlayout.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\layout\\mainlayout.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\idatabaseaccesser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\idatabaseaccesser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\wwwroot\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\wwwroot\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\utils\\utils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\utils\\utils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\schemalens.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\schemalens.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\schemalens.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\schemalens.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\databaseaccesser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\databaseaccesser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\peerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\peerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\schemaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\schemaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\peersgroupservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\peersgroupservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\encyclopediaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\encyclopediaservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\keywordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\keywordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\peersgroupmappingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\peersgroupmappingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\searchlogservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\searchlogservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\sectionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\sectionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens\\services\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5C15CFC-4C78-470E-B114-583DB23115DB}|SchemaLens\\SchemaLens.csproj|solutionrelative:schemalens\\services\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\interfaces\\idatabaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\interfaces\\idatabaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\components\\pages\\home.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\components\\pages\\home.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\keywordmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\keywordmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\peermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\peermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\encyclopediamodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\encyclopediamodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\commentmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\commentmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\model\\columnmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\model\\columnmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\enums\\sectiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\enums\\sectiontype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\enums\\peertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\enums\\peertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\enums\\keywordtype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\enums\\keywordtype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|c:\\users\\gmin\\source\\repos\\schemalens\\schemalens.client\\enums\\authoritytype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2C6D3043-444B-4297-B641-813C90CA8DCF}|SchemaLens.Client\\SchemaLens.Client.csproj|solutionrelative:schemalens.client\\enums\\authoritytype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeersGroup.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SchemaLens.Client\\Components\\Pages\\PeersGroup.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SchemaLens.Client\\Components\\Pages\\Login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Routes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SchemaLens.Client\\Routes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "Login.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Login.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Login.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Login.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Login.razor",
+              "ViewState": "AgIAACoAAAAAAAAAAAAAAC4AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T08:47:59.951Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TopMenu.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\TopMenu.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Layout\\TopMenu.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\TopMenu.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Layout\\TopMenu.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T08:25:03.635Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Program.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Program.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Program.cs",
+              "RelativeToolTip": "SchemaLens\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:47:51.848Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "CustomAuthenticationStateProvider.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\CustomAuthenticationStateProvider.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\CustomAuthenticationStateProvider.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\CustomAuthenticationStateProvider.cs",
+              "RelativeToolTip": "SchemaLens\\CustomAuthenticationStateProvider.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAwwBsAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:15:30.759Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "Routes.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Routes.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Routes.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Routes.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Routes.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:39:28.691Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Recommend.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Recommend.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Recommend.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Recommend.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Recommend.razor",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABgAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T08:50:40.888Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "App.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Components\\App.razor",
+              "RelativeDocumentMoniker": "SchemaLens\\Components\\App.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Components\\App.razor",
+              "RelativeToolTip": "SchemaLens\\Components\\App.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:37:57.675Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "PeersGroup.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeersGroup.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\PeersGroup.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeersGroup.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\PeersGroup.razor",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACUAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-08T00:48:38.217Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DatabaseService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\DatabaseService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\DatabaseService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\DatabaseService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\DatabaseService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:25.191Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PeersGroupDetail.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeersGroupDetail.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\PeersGroupDetail.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeersGroupDetail.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\PeersGroupDetail.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-08T00:50:42.631Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\_Imports.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\_Imports.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\_Imports.razor",
+              "RelativeToolTip": "SchemaLens.Client\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:43:46.589Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Program.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Program.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Program.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:39:23.589Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MainLayout.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\MainLayout.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Layout\\MainLayout.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\MainLayout.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Layout\\MainLayout.razor",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAACgAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:47:57.894Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Home.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Home.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Home.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Home.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Home.razor",
+              "ViewState": "AgIAAO0AAAAAAAAAAAAAAAABAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:47:53.338Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "PeerExamine.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeerExamine.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\PeerExamine.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\PeerExamine.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\PeerExamine.razor",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-08T00:05:45.97Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IAuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Interfaces\\IAuthenticationService.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Interfaces\\IAuthenticationService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Interfaces\\IAuthenticationService.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Interfaces\\IAuthenticationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-08T00:11:43.109Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Recommend.razor.css",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Recommend.razor.css",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Recommend.razor.css",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Recommend.razor.css",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Recommend.razor.css",
+              "ViewState": "AgIAACoAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-01-07T08:52:52.115Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Components\\_Imports.razor",
+              "RelativeDocumentMoniker": "SchemaLens\\Components\\_Imports.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Components\\_Imports.razor",
+              "RelativeToolTip": "SchemaLens\\Components\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwoAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:37:55.046Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "PeerItemSection.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\PeerItemSection.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\PeerItemSection.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\PeerItemSection.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\PeerItemSection.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-08T00:10:49.85Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "AuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\AuthenticationService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\AuthenticationService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\AuthenticationService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\AuthenticationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:12:44.6Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "MainLayout.razor.css",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\MainLayout.razor.css",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Layout\\MainLayout.razor.css",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\MainLayout.razor.css",
+              "RelativeToolTip": "SchemaLens.Client\\Layout\\MainLayout.razor.css",
+              "ViewState": "AgIAAGAAAAAAAAAAAADwv24AAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-01-07T08:24:30.749Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Utils.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Utils\\Utils.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Utils\\Utils.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Utils\\Utils.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Utils\\Utils.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:08:36.346Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "TopMenu.razor.css",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\TopMenu.razor.css",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Layout\\TopMenu.razor.css",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Layout\\TopMenu.razor.css",
+              "RelativeToolTip": "SchemaLens.Client\\Layout\\TopMenu.razor.css",
+              "ViewState": "AgIAAEgAAAAAAAAAAABIwFsAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-01-07T08:26:37.502Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "app.css",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\wwwroot\\app.css",
+              "RelativeDocumentMoniker": "SchemaLens\\wwwroot\\app.css",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\wwwroot\\app.css",
+              "RelativeToolTip": "SchemaLens\\wwwroot\\app.css",
+              "ViewState": "AgIAABYAAAAAAAAAAADwvyEAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-01-07T08:43:31.102Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "IDatabaseAccesser.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\IDatabaseAccesser.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\IDatabaseAccesser.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\IDatabaseAccesser.cs",
+              "RelativeToolTip": "SchemaLens\\IDatabaseAccesser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:16:38.222Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "SchemaLens.csproj",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\SchemaLens.csproj",
+              "RelativeDocumentMoniker": "SchemaLens\\SchemaLens.csproj",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\SchemaLens.csproj",
+              "RelativeToolTip": "SchemaLens\\SchemaLens.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-01-07T07:38:48.787Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "SchemaLens.Client.csproj",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\SchemaLens.Client.csproj",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\SchemaLens.Client.csproj",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\SchemaLens.Client.csproj",
+              "RelativeToolTip": "SchemaLens.Client\\SchemaLens.Client.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvw0AAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-01-07T07:38:44.774Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Weather.razor",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Weather.razor",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Weather.razor",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Weather.razor",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Weather.razor",
+              "ViewState": "AgIAACEAAAAAAAAAAADwvzkAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-07T07:49:07.956Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "KeywordService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\KeywordService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\KeywordService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\KeywordService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\KeywordService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:29.147Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "PeerService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeerService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\PeerService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeerService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\PeerService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:30.475Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "EncyclopediaService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\EncyclopediaService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\EncyclopediaService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\EncyclopediaService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\EncyclopediaService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:26.413Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "PeersGroupMappingService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeersGroupMappingService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\PeersGroupMappingService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeersGroupMappingService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\PeersGroupMappingService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:14:03.943Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "PeersGroupService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeersGroupService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\PeersGroupService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\PeersGroupService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\PeersGroupService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:31.82Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\appsettings.json",
+              "RelativeDocumentMoniker": "SchemaLens\\appsettings.json",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\appsettings.json",
+              "RelativeToolTip": "SchemaLens\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwQAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-01-07T08:21:06.085Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "SchemaService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SchemaService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\SchemaService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SchemaService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\SchemaService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAkAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:33.024Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "DatabaseAccesser.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\DatabaseAccesser.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\DatabaseAccesser.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\DatabaseAccesser.cs",
+              "RelativeToolTip": "SchemaLens\\DatabaseAccesser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwwAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:16:37.52Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "SearchLogService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SearchLogService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\SearchLogService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SearchLogService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\SearchLogService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:14:05.356Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "SectionService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SectionService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\SectionService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\SectionService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\SectionService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:34.405Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "CommentService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\CommentService.cs",
+              "RelativeDocumentMoniker": "SchemaLens\\Services\\CommentService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens\\Services\\CommentService.cs",
+              "RelativeToolTip": "SchemaLens\\Services\\CommentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:13:22.658Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "IDatabaseService.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Interfaces\\IDatabaseService.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Interfaces\\IDatabaseService.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Interfaces\\IDatabaseService.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Interfaces\\IDatabaseService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T08:18:13.758Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "Home.razor.css",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Home.razor.css",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Components\\Pages\\Home.razor.css",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Components\\Pages\\Home.razor.css",
+              "RelativeToolTip": "SchemaLens.Client\\Components\\Pages\\Home.razor.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-01-07T08:11:12.792Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "KeywordModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\KeywordModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\KeywordModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\KeywordModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\KeywordModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:57:04.087Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "EncyclopediaModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\EncyclopediaModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\EncyclopediaModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\EncyclopediaModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\EncyclopediaModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:56:56.466Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "CommentModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\CommentModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\CommentModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\CommentModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\CommentModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:56:38.027Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "ColumnModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\ColumnModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\ColumnModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\ColumnModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\ColumnModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:56:25.916Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "SectionType.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\SectionType.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Enums\\SectionType.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\SectionType.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Enums\\SectionType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:58:30.928Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "PeerType.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\PeerType.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Enums\\PeerType.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\PeerType.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Enums\\PeerType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:58:28.023Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "LoginModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\LoginModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\LoginModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\LoginModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\LoginModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:57:07.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "PeerModel.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\PeerModel.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Model\\PeerModel.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Model\\PeerModel.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Model\\PeerModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:57:10.317Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "KeywordType.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\KeywordType.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Enums\\KeywordType.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\KeywordType.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Enums\\KeywordType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:58:25.349Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "AuthorityType.cs",
+              "DocumentMoniker": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\AuthorityType.cs",
+              "RelativeDocumentMoniker": "SchemaLens.Client\\Enums\\AuthorityType.cs",
+              "ToolTip": "C:\\Users\\GMIN\\source\\repos\\SchemaLens\\SchemaLens.Client\\Enums\\AuthorityType.cs",
+              "RelativeToolTip": "SchemaLens.Client\\Enums\\AuthorityType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-07T07:58:10.945Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

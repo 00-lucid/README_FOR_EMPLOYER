@@ -1,0 +1,56 @@
+.FavoriteMenu .TreeViewItem {
+    --TreeView-Indent-Width: 15px;
+}
+.FavoriteMenu .TreeViewItem .Image1 {
+    position: absolute;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+}
+
+.FavoriteMenu .TreeViewItem .Text {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    font-size: 14px;
+    /* text center align */
+    display: flex;
+    align-items: center;
+}
+
+.FavoriteMenu .TreeViewItem .Label {
+    position: absolute;
+    border-radius: 10px;
+    width: 100%;
+}
+.FavoriteMenu .TreeViewItem .Label:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.FavoriteMenu .TreeViewItem .Label:active {
+    background-color: var(--Background-Normal-Active);
+}
+.FavoriteMenu .TreeViewItem .SelectedLabel {
+    background-color: var(--Background-Highlight);
+}
+.FavoriteMenu .TreeViewItem .SelectedLabel:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.FavoriteMenu .TreeViewItem .SelectedLabel:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.FavoriteMenu .CloseButton .CloseIcon {
+    position: absolute;
+    margin-top: 8px;
+    right: 0px;
+    --CloseIcon-Fill: #e7ebf6;
+    --CloseIcon-Stroke: #666;
+}
+.FavoriteMenu .CloseButton .CloseIcon:hover {
+    --CloseIcon-Fill: #fff;
+    --CloseIcon-Stroke: #666;
+}
+.FavoriteMenu .CloseButton .CloseIcon:active {
+    --CloseIcon-Fill: #c7cbd6;
+    --CloseIcon-Stroke: #444;
+}

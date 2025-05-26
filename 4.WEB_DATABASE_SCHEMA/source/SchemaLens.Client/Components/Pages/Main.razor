@@ -1,0 +1,279 @@
+﻿@page "/main"
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@using SchemaLens.Client.Utils
+@rendermode InteractiveServer
+@inject IKeywordService KeywordService
+@inject ISchemaService SchemaService
+@inject IEncyclopediaService EncyclopediaService
+@inject ISearchLogService SearchLogService
+@inject IPeerService PeerService
+@inject NavigationManager NavigationManager
+
+<PageTitle>SchemaLens</PageTitle>
+<div id="home-container">
+    <h1 id="home-title">
+        SchemaLens
+        <RadzenText TextStyle="TextStyle.Caption">v0.13</RadzenText>
+    </h1>
+    <div id="searchbox-container">
+        @* <p>@searchTerm</p> *@
+        <div id="autocomplete-with-selectbar">
+            @* <div id="selectbar-container">
+                <RadzenSelectBar Style="width: 100%; align-self: center;"
+                                    Multiple="true"
+                                    Data="@filterModels"
+                                    @bind-Value=@filters
+                                    TValue="IEnumerable<string>"
+                                    TextProperty="Type"
+                                    ValueProperty="Type">
+                </RadzenSelectBar>
+            </div> *@
+
+            @*<RadzenAutoComplete Style="width: 100%;"
+                                FilterOperator="StringFilterOperator.StartsWith"
+                                FilterDelay="1000"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Placeholder="무엇을 검색할까요?"
+                                @bind-Value=@keyword
+                                LoadData=@OnLoadData
+                                Data=@keywordModels
+                                TextProperty="@nameof(KeywordModel.Name)"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Keyword" }})"
+                                PopupStyle="display:flex;max-height:400px;scrollbar-width:none;">
+                <Template>
+                    @{
+                        var searchTerm = @keyword?.ToLower() ?? string.Empty;
+                        var index = @context.Name?.ToLower().IndexOf(searchTerm) ?? -1;
+                        var objectName = @context.Name;
+                    }
+                    @if (context.Type == KeywordType.Database)
+                    {
+                        if (index != -1)
+                        {
+                            <NavLink @onclick="() => {OnMoveSchemaPage(context);}" style="color: inherit; text-decoration: none;">
+                                <span class="searchbox-item">
+                                    <img class="searchbox-item-icon" src="images/icon-database-2.png" alt="Icon" />
+                                    @context.Name.Substring(0, index)
+                                    <span class="highlight-searchbox-item">
+                                        @context.Name.Substring(index, @keyword.Length)
+                                    </span>
+                                    @context.Name.Substring(index + @keyword.Length)
+                                </span>
+                            </NavLink>
+                        }
+                    }
+                    else if (context.Type == KeywordType.Table)
+                    {
+                        if (index != -1)
+                        {
+                            <NavLink style="color: inherit; text-decoration: none;" @onclick="() => {OnMoveSchemaPage(context);}">
+                                <span class="searchbox-item">
+                                    <img class="searchbox-item-icon" src="images/icon-table-3.png" alt="Icon" />
+                                    @context.Name.Substring(0, index)
+                                    <span class="highlight-searchbox-item">
+                                        @context.Name.Substring(index, @keyword.Length)
+                                    </span>
+                                    @context.Name.Substring(index + @keyword.Length)
+                                    <span class="searchbox-subtitle">
+                                        @context.DbName
+                                    </span>
+                                </span>
+                            </NavLink>
+                        }
+                    }
+                    else if (context.Type == KeywordType.Column)
+                    {
+                        if (index != -1)
+                        {
+                            <NavLink style="color: inherit; text-decoration: none;" @onclick="() => {OnMoveSchemaPage(context);}">
+                                <span class="searchbox-item">
+                                    <img class="searchbox-item-icon" src="images/icon-column.png" alt="Icon" />
+                                    @context.Name.Substring(0, index)
+                                    <span class="highlight-searchbox-item">
+                                        @context.Name.Substring(index, @keyword.Length)
+                                    </span>
+                                    @context.Name.Substring(index + @keyword.Length)
+                                    <span class="searchbox-subtitle">
+                                        @context.DbName
+                                    </span>
+                                </span>
+                            </NavLink>
+                        }
+                    }
+                    else
+                    {
+                        if (index != -1)
+                        {
+                            <NavLink style="color: inherit; text-decoration: none;" @onclick="() => {OnMoveSchemaPage(context);}">
+                                <span class="searchbox-item">
+                                    @context.Name.Substring(0, index)
+                                    <span class="highlight-searchbox-item">
+                                        @context.Name.Substring(index, @keyword.Length)
+                                    </span>
+                                    @context.Name.Substring(index + @keyword.Length)
+                                </span>
+                            </NavLink>
+                        }
+                    }
+                </Template>
+            </RadzenAutoComplete>*@
+
+            @* @bind-Value="@searchTerm" *@
+
+            @* width: 0; height: 0; 으로 임시 비활성화 *@
+            @* PopupStyle="width: 0; height:0; display:flex;max-height:400px;scrollbar-width:none;" *@
+            <RadzenAutoComplete Style="width: 100%;"
+                                FilterOperator="StringFilterOperator.Contains"
+                                FilterDelay="500"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Placeholder="무엇을 검색할까요?"
+                                LoadData=@OnLoadDataEncyclopedia
+                                Data=@encyclopediaModels
+                                TextProperty="@nameof(EncyclopediaModel.SearchTerm)"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "SearchTerm" }})"
+                                PopupStyle="width: 0; height:0; display:flex;max-height:400px;scrollbar-width:none;"
+                                @onkeydown="HandleKeyPress"
+                                @oninput="OnInputValueChanged"
+            >
+                <Template>
+                    @{
+                        var _searchTerm = @searchTerm?.ToLower() ?? string.Empty;
+                        var index = @context.SearchTerm?.ToLower().IndexOf(_searchTerm) ?? -1;
+                        var objectName = @context.SearchTerm;
+                    }
+                    @if (index != -1)
+                    {
+                        <NavLink @onclick="() => {}" style="color: inherit; text-decoration: none;">
+                            <span class="searchbox-item">
+                                @context.SearchTerm.Substring(0, index)
+                                <span class="highlight-searchbox-item">
+                                    @context.SearchTerm.Substring(index, @searchTerm.Length)
+                                </span>
+                                @context.SearchTerm.Substring(index + @searchTerm.Length)
+                                <span class="searchbox-subtitle">
+                                    @context.RelatedTerm
+                                </span>
+                            </span>
+                        </NavLink>
+                    }
+                </Template>
+            </RadzenAutoComplete>
+            @* <RadzenText TextStyle="TextStyle.Body2">
+        @((MarkupString)(!string.IsNullOrEmpty(keyword) ? $", Value is: <strong>{keyword}</strong>" : ""))
+        </RadzenText> *@
+        </div>
+        <div class="home-info-container">
+            <div class="recent-peer-list-container">
+                <RadzenText TextStyle="TextStyle.Caption">최근 승인된 예약어</RadzenText>
+                @if (recentPeers is not null)
+                {
+                    @foreach (PeerModel peer in recentPeers)
+                    {
+                        @if (peer.ApprovedAt is not null)
+                        {
+                            <div class="recent-peer-list">
+                                <RadzenText TextStyle="TextStyle.Subtitle2">@peer.RelatedTerm</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2">@Common.GetTimeElapsedText(peer.ApprovedAt)</RadzenText>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <div class="project-list-container">
+                <RadzenText TextStyle="TextStyle.Caption">진행중인 프로젝트</RadzenText>
+                <div class="project-list">
+                    <RadzenText Style="cursor: pointer;" TextStyle="TextStyle.Subtitle2" @onclick="() => {OnMoveProjectPage();}">
+                        <RadzenBadge Style="margin-right: 0.25rem;" BadgeStyle="BadgeStyle.Success" Text="신규" />
+                        매홍
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2">조승렬 외 2인</RadzenText>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* <p id="count-text" style="display:none;">@keywordModels?.Count() ?? 0 개</p> *@
+</div>
+
+@code {
+    string keyword = "";
+    string searchTerm = "";
+    IEnumerable<PeerModel> recentPeers;
+
+    IEnumerable<string> filters = new string[] { "Table" };
+    public class FilterModel
+    {
+        public string Type { get; set; }
+    }
+    IEnumerable<FilterModel> filterModels = new FilterModel[] {
+        new FilterModel(){ Type = "Database"}, new FilterModel() { Type = "Table" }, new FilterModel() { Type = "Column" } };
+
+    IEnumerable<KeywordModel> keywordModels;
+    IEnumerable<EncyclopediaModel> encyclopediaModels;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        recentPeers = await PeerService.GetPeersOfCreatedRecent();
+    }
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        if (!String.IsNullOrEmpty(args.Filter))
+        {
+            keywordModels = await KeywordService.GetKeywordsBySearchTerm(args.Filter, filters);
+        }
+    }
+
+    async Task OnLoadDataEncyclopedia(LoadDataArgs args)
+    {
+        if (!String.IsNullOrEmpty(args.Filter))
+        {
+            encyclopediaModels = await EncyclopediaService.GetEncycloBySearchTerm(args.Filter);
+        }
+    }
+
+    async Task OnMoveSchemaPage(KeywordModel model)
+    {
+        var url = $"/schema?ObjectId={model.ObjectId}&Name={model.Name}&Type={model.Type}&DbName={model.DbName}&ParentId={model.ParentId}";
+        NavigationManager.NavigateTo(url);
+    }
+
+    async Task OnMoveRecommandPage()
+    {
+        var url = $"/recommend?SearchTerm={searchTerm}";
+        NavigationManager.NavigateTo(url);
+    }
+    
+    async Task OnMoveProjectPage()
+    {
+        var url = $"/projects?ProjectId=1";
+        NavigationManager.NavigateTo(url);
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchLogService.CreateSearchLog(searchTerm, 1);
+            await OnMoveRecommandPage();
+        }
+    }
+
+    void OnInputValueChanged(ChangeEventArgs e)
+    {
+        // 사용자가 입력할 때마다 searchTerm 최신화
+        string newSearchTerm = e.Value?.ToString() ?? string.Empty;
+
+        // 최근 문자와 이전 문자가 중복일 때만 제거하는 알고리즘
+        if (!string.IsNullOrEmpty(newSearchTerm))
+        {
+            // 중복된 글자가 붙어있으면 하나 삭제
+            // newSearchTerm = RemoveDuplicateAdjacentChars(newSearchTerm);
+        }
+
+        Console.WriteLine(newSearchTerm);
+        searchTerm = newSearchTerm;
+    }
+}

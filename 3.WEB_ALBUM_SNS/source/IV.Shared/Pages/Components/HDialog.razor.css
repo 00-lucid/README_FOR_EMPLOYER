@@ -1,0 +1,56 @@
+/* 전체 다이얼로그를 뒷덮는(overlay) 마스크 영역 */
+.h-dialog-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+/* 다이얼로그 콘텐츠 영역 */
+.h-dialog-content {
+    background-color: var(--light-color); /* app.css의 글로벌 색상 변수 활용 */
+    min-width: 320px;
+    max-width: 80vw;
+    /*border-radius: 8px;*/
+    padding: 1rem;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* 헤더 영역 */
+.h-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.h-dialog-title {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+/* 닫기 버튼 */
+.h-dialog-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+/* 본문 영역 */
+.h-dialog-body {
+    margin-bottom: 1rem;
+}
+
+/* 푸터 영역 */
+.h-dialog-footer {
+    text-align: right;
+}

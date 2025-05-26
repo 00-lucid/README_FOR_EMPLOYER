@@ -1,0 +1,135 @@
+﻿/* 마스크(오버레이) 영역 */
+.h-image-dialog-mask {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: block;
+}
+
+/* 닫기(X) 버튼 */
+.h-image-dialog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: var(--light-color);
+    cursor: pointer;
+    z-index: 1000; /* 이미지보다 항상 위에 있도록 */
+}
+
+/* 이미지를 화면에 '거의 가득' 채우되, 전체가 보이도록 (contain) */
+.h-image-dialog-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    object-fit: contain; /* 원본 비율 유지 + 화면에 맞춤 (잘림 방지) */
+    display: block;
+}
+
+/* 이미지가 없을 때 보일 텍스트 */
+.no-image-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--light-color);
+    background: transparent;
+}
+
+/* 이전/다음/삭제 버튼 영역 */
+.h-image-dialog-navigation {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+}
+
+/* 기존 .nav-button 스타일에 애니메이션 관련 코드, 그림자 등을 적용 */
+.nav-button {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    border: none;
+
+    /* 크기·둥근 모서리·그림자 효과 등 필요한 부분 */
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+    /* 가운데 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    font-size: 1rem;
+
+    /* 마진 또는 패딩은 필요에 따라 조절 */
+    margin: 0;
+    padding: 0;
+}
+
+
+/* 삭제 버튼 용도 구분(원하실 경우 색상 변경 가능) */
+.delete-button {
+    background-color: #cc3333; /* 예: 빨간색 계열 */
+}
+
+.nav-button:disabled {
+    background-color: var(--secondary-color);
+    cursor: default;
+}
+
+/* 호버 애니메이션 효과 */
+.nav-button:hover {
+    animation: hoverAnimation 0.3s ease-in-out forwards;
+}
+
+@keyframes hoverAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 클릭 애니메이션 효과 */
+.nav-button:active {
+    animation: clickAnimation 0.2s ease-in-out forwards;
+}
+
+@keyframes clickAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 삭제 버튼(배경색만 따로) */
+.delete-button {
+    background-color: #cc3333;
+}
+
+/* 비활성화 상태 */
+.nav-button:disabled {
+    background-color: var(--secondary-color);
+    cursor: default;
+    opacity: 0.6;
+}

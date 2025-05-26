@@ -1,0 +1,157 @@
+﻿<div class="form-group">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    <div class="input-wrapper">
+        <input
+            type="datetime-local"
+            id="@Id"
+            value="@FormattedValue"
+            placeholder="@PlaceHolder"
+            class="@GetInputClass()"
+            @onblur="OnBlur"
+            @oninput="HandleInput"
+            @attributes="AdditionalAttributes"
+            min="@MinDate"
+            max="@MaxDate"
+            step="@Step"
+            />
+
+        <div class="button-container">
+            @ChildContent
+        </div>
+    </div>
+
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter]
+    public DateTime Value { get; set; } = DateTime.Now;
+
+    [Parameter]
+    public EventCallback<DateTime> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? PlaceHolder { get; set; }
+
+    [Parameter]
+    public string Format { get; set; } = "yyyy-MM-ddTHH:mm"; // HTML datetime-local 형식
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public Func<DateTime, string?>? Validation { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnValidationChange { get; set; }
+
+    [Parameter]
+    public bool UseLocalTime { get; set; } = true; // 로컬 시간 사용 여부
+
+    [Parameter]
+    public string? MinDate { get; set; } // 최소 날짜 (yyyy-MM-ddTHH:mm 형식)
+
+    [Parameter]
+    public string? MaxDate { get; set; } // 최대 날짜 (yyyy-MM-ddTHH:mm 형식)
+
+    [Parameter]
+    public int Step { get; set; } = 60; // 시간 선택 간격(초 단위, 기본 1분)
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string? ErrorMessage { get; set; }
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    private bool IsValidated { get; set; } = false;
+    private bool _isValid = false;
+    public bool IsValid => _isValid;
+
+    // HTML datetime-local 형식으로 변환된 문자열 값
+    private string FormattedValue => Value.ToString(Format);
+
+    // 포커스를 잃었을 때 유효성 검사 실행
+    private async Task OnBlur()
+    {
+        await ValidateInput();
+    }
+
+    private async Task ValidateInput()
+    {
+        IsValidated = true;
+        bool oldIsValid = _isValid;
+
+        if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+            _isValid = string.IsNullOrEmpty(ErrorMessage);
+        }
+        else
+        {
+            ErrorMessage = null;
+            _isValid = true;
+        }
+
+        // 유효성 상태가 변경되었을 때만 이벤트 발생
+        if (oldIsValid != _isValid)
+        {
+            await OnValidationChange.InvokeAsync(_isValid);
+        }
+    }
+
+    private string GetInputClass()
+    {
+        if (!IsValidated) // 아직 유효성 검사가 되지 않은 경우
+        {
+            return "form-control";
+        }
+
+        if (HasError) // 오류가 있는 경우
+        {
+            return "form-control error";
+        }
+
+        // 유효성 검사가 통과된 경우
+        return "form-control valid";
+    }
+    
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (e.Value is string newValue && !string.IsNullOrEmpty(newValue))
+        {
+            try
+            {
+                // 문자열을 DateTime으로 파싱
+                if (DateTime.TryParse(newValue, out DateTime parsedDate))
+                {
+                    // UTC 변환 처리
+                    Value = UseLocalTime ? parsedDate : parsedDate.ToUniversalTime();
+                    await ValueChanged.InvokeAsync(Value);
+                }
+            }
+            catch
+            {
+                // 파싱 오류가 발생하면 유효성 검사 실패로 처리
+                ErrorMessage = "올바른 날짜 형식이 아닙니다.";
+                _isValid = false;
+                await OnValidationChange.InvokeAsync(_isValid);
+                return;
+            }
+            
+            await ValidateInput();
+        }
+    }
+}

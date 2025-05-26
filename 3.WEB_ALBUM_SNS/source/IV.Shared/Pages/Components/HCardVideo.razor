@@ -1,0 +1,46 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div class="h-card-video"
+     style="width: @(Width ?? "auto"); height: @(Height ?? "auto");"
+     @onclick="HandleClick">
+    
+    <!-- 실제 비디오 출력 -->
+    <video 
+        src="@(VideoUrl + "?" + Configuration.GetConnectionString("ShortBlobStorageToken"))"
+        class="h-card-video-element"
+        muted
+        preload="metadata" 
+        loop
+        autoplay
+    ></video>
+    
+    @ChildContent
+    
+    @if (IsFooter)
+    {
+        <div class="h-card-video-footer">
+            <h3 class="h-card-video-title">@Title</h3>
+            <p class="h-card-video-subtitle">@Subtitle</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Video Card Title";
+    [Parameter] public string Subtitle { get; set; } = "Video Card Subtitle";
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? VideoUrl { get; set; }
+    [Parameter] public bool IsFooter { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+}

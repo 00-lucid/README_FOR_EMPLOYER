@@ -1,0 +1,185 @@
+﻿@typeparam TEnum where TEnum : struct, Enum
+
+<div class="form-group">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">
+            @Label
+            @if (Required)
+            {
+                <span class="required-mark">*</span>
+            }
+        </label>
+    }
+    <div class="input-wrapper" style="@GetWidthStyle()">
+        <select
+            id="@Id"
+            class="@GetSelectClass()"
+            @onchange="HandleChange"
+            @onblur="OnBlur"
+            required="@Required">
+            
+            @if (!string.IsNullOrEmpty(PlaceHolder))
+            {
+                <option value="" disabled selected hidden>@PlaceHolder</option>
+            }
+            
+            @foreach (var item in Items)
+            {
+                <option value="@item.Value" selected="@(item.Value == ConvertToString(Value))">@item.Text</option>
+            }
+        </select>
+
+        <div class="dropdown-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        
+        <div class="button-container">
+            @ChildContent
+        </div>
+    </div>
+
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    public class DropDownItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter]
+    public TEnum Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TEnum> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? PlaceHolder { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; } = false;
+
+    [Parameter]
+    public List<DropDownItem> Items { get; set; } = new List<DropDownItem>();
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public Func<TEnum, string?>? Validation { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnValidationChange { get; set; }
+
+    [Parameter]
+    public string Width { get; set; } = "";
+
+    private bool _isValid = false;
+    public bool IsValid => _isValid;
+
+    private string? ErrorMessage { get; set; }
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    private bool IsValidated { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        // 컴포넌트 초기화 시 유효성 검사 수행
+        IsValidated = true;
+        if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+            _isValid = string.IsNullOrEmpty(ErrorMessage);
+        }
+        else
+        {
+            _isValid = true;
+        }
+    }
+
+    private async Task OnBlur()
+    {
+        await ValidateInput();
+    }
+
+    private async Task ValidateInput()
+    {
+        IsValidated = true;
+        bool oldIsValid = _isValid;
+
+        // Required 체크 먼저 수행
+        if (Required && Value.Equals(default(TEnum)))
+        {
+            ErrorMessage = $"{Label}을(를) 선택해주세요.";
+            _isValid = false;
+        }
+        else if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+            _isValid = string.IsNullOrEmpty(ErrorMessage);
+        }
+        else
+        {
+            ErrorMessage = null;
+            _isValid = true;
+        }
+
+        // 유효성 상태가 변경되었을 때만 이벤트 발생
+        if (oldIsValid != _isValid)
+        {
+            await OnValidationChange.InvokeAsync(_isValid);
+        }
+    }
+
+    private string GetSelectClass()
+    {
+        if (!IsValidated) // 아직 유효성 검사가 되지 않은 경우
+        {
+            return "form-control";
+        }
+
+        if (HasError) // 오류가 있는 경우
+        {
+            return "form-control error";
+        }
+
+        // 유효성 검사가 통과된 경우
+        return "form-control valid";
+    }
+
+    private string GetWidthStyle()
+    {
+        return !string.IsNullOrEmpty(Width) ? $"width: {Width};" : "";
+    }
+    
+    private async Task HandleChange(ChangeEventArgs e)
+    {
+        if (e.Value is string newValue && !string.IsNullOrEmpty(newValue))
+        {
+            TEnum parsedValue = (TEnum)Enum.Parse(typeof(TEnum), newValue);
+            Value = parsedValue;
+            await ValueChanged.InvokeAsync(parsedValue);
+            
+            await ValidateInput();
+        }
+    }
+    
+    private string ConvertToString(TEnum value)
+    {
+        return value.ToString();
+    }
+}

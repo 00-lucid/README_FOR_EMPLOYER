@@ -1,0 +1,379 @@
+﻿@page "/profile/{UserId:int}"
+@using IV.Shared.Helpers
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject IAlbumService AlbumService
+@using Microsoft.Extensions.Configuration
+@using SchemaLens.Client.Utils
+@inject IConfiguration Configuration
+@inject IAzureService AzureService
+
+@if (_isLoading)
+{
+    <HSpinner IsLoading="@_isLoading" />
+}
+<HLayoutScroll>
+    <div class="profile-container">
+        <!-- 프로필 상단 배경 영역 -->
+        <div class="profile-background">
+            <img class="profile-background-image" src="@(_backgroundImage + "?" + Configuration.GetConnectionString("BlobStorageToken"))" alt="background"/>
+        </div>
+        
+        <!-- 프로필, 앨범 목록 등 메인 영역 -->
+        <HColumn Gap="1rem" AlignItems="center">
+            <HCircleCard
+                Class="overlapped-card"
+                ImageUrl="@_profileImage">
+            </HCircleCard>
+            <HText TextType="HText.HTextType.Heading2">@_username</HText>
+            <HText TextType="HText.HTextType.Body1">@_userBio</HText>
+            @if (_userId == UserId)
+            {
+                <HButton OnClick="() => _isBottomsheetOpen = true">프로필 수정</HButton>
+            }
+        </HColumn>
+    </div>
+    <HColumn IsBottomSpace="true">
+        <HGrid Padding="16px 0px 16px 0px">
+            @foreach (var album in _albums)
+            {
+                // _thumbnails에 앨범 ID가 있는지 확인하여, 있으면 그 URL을 사용
+                var albumThumbnailUrl = _thumbnails.GetValueOrDefault(album.AlbumId, "https://ivblobstorage.blob.core.windows.net/images/default-album.png");
+
+                if (album.IsPrivate)
+                {
+                    // TODO blur 효과를 css로 주는 것이 아니라 블러가 적용된 사진이 저장되고 불러와야 함.
+                    <div style="position: relative;">
+                        <HCardImage
+                            ImageUrl="@albumThumbnailUrl"
+                            OnClick="@(() => OnClickPrivateAlbum(album))"
+                            Title="@album.AlbumTitle"
+                            Subtitle="@album.AlbumDescription"
+                            IsBlur="true"
+                        />
+                        <div class="private-lock-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="32px"
+                                 height="32px"
+                                 viewBox="0 0 24 24"
+                                 fill="#FFFFFF">
+                                <path d="M17 8V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H5c-1.1 0-2 .9-2 2v10
+                                       c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2h-2zm-2 0H9V6
+                                       c0-1.65 1.35-3 3-3s3 1.35 3 3v2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <HCardImage
+                        ImageUrl="@albumThumbnailUrl"
+                        OnClick="() => NavigateToAlbumDetail(album.AlbumId)"
+                        Title="@album.AlbumTitle"
+                        Subtitle="@album.AlbumDescription"/>
+                }
+            }
+        </HGrid>
+    </HColumn>
+</HLayoutScroll>
+
+<!-- BottomSheet 컴포넌트 사용 예 -->
+<HBottomSheet IsOpen="@_isBottomsheetOpen" IsOpenChanged="OnBottomSheetOpenChanged">
+    <HColumn AlignItems="center" Gap="0.5rem">
+        <HText TextType="HText.HTextType.Subtitle1">프로필 사진 변경</HText>
+        <HFileInputButton Id="ProfileImageUpload" IsFloating="false" OnFileChanged="@HandleProfileChanged" Multiple="false"></HFileInputButton>
+        <HText TextType="HText.HTextType.Subtitle1">배경 사진 변경</HText>
+        <HFileInputButton Id="BackgroundImageUpload" IsFloating="false" OnFileChanged="@HandleBackgroundChanged" Multiple="false"></HFileInputButton>
+    </HColumn>
+</HBottomSheet>
+
+<HSnackbar
+    IsOpen="@_isSnackbarOpen"
+    IsOpenChanged="@OnIsOpenChanged"
+    Message="@_snackbarMessage"
+    ActionLabel="실행 취소"
+    OnActionClicked="@UndoAction"
+    Duration="4000" />
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+    private bool _isLoading { get; set; } = false; // 로딩 상태 변수 추가
+
+    private string _username;
+    private string _profileImage;
+    private string _userBio;
+    private string _backgroundImage;
+
+    private int _userId;
+    private int _prevUserId;
+
+    // 모달 open/close 여부
+    private bool _isDialogOpen = false;
+    
+    private List<AlbumModel> _albums = new();
+    private readonly Dictionary<int, string> _thumbnails = new();
+
+    // BottomSheet 열림/닫힘 상태
+    private bool _isBottomsheetOpen;
+    private bool _isSnackbarOpen;
+    private string _snackbarMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _prevUserId = UserId;
+        await LoadUserDataAsync(UserId);
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        // 만약 파라미터(UserId)가 변경되었다면 새로 데이터를 불러온다.
+        if (_prevUserId != UserId)
+        {
+            _prevUserId = UserId;
+            await LoadUserDataAsync(UserId);
+        }
+    }
+    
+    private async Task LoadUserDataAsync(int targetUserId)
+    {
+        _userId = await UserService.GetUserIdAsync();
+        var user = await UserService.GetCurrentUserAsync(targetUserId);
+
+        _username = user.Username;
+        _userBio = "아직 아무 소개도 없습니다 :C";
+        _profileImage = user.ProfileImage;
+        _backgroundImage = user.BackgroundImage;
+    
+        _albums = await AlbumService.GetAlbumByUserIdAsync(targetUserId);
+    
+        _thumbnails.Clear();
+        foreach (var album in _albums)
+        {
+            var thumbnails = await AlbumService.GetAlbumThumbnailByIdAsync(album.AlbumId);
+            if (thumbnails.Count > 0)
+            {
+                _thumbnails[album.AlbumId] = thumbnails.First().PhotoUrl;
+            }
+            else
+            {
+                _thumbnails[album.AlbumId] = 
+                    "https://ivblobstorage.blob.core.windows.net/images/default-album.png";
+            }
+        }
+    }
+
+    
+    private void NavigateToAlbumDetail(int albumId)
+    {
+        NavigationManager.NavigateTo($"/albums/detail/{albumId}");
+    }
+    
+    private async Task OnBottomSheetOpenChanged(bool value)
+    {
+        _isBottomsheetOpen = value;
+        // 필요한 로직이 있다면, 여기에 추가
+        await Task.CompletedTask;
+    }
+
+    private void ShowSnackbar()
+    {
+        _isSnackbarOpen = true;
+    }
+    
+    private void OnIsOpenChanged(bool isOpen)
+    {
+        _isSnackbarOpen = isOpen;
+    }
+
+    private void UndoAction()
+    {
+        // 원하는 로직 수행
+        Console.WriteLine("실행 취소 로직 실행");
+    }
+    
+    private async Task HandleProfileChanged(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount == 0)
+        {
+            return;
+        }
+
+        _isLoading = true;
+
+        try
+        {
+            // 네트워크 속도 측정
+            int concurrencyLevel = await Common.GetNetworkConcurrencyLevelAsync();
+            
+            using SemaphoreSlim semaphore = new SemaphoreSlim(concurrencyLevel);
+            var uploadTasks = new List<Task>();
+
+            foreach (var file in e.GetMultipleFiles())
+            {
+                // 각 파일을 병렬로 업로드
+                uploadTasks.Add(UploadSingleFileAsync(file,semaphore, "profile"));
+            }
+
+            await Task.WhenAll(uploadTasks);
+
+            // 프로필 사진 다시 가져오기
+            var user = await UserService.GetCurrentUserAsync(UserId);
+            _profileImage = user.ProfileImage;
+            
+            await InvokeAsync(StateHasChanged);
+            
+            _snackbarMessage = "프로필 사진이 변경되었습니다.";
+            _isSnackbarOpen = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    private async Task HandleBackgroundChanged(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount == 0)
+        {
+            return;
+        }
+
+        _isLoading = true;
+
+        try
+        {
+            // 네트워크 속도 측정
+            int concurrencyLevel = await Common.GetNetworkConcurrencyLevelAsync();
+            
+            using SemaphoreSlim semaphore = new SemaphoreSlim(concurrencyLevel);
+            var uploadTasks = new List<Task>();
+
+            foreach (var file in e.GetMultipleFiles())
+            {
+                // 각 파일을 병렬로 업로드
+                uploadTasks.Add(UploadSingleFileAsync(file,semaphore, "background"));
+            }
+
+            await Task.WhenAll(uploadTasks);
+
+            // 배경 사진 다시 가져오기
+            var user = await UserService.GetCurrentUserAsync(UserId);
+            _backgroundImage = user.BackgroundImage;
+            
+            await InvokeAsync(StateHasChanged);
+            
+            _snackbarMessage = "배경 사진이 변경되었습니다.";
+            _isSnackbarOpen = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    private async Task UploadSingleFileAsync(
+        IBrowserFile file,
+        SemaphoreSlim semaphore,
+        string type
+    )
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            // 파일 업로드(Chunk 단위 등 필요 시 구현)
+            string fileUri = await UploadChunkFile(file);
+
+            if (type.Equals("profile"))
+            {
+                // Users 테이블의 ProfileImage 업데이트
+                await UserService.UpdateProfileAsync(UserId, fileUri);
+            }
+            else
+            {
+                // Users 테이블의 ProfileImage 업데이트
+                await UserService.UpdateBackgroundAsync(UserId, fileUri);
+            }
+
+            
+            // UI 스레드 갱신
+            await InvokeAsync(StateHasChanged);
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+    
+    private async Task<string> UploadChunkFile(IBrowserFile file)
+    {
+        // 1GB 예시 (필요에 따라 조절)
+        using var fileStream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 1024);
+
+        const int chunkSize = 2 * 1024 * 1024; // 2MB
+        var buffer = new byte[chunkSize];
+        int bytesRead;
+        int chunkIndex = 0;
+
+        // 서버에서 청크를 구별할 임시 ID
+        string fileId = Guid.NewGuid().ToString();
+        
+        // chunkSize 단위로 반복해서 읽어 서버에 업로드
+        while ((bytesRead = await fileStream.ReadAsync(buffer, 0, chunkSize)) > 0)
+        {
+            var chunkData = new byte[bytesRead];
+            Array.Copy(buffer, 0, chunkData, 0, bytesRead);
+            await AzureService.UploadChunkAsync(chunkData, chunkIndex, fileId);
+            chunkIndex++;
+        }
+
+        string fileUri = await AzureService.MergeChunksAsync(fileId, file.Name);
+
+        return fileUri;
+    }
+    
+    private void NavigateToPrivateAlbumDetail(int albumId, int albumOwner)
+    {
+        
+        if (_userId.Equals(albumOwner))
+        {
+            NavigationManager.NavigateTo($"/albums/detail/{albumId}");
+        }
+        else
+        {
+            _snackbarMessage = "접근 권한이 없습니다.";
+            _isSnackbarOpen = true;
+
+            StateHasChanged();
+        }
+    }
+
+    private void OnClickPrivateAlbum(AlbumModel album)
+    {
+        /**
+         * 만약 판매중인 비공개 앨범일 경우 구매 모달로 이동
+         * 판매하지 않는다면, 스낵바를 통해 접근 권한이 없다는 것을 알림.
+         */
+        if (album.IsPaid)
+        {
+            // 구매 다이어로그
+        }
+        else
+        {
+            NavigateToPrivateAlbumDetail(album.AlbumId, album.UserId);
+        }
+    }
+}

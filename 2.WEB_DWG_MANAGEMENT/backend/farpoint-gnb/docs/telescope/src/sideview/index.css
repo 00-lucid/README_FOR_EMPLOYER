@@ -1,0 +1,30 @@
+.LightTheme,
+.DarkTheme .SideView {
+    --Text-Highlight: #4a70f7;
+    --Text-Normal: #464646;
+    --Text-Hover: #4a70f7;
+    --Text-Active: #3b5bd1;
+    --Background-Highlight: #4a70f7;
+    --Background-Highlight-Hover: #4265e3;
+    --Background-Highlight-Active: #3b5bd1;
+    --Background-Normal: #f4f6fc;
+    --Background-Normal-Hover: #e1e3e8;
+    --Background-Normal-Active: #d3d5db;
+    --Stroke-Highlight: #fff;
+    --Stroke-Normal: #464646;
+    --Separate-Line: #c5cbcf;
+    --Icon-Normal: #5e6467;
+    --Icon-Highlight: #fff;
+    --Table-Row-Highlight: #e7edf1;
+    --Table-Row-Hover: #dce1e6;
+    --Table-Row-Active: #d3d8de;
+
+    --Component-Border: #e6e8ef;
+    --Component-Background: #fff;
+    --Component-Background-Hover: #f8f8f8;
+    --Component-Background-Active: #f0f0f0;
+    --Component-Active: #4a70f7;
+    --Component-Stroke: #464646;
+    --Component-Disable: #a4a4a4;
+    --Component-Shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+}

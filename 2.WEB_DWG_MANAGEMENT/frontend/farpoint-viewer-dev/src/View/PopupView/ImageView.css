@@ -1,0 +1,44 @@
+.picture-view {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.picture-container {
+    height: 90vh;
+    overflow: hidden;
+}
+
+.picture-skeleton {
+    width: 70vw;
+    height: 90vh;
+    background-color: #eee;
+    justify-content: center;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+.picture-flex {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.picture-image {
+    height: 100%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.6);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

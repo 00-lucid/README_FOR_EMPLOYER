@@ -1,0 +1,305 @@
+.SelectMarkupFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: visible;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+}
+
+.SelectMarkup {
+    position: absolute;
+    left: calc((100% - 480px) / 2);
+    top: calc((100% - 334px) / 2);
+    width: 480px;
+    height: 334px;
+    background-color: var(--toolbar-background);
+    border-radius: 6px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    padding-bottom: 10px;
+    pointer-events: all;
+    color: var(--image-stroke-color);
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.SelectMarkup .Titlebar {
+    background-color: var(--Dialogue-Titlebar-background);
+    position: relative;
+    height: 30px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: 6px 0px 0px 0px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.3);
+}
+
+.SelectMarkup .Text {
+    top: 0px;
+    width: 100%;
+    text-align: center;
+}
+
+.SelectMarkup .ListView {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    width: calc(100% - 20px);
+    height: 230px;
+    overflow-y: scroll;
+    border-collapse: collapse;
+}
+
+.SelectMarkup .ListView::-webkit-scrollbar {
+    display: none;
+}
+
+.SelectMarkup .ListView .Header tr {
+    border-bottom: 0px;
+    width: 100%;
+    height: 40px;
+}
+
+.SelectMarkup .ListView .Header th {
+    opacity: 0.7;
+}
+
+.SelectMarkup .ListView .RowItem svg {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.SelectMarkup .ListView .Total {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+}
+.SelectMarkup .ListView .Header span {
+    margin-left: 0px;
+}
+
+.SelectMarkup .ListView tr {
+    border-bottom: 1px solid var(--Dialogue-Date-background);
+    height: 50px;
+}
+
+.SelectMarkup table {
+    border-collapse: collapse;
+}
+
+table th:nth-child(1) {
+    -webkit-border-radius: 13px 0px 0px 13px;
+    -moz-border-radius: 13px 0px 0px 13px;
+    border-radius: 13px 0px 0px 10px;
+}
+
+table th:nth-last-child(1) {
+    -webkit-border-radius: 0px 3px 3px 0px;
+    -moz-border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 13px 10px 0px;
+}
+
+.SelectMarkup .ListView thead {
+    top: 40px;
+    width: 100%;
+    height: 40px;
+    background-color: var(--Dialogue-Date-background);
+    border-radius: 6px;
+    /* border: solid 1px rgba(0, 0, 0, 0.7); */
+}
+
+/* 460 */
+.SelectMarkup .ListView .Header .Title {
+    width: 90px;
+}
+.SelectMarkup .ListView .Header .Writer {
+    width: 260px;
+}
+.SelectMarkup .ListView .Header .Date {
+    width: 110px;
+}
+
+.SelectMarkup .ViewButton {
+    position: absolute;
+    top: 280px;
+    left: 320px;
+    width: 148px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.SelectMarkup .DisabledViewButton {
+    position: absolute;
+    top: 280px;
+    left: 320px;
+    width: 148px;
+    height: 40px;
+    border-radius: 6px;
+    /* background-color: #3b59c5; */
+    background-color: var(--Dialogue-Button-Disable);
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+
+.SelectMarkup .ViewButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.SelectMarkup .ViewButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.SelectMarkup .CancelViewButton {
+    position: absolute;
+    top: 280px;
+    left: 165px;
+    width: 148px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    color: #fff;
+    color: var(--image-stroke-color);
+}
+.SelectMarkup .CancelViewButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.SelectMarkup .CancelViewButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.SelectMarkup .DeleteButton {
+    position: absolute;
+    top: 280px;
+    left: 10px;
+    width: 148px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: #cc0000;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.SelectMarkup .DisabledDeleteButton {
+    /* background-color: #8e0000; */
+    background-color: var(--Dialogue-Button-Disable);
+    position: absolute;
+    top: 280px;
+    left: 10px;
+    width: 148px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+.SelectMarkup .DeleteButton:hover {
+    background-color: #c00000;
+}
+.SelectMarkup .DeleteButton:active {
+    background-color: #b80000;
+}
+
+.SelectMarkup .CancelLoadButton {
+    position: absolute;
+    top: 280px;
+    left: 10px;
+    width: 226px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    color: #fff;
+    color: var(--image-stroke-color);
+}
+.SelectMarkup .CancelLoadButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.SelectMarkup .CancelLoadButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.SelectMarkup .LoadButton {
+    position: absolute;
+    top: 280px;
+    left: 243px;
+    width: 226px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.SelectMarkup .DisabledLoadButton {
+    position: absolute;
+    top: 280px;
+    left: 243px;
+    width: 226px;
+    height: 40px;
+    border-radius: 6px;
+    /* background-color: #3b59c5; */
+    background-color: var(--Dialogue-Button-Disable);
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+.SelectMarkup .LoadButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.SelectMarkup .LoadButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.DarkTheme {
+    --icon-toolbar-background: #f4f6fc;
+    --icon-toolbar-drag: #dfe6ea;
+    --icon-toolbar-active: #d5dadd;
+    --icon-toolbar-foreground: #444a4d;
+    --markup-background-color: rgba(230, 230, 230, 0.76);
+    --markup-active-foreground: #d5dadd;
+}
+
+.LightTheme {
+    --icon-toolbar-background: #3c3f41;
+    --icon-toolbar-drag: #26282a;
+    --icon-toolbar-active: black;
+    --icon-toolbar-foreground: #fff;
+    --markup-background-color: rgba(73, 77, 79, 0.76);
+    --markup-active-foreground: #2b2d2e;
+}
+
+.RowItem:hover {
+    background-color: rgba(80, 80, 80, 0.36);
+}
+
+.First {
+    padding-left: 30px;
+}
+
+.Second {
+    padding-left: 20px;
+}
+
+.Third {
+    padding-left: 20px;
+}
+
+.Focus {
+    background-color: #4a70f7;
+}
+
+.RowItem.Focus:hover {
+    background-color: #4265e3;
+}

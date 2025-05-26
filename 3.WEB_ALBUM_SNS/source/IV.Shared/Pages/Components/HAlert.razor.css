@@ -1,0 +1,58 @@
+﻿.HAlert {
+    position: relative;
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+    color: #fff; /* 텍스트 색상: 흰색 */
+    font-family: sans-serif;
+}
+
+/* 알림 유형별 배경색 */
+.HAlert-warning {
+    background-color: var(--warning-color);
+}
+
+.HAlert-error {
+    background-color: var(--error-color);
+}
+
+.HAlert-success {
+    background-color: var(--success-color);
+}
+
+.HAlert-info {
+    background-color: var(--info-color);
+}
+
+/* 제목/부제목 */
+.alert-header {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.alert-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+/* 게이지바 */
+.alert-timer {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin-top: 12px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.alert-timer-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #fff;
+    transition: width 0.1s linear;
+    border-radius: 2px;
+}

@@ -1,0 +1,64 @@
+.TreeViewItem {
+    --TreeView-Indent-Width: 15px;
+}
+.TreeViewItem .Image1,
+.Image2 {
+    position: absolute;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+}
+.TreeViewItem .Image1 {
+    transition: all 0.2s;
+}
+
+.TreeViewItem .Text {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    font-size: 14px;
+    /* text center align */
+    display: flex;
+    align-items: center;
+}
+
+.TreeViewItem .Label {
+    position: absolute;
+    border-radius: 10px;
+    width: 100%;
+}
+.TreeViewItem .Label:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.TreeViewItem .Label:active {
+    background-color: var(--Background-Normal-Active);
+}
+.TreeViewItem .SelectedLabel {
+    background-color: var(--Background-Highlight);
+}
+.TreeViewItem .SelectedLabel:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.TreeViewItem .SelectedLabel:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.TreeViewItem .ShowAllIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+}
+.TreeViewItem .ShowAllIcon:hover {
+    --CloseIcon-Fill: #d7dbe6;
+    --CloseIcon-Stroke: #555;
+}
+
+.TreeViewItem .ShowAllBackground {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+}

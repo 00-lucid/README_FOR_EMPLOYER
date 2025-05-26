@@ -1,0 +1,216 @@
+﻿@page "/verify-signup"
+@using System.ComponentModel.DataAnnotations
+@using IV.Shared.Helpers
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Pages.Components
+@using IV.Web.Services
+@inject NavigationManager NavigationManager
+@inject IEmailService EmailService
+@inject ILoginService LoginService
+
+<HSpinner IsLoading="@IsLoading" />
+
+<HLayoutCenter>
+    <div class="verify-container">
+        <HRow AlignItems="center" JustifyContent="center">
+            <h1>IV</h1>
+        </HRow>
+
+        <!-- STEP 1: 코드 인증 폼 -->
+        @if (!IsCodeVerified)
+        {
+            <HColumn Gap="1rem">
+                <form @onsubmit="HandleVerifyCodeAsync">
+                    <HColumn Gap="1rem">
+                        <HTextInput Label="Verification Code" Type="text" Id="verificationCode"
+                                    Value="@_verificationModel.Code"
+                                    ValueChanged="val => _verificationModel.Code = val"
+                                    PlaceHolder="Enter the 6-digit code"
+                                    MaxLength="6" />
+                        <button type="submit" class="btn btn-primary">Verify</button>
+                    </HColumn>
+                </form>
+
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <p class="error-message">@ErrorMessage</p>
+                }
+
+                <div class="auxiliary-links">
+                    <p>
+                        Didn’t receive a code? <a href="/signup">Back to Signup</a>
+                    </p>
+                </div>
+            </HColumn>
+        }
+        else
+        {
+            <!-- STEP 2: 회원가입 최종 정보 (UserName, Password 등) -->
+            <HColumn Gap="1rem">
+                <form @onsubmit="HandleCreateAccountAsync">
+                    <HColumn Gap="1rem">
+                        <HTextInput Label="User Name" Type="text" Id="username"
+                                    Value="@_accountModel.UserName"
+                                    ValueChanged="val => _accountModel.UserName = val"
+                                    PlaceHolder="Enter your user name" />
+
+                        <HTextInput Label="Password" Type="password" Id="password"
+                                    Value="@_accountModel.Password"
+                                    ValueChanged="val => _accountModel.Password = val"
+                                    PlaceHolder="Enter your password" />
+
+                        <HTextInput Label="Confirm Password" Type="password" Id="confirmPassword"
+                                    Value="@_accountModel.ConfirmPassword"
+                                    ValueChanged="val => _accountModel.ConfirmPassword = val"
+                                    PlaceHolder="Confirm your password" />
+
+                        <button type="submit" class="btn btn-primary">Finish Signup</button>
+                    </HColumn>
+                </form>
+
+                @if (FinalErrors.Any())
+                {
+                    <ul class="error-messages">
+                        @foreach (var error in FinalErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                }
+            </HColumn>
+        }
+    </div>
+</HLayoutCenter>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? email { get; set; }
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private bool IsLoading { get; set; } = false;
+    private bool IsCodeVerified { get; set; } = false;
+
+    private readonly VerificationModel _verificationModel = new();
+    private readonly AccountModel _accountModel = new();
+
+    private string ErrorMessage { get; set; } = string.Empty;
+    private List<string> FinalErrors { get; set; } = new();
+
+    /// <summary>
+    /// 1) 인증 코드 검증
+    /// </summary>
+    private async Task HandleVerifyCodeAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_verificationModel.Code) || _verificationModel.Code.Length != 6)
+            {
+                ErrorMessage = "Please enter a valid 6-digit verification code.";
+                return;
+            }
+
+            // 이메일 및 인증 코드가 실제로 유효한지 검증
+            bool isValid = await EmailService.ValidateCodeAsync(_verificationModel.Code);
+            // ex) await EmailService.ValidateCodeAsync(email, _verificationModel.Code);
+
+            if (isValid)
+            {
+                // 인증 성공 -> 회원가입 완료 폼으로 전환
+                IsCodeVerified = true;
+            }
+            else
+            {
+                ErrorMessage = "The verification code is invalid or has expired.";
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "An error occurred. Please try again.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// 2) 최종 회원가입 처리
+    /// </summary>
+    private async Task HandleCreateAccountAsync()
+    {
+        IsLoading = true;
+        FinalErrors.Clear();
+
+        // 간단 유효성 검사
+        if (string.IsNullOrWhiteSpace(_accountModel.UserName))
+        {
+            FinalErrors.Add("User Name is required.");
+        }
+        if (string.IsNullOrWhiteSpace(_accountModel.Password) ||
+            string.IsNullOrWhiteSpace(_accountModel.ConfirmPassword))
+        {
+            FinalErrors.Add("Password and Confirm Password are required.");
+        }
+        else if (_accountModel.Password != _accountModel.ConfirmPassword)
+        {
+            FinalErrors.Add("Passwords do not match.");
+        }
+
+        if (FinalErrors.Any())
+        {
+            IsLoading = false;
+            return;
+        }
+
+        try
+        {
+            var decryptedEMail = AesEncryptionHelper.Decrypt(email);
+            // 실제 회원가입 로직
+            bool isSignupSuccessful = await LoginService.SignupAsync(
+                _accountModel.UserName,
+                decryptedEMail,
+                _accountModel.Password
+            );
+
+            if (isSignupSuccessful)
+            {
+                // 성공 처리
+                var verificationUrl = !string.IsNullOrEmpty(ReturnUrl) 
+                    ? $"/login?returnUrl={Uri.EscapeDataString(ReturnUrl)}" 
+                    : $"/login";
+                NavigationManager.NavigateTo(verificationUrl);
+            }
+            else
+            {
+                FinalErrors.Add("Signup failed. Please try again.");
+            }
+        }
+        catch (Exception)
+        {
+            FinalErrors.Add("An error occurred while creating your account. Please try again.");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    // 인증 코드 입력용 모델
+    private class VerificationModel
+    {
+        public string Code { get; set; } = string.Empty;
+    }
+
+    // 회원가입 최종 정보 입력용 모델
+    private class AccountModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

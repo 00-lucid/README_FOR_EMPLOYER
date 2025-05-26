@@ -1,0 +1,77 @@
+.NotiorderMenu .TreeViewItem {
+    --TreeView-Indent-Width: 15px;
+}
+.NotiorderMenu .TreeViewItem .Image1 {
+    position: absolute;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+}
+
+.NotiorderMenu > .ShowAllIcon {
+    position: absolute;
+    top: 22px;
+    left: 70px;
+    width: 24px;
+    height: 24px;
+}
+
+.NotiorderMenu > .ShowAllBackground {
+    position: absolute;
+    top: 14px;
+    left: 62px;
+    width: 40px;
+    height: 40px;
+}
+
+.NotiorderMenu .TreeViewItem .ShowAllIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+}
+
+.NotiorderMenu .ShowAllIcon :hover {
+    --CloseIcon-Fill: #d7dbe6;
+    --CloseIcon-Stroke: #555;
+}
+
+.NotiorderMenu .TreeViewItem .ShowAllBackground {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+}
+
+.NotiorderMenu .TreeViewItem .Text {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    font-size: 14px;
+    /* text center align */
+    display: flex;
+    align-items: center;
+}
+
+.NotiorderMenu .TreeViewItem .Label {
+    position: absolute;
+    border-radius: 10px;
+    width: 100%;
+}
+.NotiorderMenu .TreeViewItem .Label:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.NotiorderMenu .TreeViewItem .Label:active {
+    background-color: var(--Background-Normal-Active);
+}
+.NotiorderMenu .TreeViewItem .SelectedLabel {
+    background-color: var(--Background-Highlight);
+}
+.NotiorderMenu .TreeViewItem .SelectedLabel:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.NotiorderMenu .TreeViewItem .SelectedLabel:active {
+    background-color: var(--Background-Highlight-Active);
+}

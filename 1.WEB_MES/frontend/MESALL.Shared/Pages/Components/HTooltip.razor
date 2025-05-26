@@ -1,0 +1,86 @@
+﻿@using MESALL.Shared.Enums
+@namespace MESALL.Shared.Pages.Components
+
+<div class="tooltip-container @PositionClass" @onmouseover="ShowTooltip" @onmouseout="HideTooltip">
+    <div class="tooltip-trigger">
+        @ChildContent
+    </div>
+    
+    @if (IsVisible)
+    {
+        <div class="tooltip-content @SizeClass" style="min-width:@MinWidth; max-width:@MaxWidth">
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-body">
+                @if (!string.IsNullOrEmpty(Title))
+                {
+                    <div class="tooltip-title">@Title</div>
+                }
+                <div class="tooltip-text">@Text</div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    [Parameter]
+    public string Text { get; set; }
+    
+    [Parameter]
+    public string Title { get; set; }
+    
+    [Parameter]
+    public TooltipPosition Position { get; set; } = TooltipPosition.Top;
+    
+    [Parameter]
+    public TooltipSize Size { get; set; } = TooltipSize.Medium;
+    
+    [Parameter]
+    public string MaxWidth { get; set; } = "300px";
+    
+    [Parameter]
+    public string MinWidth { get; set; } = "max-content";
+    
+    [Parameter]
+    public int ShowDelayMs { get; set; } = 200;
+    
+    [Parameter]
+    public int HideDelayMs { get; set; } = 100;
+    
+    private bool IsVisible { get; set; }
+    private Timer ShowTimer { get; set; }
+    private Timer HideTimer { get; set; }
+    
+    private string PositionClass => $"tooltip-{Position.ToString().ToLowerInvariant()}";
+    private string SizeClass => $"tooltip-{Size.ToString().ToLowerInvariant()}";
+    
+    private void ShowTooltip()
+    {
+        HideTimer?.Dispose();
+        
+        ShowTimer = new Timer(_ =>
+        {
+            IsVisible = true;
+            InvokeAsync(StateHasChanged);
+        }, null, ShowDelayMs, Timeout.Infinite);
+    }
+    
+    private void HideTooltip()
+    {
+        ShowTimer?.Dispose();
+        
+        HideTimer = new Timer(_ =>
+        {
+            IsVisible = false;
+            InvokeAsync(StateHasChanged);
+        }, null, HideDelayMs, Timeout.Infinite);
+    }
+    
+    public void Dispose()
+    {
+        ShowTimer?.Dispose();
+        HideTimer?.Dispose();
+    }
+}

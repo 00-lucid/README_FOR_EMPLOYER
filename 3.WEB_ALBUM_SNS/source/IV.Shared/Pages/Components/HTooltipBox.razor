@@ -1,0 +1,11 @@
+﻿<div class="h-tooltip-box">
+    @Text
+</div>
+
+@code {
+    /// <summary>
+    /// 실제 툴팁에 표시될 텍스트
+    /// </summary>
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+}

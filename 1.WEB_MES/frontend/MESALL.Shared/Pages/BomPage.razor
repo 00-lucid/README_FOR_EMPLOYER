@@ -1,0 +1,1066 @@
+﻿@page "/bom"
+@using System.Text.Json
+@using System.Net.Http.Json
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.Interfaces
+@inject IBomService BomService
+@inject NavigationManager NavigationManager
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>BOM 관리</h1>
+            <span class="bom-count">총 @(_filteredBoms?.Count ?? 0)개의 BOM</span>
+        </div>
+    </header>
+
+    <HRow JustifyContent="space-between" AlignItems="center">
+        <div class="filters-section">
+            <div class="filter-tag @(_activeFilter == null ? "active" : "")" @onclick='() => ApplyFilter(null)'>
+                전체
+            </div>
+            <div class="filter-tag @(_activeFilter == BomStatus.Active ? "active" : "")" @onclick='() => ApplyFilter(BomStatus.Active)'>
+                활성
+            </div>
+            <div class="filter-tag @(_activeFilter == BomStatus.Inactive ? "active" : "")" @onclick='() => ApplyFilter(BomStatus.Inactive)'>
+                비활성
+            </div>
+            <div class="filter-tag @(_activeFilter == BomStatus.Draft ? "active" : "")" @onclick='() => ApplyFilter(BomStatus.Draft)'>
+                임시저장
+            </div>
+        </div>
+
+        <HRow AutoWidth="true" Gap="1rem" AlignItems="center">
+            <HTextInput
+                Width="300px"
+                PlaceHolder="BOM 코드, 품목명 검색"
+                Value="@_searchTerm"
+                ValueChanged="@((value) => { _searchTerm = value; ApplyFiltersAndSort(); })"
+                MarginBottom="0"
+            >
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="clear-search" @onclick="ClearSearch">×</button>
+                }
+            </HTextInput>
+
+            @* <div class="view-toggle"> *@
+            @*     <button class="view-toggle-btn @(_viewMode == ViewMode.List ? "active" : "")"  *@
+            @*             @onclick="() => _viewMode = ViewMode.List"> *@
+            @*         <i class="fas fa-list"></i> *@
+            @*     </button> *@
+            @*     <button class="view-toggle-btn @(_viewMode == ViewMode.Tree ? "active" : "")"  *@
+            @*             @onclick="() => _viewMode = ViewMode.Tree"> *@
+            @*         <i class="fas fa-sitemap"></i> *@
+            @*     </button> *@
+            @* </div> *@
+
+            <HButton OnClick="OpenAddBomDialog">
+                BOM 등록
+            </HButton>
+        </HRow>
+    </HRow>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="BOM 정보를 불러오는 중입니다..." />
+    }
+    else if (_filteredBoms == null || _filteredBoms.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="6" height="6" rx="1"></rect>
+                    <rect x="16" y="2" width="6" height="6" rx="1"></rect>
+                    <rect x="16" y="16" width="6" height="6" rx="1"></rect>
+                    <rect x="2" y="16" width="6" height="6" rx="1"></rect>
+                    <path d="M5 8v8"></path>
+                    <path d="M19 8v8"></path>
+                    <path d="M8 5h8"></path>
+                    <path d="M8 19h8"></path>
+                </svg>
+            </div>
+            <h3>BOM이 없습니다</h3>
+            @if (!string.IsNullOrEmpty(_searchTerm) || _activeFilter != null)
+            {
+                <p>검색어 또는 필터에 해당하는 BOM이 없습니다.</p>
+                <button class="secondary-btn" @onclick="ClearFilters">
+                    필터 초기화
+                </button>
+            }
+            else
+            {
+                <p>첫 번째 BOM을 등록해 보세요!</p>
+                <button class="primary-btn" @onclick="OpenAddBomDialog">
+                    BOM 등록
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="tree-view">
+            @foreach (var bom in _filteredBoms)
+            {
+                <div class="bom-tree-card">
+                    <div class="bom-tree-header">
+                        <div class="bom-tree-info">
+                            <span class="bom-status @GetBomStatusClass(bom.BomStatus)">
+                                @GetBomStatusDisplayName(bom.BomStatus)
+                            </span>
+                            <span class="bom-code">@bom.BomId</span>
+                            <span class="version-tag">v@(bom.BomVersion)</span>
+                        </div>
+                        <div class="bom-tree-actions">
+                            <button class="icon-btn view-btn" title="상세보기" @onclick="() => ViewBomDetails(bom)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>ㄷ
+                            </button>
+                            <button class="icon-btn edit-btn" title="수정" @onclick="() => OpenEditBomDialog(bom)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                    <path d="m15 5 4 4" />
+                                </svg>
+                            </button>
+                            <button class="icon-btn clone-btn" title="복제">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="8" y="8" width="12" height="12" rx="2" ry="2" />
+                                    <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+                                </svg>
+                            </button>
+                            <button class="icon-btn delete-btn" title="삭제">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 6h18" />
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                    <line x1="10" y1="11" x2="10" y2="17" />
+                                    <line x1="14" y1="11" x2="14" y2="17" />
+                                </svg>
+                            </button>
+                            <button class="icon-btn expand-btn-alt" @onclick="() => ToggleExpand(bom)">
+                                @if (bom.IsExpanded)
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m18 15-6-6-6 6" />
+                                    </svg>
+                                }
+                                else
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m6 9 6 6 6-6" />
+                                    </svg>
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bom-tree-root">
+                        @if (_bomItemTrees.TryGetValue(bom.BomId, out var itemTrees) && itemTrees.Count > 0)
+                        {
+                            @* ParentItem이 null인 루트 아이템 표시 *@
+                            var rootItems = itemTrees.Where(item => item.ItemBom.ParentItem == null).ToList();
+                            if (rootItems.Count > 0)
+                            {
+                                foreach (var rootItem in rootItems)
+                                {
+                                    <div class="item-node parent-node">
+                                        <div class="item-node-placeholder">
+                                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                                <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                                <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                                <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="item-node-content">
+                                            <div class="item-node-name">@rootItem.ItemBom.Item.ItemName</div>
+                                            <div class="item-node-details">
+                                                <span>@rootItem.ItemBom.Quantity @rootItem.ItemBom.Item.Unit</span>
+                                                <span>등록일: @bom.CreatedAt.ToString("yyyy-MM-dd")</span>
+                                                @if (!string.IsNullOrEmpty(rootItem.ItemBom.Remark))
+                                                {
+                                                    <span class="component-note">@rootItem.ItemBom.Remark</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (bom.IsExpanded)
+                                    {
+                                        <div class="component-tree">
+                                            @*ㄷ 현재 루트 아이템의 자식 아이템들 표시 *@
+                                            @{
+                                                var childItems = itemTrees[0].Children.Where(item => item.ItemBom.ParentItem != null && item.ItemBom.ParentItem.ItemId == rootItem.ItemBom.ItemId).ToList();
+                                            }
+
+                                            @if (childItems.Count > 0)
+                                            {
+                                                @foreach (var childItem in childItems)
+                                                {
+                                                    <div class="tree-connection-line"></div>
+                                                    <div class="item-node child-node">
+                                                        <div class="item-node-placeholder">
+                                                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                                                <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                                                <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                                                <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="item-node-content">
+                                                            <div class="item-node-name">@childItem.ItemBom.Item.ItemName</div>
+                                                            <div class="item-node-details">
+                                                                <span>@childItem.ItemBom.Quantity @childItem.ItemBom.Item.Unit</span>
+                                                                @if (!string.IsNullOrEmpty(childItem.ItemBom.Remark))
+                                                                {
+                                                                    <span class="component-note">@childItem.ItemBom.Remark</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="empty-component-tree">
+                                                    <span>이 구성품에 등록된 하위 아이템이 없습니다.</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div class="item-node parent-node">
+                                    <div class="item-node-placeholder">
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                            <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                            <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                            <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="item-node-content">
+                                        <div class="item-node-name">정의된 루트 아이템 없음</div>
+                                        <div class="item-node-details">
+                                            <span>등록일: @bom.CreatedAt.ToString("yyyy-MM-dd")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="item-node parent-node">
+                                <div class="item-node-placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                        <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                        <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                <div class="item-node-content">
+                                    <div class="item-node-name">루트아이탬</div>
+                                    <div class="item-node-details">
+                                        <span>등록일: @bom.CreatedAt.ToString("yyyy-MM-dd")</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (_loadingItemsForBom == bom.BomId)
+                            {
+                                <div class="loading-items">
+                                    <div class="spinner"></div>
+                                    <span>아이템 로드 중...</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* <!-- BOM 등록 다이얼로그 --> *@
+@* <HDialog IsOpen="@_isAddBomDialogOpen" IsOpenChanged="@((value) => _isAddBomDialogOpen = value)" Title="BOM 등록"> *@
+@*     <ChildContent> *@
+@*         <HDropDown TEnum="BomStatus" *@
+@*                    Id="bomStatus" *@
+@*                    Label="BOM 유형" *@
+@*                    Value="@_newBom.BomStatus" *@
+@*                    ValueChanged="@((value) => _newBom.BomStatus = value)" *@
+@*                    PlaceHolder="BOM 유형을 선택하세요" *@
+@*                    Required="true" *@
+@*                    Items="@_bomStatusOptions"> *@
+@*         </HDropDown> *@
+@* *@
+@*         <HTextInput *@
+@*             @bind-Value="_newBom.BomVersion" *@
+@*             Width="100%" *@
+@*             PlaceHolder="BOM 버전 입력 (예: 1.0)"/> *@
+@* *@
+@*         <HTextArea *@
+@*             @bind-Value="_newBom.Remark" *@
+@*             PlaceHolder="필요한 경우 비고 사항을 입력하세요" *@
+@*             Rows="3"/> *@
+@*     </ChildContent> *@
+@* *@
+@*     <FooterContent> *@
+@*         <HRow JustifyContent="flex-end" Gap="1rem"> *@
+@*             <HButton OnClick="@(() => _isAddBomDialogOpen = false)"> *@
+@*                 취소 *@
+@*             </HButton> *@
+@*             <HButton OnClick="CreateBom"> *@
+@*                 등록 *@
+@*             </HButton> *@
+@*         </HRow> *@
+@*     </FooterContent> *@
+@* </HDialog> *@
+
+
+<HDialog @bind-IsOpen="_isAddBomDialogOpen" Title="BOM 등록">
+    <ChildContent>
+        <div class="bom-dialog-content">
+            <div class="bom-dialog-main">
+                <h3 class="section-title">기본 정보</h3>
+
+                <HRow Gap="1rem">
+                    @* <HTextInput *@
+                    @*     Id="bomCode" *@
+                    @*     Label="BOM 코드" *@
+                    @*     Value="@_newBom.BomCode" *@
+                    @*     ValueChanged="@((value) => _editingBom.BomCode = value)" *@
+                    @*     PlaceHolder="BOM 코드 입력" *@
+                    @*     Required="true" *@
+                    @*     Validation="@((value) => string.IsNullOrWhiteSpace(value) ? "BOM 코드를 입력해주세요." : null)"> *@
+                    @* </HTextInput> *@
+
+                    <HDropDown
+                        TEnum="BomStatus"
+                        Id="bomStatus"
+                        Label="상태"
+                        Value="@_newBom.BomStatus"
+                        ValueChanged="@((value) => _newBom.BomStatus = value)"
+                        PlaceHolder="상태 선택"
+                        Required="true"
+                        Items="@_bomStatusOptions">
+                    </HDropDown>
+
+                    <HNumberInput
+                        Id="bomVersion"
+                        Label="버전"
+                        Value="@_newBom.BomVersion"
+                        ValueChanged="@((value) => _newBom.BomVersion = (int)value)"
+                        Min="1"
+                        Step="1"
+                        Required="true"
+                        Width="48%">
+                    </HNumberInput>
+                </HRow>
+
+                <HSelect TValue="int"
+                         Id="parentItem"
+                         Label="상위 품목"
+                         Value="@_selectedParentItemId"
+                         ValueChanged="@((value) => SelectParentItem(value))"
+                         PlaceHolder="상위 품목 선택"
+                         Required="true"
+                         Options="@_itemOptions"
+                         EnableSearch="true"
+                />
+
+                <HTextArea
+                    Id="bomNote"
+                    Label="비고"
+                    Value="@_newBom.Remark"
+                    ValueChanged="@((value) => _newBom.Remark = value)"
+                    PlaceHolder="BOM에 대한 비고사항을 입력하세요">
+                </HTextArea>
+
+                <div class="divider"></div>
+
+                <div class="component-section">
+                    <div class="section-header">
+                        <h3 class="section-title">구성품 목록</h3>
+                        <button class="add-component-btn" @onclick="OpenAddComponentDialog">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg> 구성품 추가
+                        </button>
+                    </div>
+
+                    @if (_newBom.Items.Count(item => item.ParentItemId != null) == 0)
+                    {
+                        <div class="empty-components">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 9.8V5a2 2 0 0 0-2-2h-4.8c0-1.1-.9-2-2-2-1.1 0-2 .9-2 2H5a2 2 0 0 0-2 2v4.8c-1.1 0-2 .9-2 2 0 1.1.9 2 2 2V19a2 2 0 0 0 2 2h4.8c0 1.1.9 2 2 2 1.1 0 2-.9 2-2H19a2 2 0 0 0 2-2v-4.8c1.1 0 2-.9 2-2 0-1.1-.9-2-2-2"/>
+                            </svg><p>추가된 구성품이 없습니다.</p>
+                            <p>구성품 추가 버튼을 클릭하여 구성품을 추가하세요.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="components-list">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>이미지</th>
+                                    <th>품목</th>
+                                    <th>수량</th>
+                                    @* <th>단위</th> *@
+                                    <th>비고</th>
+                                    <th>작업</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var component in _newBom.Items.Where(item => item.ParentItemId != null))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="item-thumbnail-placeholder">
+                                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                                    <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                                    <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                                    <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                                </svg>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @* @{ *@
+                                            @*     var itemName = "Unknown"; *@
+                                            @*     var item = _itemsList.FirstOrDefault(i => i.ItemId == component.ItemId); *@
+                                            @*     if (item != null) *@
+                                            @*     { *@
+                                            @*         itemName = item.ItemName; *@
+                                            @*     } *@
+                                            @* } *@
+                                            <span>@component.ItemId</span>
+                                        </td>
+                                        <td>@component.Quantity</td>
+                                        <td>@component.Remark</td>
+                                        <td class="actions-cell">
+                                            <button class="icon-btn edit-btn" title="수정">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                                    <path d="m15 5 4 4"/>
+                                                </svg>
+                                            </button>
+                                            <button class="icon-btn delete-btn" title="삭제">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M3 6h18"/>
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                    <line x1="10" y1="11" x2="10" y2="17"/>
+                                                    <line x1="14" y1="11" x2="14" y2="17"/>
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="CreateBom">등록</HButton>
+    </FooterContent>
+</HDialog>
+
+<HDialog @bind-IsOpen="_showComponentDialog" Title="구성품 추가" >
+    <ChildContent>
+        <HSelect
+            TValue="int"
+            Id="componentItem"
+            Label="품목"
+            Value="@_newComponentItemId"
+            ValueChanged="@((value) => SelectComponentItem(value))"
+            PlaceHolder="품목 선택"
+            Required="true"
+            Options="@_componentItemOptions">
+        </HSelect>
+
+        <HRow JustifyContent="space-between">
+            <HNumberInput
+                Id="quantity"
+                Label="수량"
+                @bind-Value="@_newComponentQuantity"
+                Min="0.001"
+                Step="1"
+                Required="true"
+                Width="48%">
+            </HNumberInput>
+        </HRow>
+
+        <HTextArea
+            Id="componentNote"
+            Label="비고"
+            @bind-Value="@_newComponentRemark"
+            PlaceHolder="구성품에 대한 비고사항을 입력하세요">
+        </HTextArea>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="AddComponent">추가</HButton>
+    </FooterContent>
+</HDialog>
+
+<!-- BOM 수정 다이얼로그 -->
+@* <HDialog IsOpen="@_isEditBomDialogOpen" IsOpenChanged="@((value) => _isEditBomDialogOpen = value)" Title="BOM 수정"> *@
+@*     <ChildContent> *@
+@*         <HDropDown TEnum="BomStatus" *@
+@*                    Id="bomStatus" *@
+@*                    Label="BOM 유형" *@
+@*                    Value="@_editingBom.BomStatus" *@
+@*                    ValueChanged="@((value) => _editingBom.BomStatus = value)" *@
+@*                    PlaceHolder="BOM 유형을 선택하세요" *@
+@*                    Required="true" *@
+@*                    Items="@_bomStatusOptions"> *@
+@*         </HDropDown> *@
+@* *@
+@*         <HTextInput *@
+@*                 @bind-Value="_editingBom.BomVersion" *@
+@*                 Width="100%" *@
+@*                 PlaceHolder="BOM 버전 입력 (예: 1.0)" *@
+@*             /> *@
+@* *@
+@*             <HTextArea *@
+@*                 @bind-Value="_editingBom.Remark" *@
+@*                 Width="100%" *@
+@*                 PlaceHolder="필요한 경우 비고 사항을 입력하세요" *@
+@*                 Rows="3" *@
+@*             /> *@
+@*     </ChildContent> *@
+@* *@
+@*     <FooterContent> *@
+@*         <HRow JustifyContent="flex-end" Gap="1rem"> *@
+@*             <HButton OnClick="@(() => _isEditBomDialogOpen = false)"> *@
+@*                 취소 *@
+@*             </HButton> *@
+@*             <HButton> *@
+@*                 저장 *@
+@*             </HButton> *@
+@*         </HRow> *@
+@*     </FooterContent> *@
+@* </HDialog> *@
+
+@code {
+    // 상태 변수
+    private List<Bom> _allBoms = new();
+    private List<Bom> _filteredBoms = new();
+    private BomStatus? _activeFilter;
+    private string _searchTerm = "";
+    private bool _isLoading = true;
+    private int? _loadingItemsForBom;
+    private Dictionary<int, List<ItemBomTree>> _bomItemTrees = new();
+
+    // 정렬 상태
+    private string _sortField = "date";
+    private bool _sortAscending = false;
+
+    // 다이얼로그 상태
+    private bool _isAddBomDialogOpen = false;
+    private bool _isEditBomDialogOpen = false;
+    private bool _showComponentDialog = false;
+    
+    // 폼 데이터
+    private CreateBomRequest _newBom = new();
+    private UpdateBomRequest _editingBom = new();
+    private int _editingBomId;
+
+    private decimal _newComponentQuantity = 1.0m;
+    private string _newComponentRemark = "";
+    
+    // 셀렉트 옵션
+    private List<HDropDown<BomStatus>.DropDownItem> _bomStatusOptions = new()
+    {
+        new() { Value = nameof(BomStatus.Active), Text = "활성화" },
+        new() { Value = nameof(BomStatus.Draft), Text = "임시저장" },
+        new() { Value = nameof(BomStatus.Inactive), Text = "비활성" },
+    };
+    
+    private List<HSelect<int>.SelectOption> _itemOptions = new List<HSelect<int>.SelectOption>
+    {
+        new() { Value = 1, Label = "나사" },
+        new() { Value = 2, Label = "기본 철판" },
+        new() { Value = 3, Label = "라벨용 종이" },
+        new() { Value = 4, Label = "중간 반제품 A" },
+        new() { Value = 5, Label = "스프링" },
+        new() { Value = 6, Label = "완성 제품 A" }
+    };
+    
+    private List<HSelect<int>.SelectOption> _componentItemOptions = new List<HSelect<int>.SelectOption>
+    {
+        new() { Value = 1, Label = "나사" },
+        new() { Value = 2, Label = "기본 철판" },
+        new() { Value = 3, Label = "라벨용 종이" },
+        new() { Value = 4, Label = "중간 반제품 A" },
+        new() { Value = 5, Label = "스프링" },
+        new() { Value = 6, Label = "완성 제품 A" }
+    };
+    
+    private int _selectedParentItemId;
+    private int _newComponentItemId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBomsAsync();
+    }
+
+    // BOM 데이터 로드
+    private async Task LoadBomsAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            if (_activeFilter == null)
+            {
+                _allBoms = await BomService.GetAllBomsAsync();
+            }
+            else
+            {
+                _allBoms = await BomService.GetBomsByStatusAsync(_activeFilter.ToString());
+            }
+
+            ApplyFiltersAndSort();
+        
+            // BOM 로드 후 모든 BOM의 아이템 트리 미리 로드
+            await LoadAllBomItemTreesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading BOMs: {ex.Message}");
+            _allBoms = new List<Bom>();
+            _filteredBoms = new List<Bom>();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadAllBomItemTreesAsync()
+    {
+        if (_filteredBoms == null || _filteredBoms.Count == 0)
+            return;
+
+        // 성능 최적화를 위해 병렬로 로드 (선택 사항)
+        var loadTasks = new List<Task>();
+    
+        foreach (var bom in _filteredBoms)
+        {
+            // 이미 로드된 BOM은 건너뛰기
+            if (_bomItemTrees.ContainsKey(bom.BomId))
+                continue;
+            
+            loadTasks.Add(LoadSingleBomItemTreeAsync(bom.BomId));
+        }
+    
+        // 모든 로드 작업이 완료될 때까지 대기
+        await Task.WhenAll(loadTasks);
+    
+        // 모든 BOM을 확장 상태로 설정 (선택 사항, 원하는 경우에만 사용)
+        foreach (var bom in _filteredBoms)
+        {
+            bom.IsExpanded = true;
+        }
+    }
+    
+    private async Task LoadSingleBomItemTreeAsync(int bomId)
+    {
+        try
+        {
+            var itemTrees = await BomService.GetBomItemTreeAsync(bomId);
+            _bomItemTrees[bomId] = itemTrees;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading BOM item tree for BOM ID {bomId}: {ex.Message}");
+            _bomItemTrees[bomId] = new List<ItemBomTree>();
+        }
+    }
+    
+    // BOM 품목 트리 로드
+    private async Task LoadBomItemTreeAsync(Bom bom)
+    {
+        if (!bom.IsExpanded)
+        {
+            return;
+        }
+
+        if (_bomItemTrees.ContainsKey(bom.BomId))
+        {
+            return;
+        }
+
+        _loadingItemsForBom = bom.BomId;
+
+        try
+        {
+            var itemTrees = await BomService.GetBomItemTreeAsync(bom.BomId);
+            _bomItemTrees[bom.BomId] = itemTrees;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading BOM item tree: {ex.Message}");
+            _bomItemTrees[bom.BomId] = new List<ItemBomTree>();
+        }
+        finally
+        {
+            _loadingItemsForBom = null;
+        }
+    }
+
+    // BOM 생성
+    // BOM 생성 함수 수정
+    private async Task CreateBom()
+    {
+        try
+        {
+            // 상위 품목이 선택되었는지 확인
+            if (_selectedParentItemId is 0)
+            {
+                // 알림 표시: "상위 품목을 선택해주세요"
+                return;
+            }
+
+            // 상위 품목 ID
+            int parentItemId = _selectedParentItemId;
+        
+            // 상위 품목이 아직 추가되지 않았다면 추가
+            if (!_newBom.Items.Any(item => item.ItemId == parentItemId && item.ParentItemId == null))
+            {
+                // 상위 품목 추가
+                _newBom.Items.Add(new AddItemToBomRequest
+                {
+                    ItemId = parentItemId,
+                    Quantity = 1,
+                    Remark = _newBom.Remark,
+                    ParentItemId = null // 루트 아이템이므로 ParentItemId는 null
+                });
+            }
+
+            var result = await BomService.CreateBomAsync(_newBom);
+
+            if (result != null)
+            {
+                // 성공적으로 생성되면 목록 다시 로드
+                _isAddBomDialogOpen = false;
+            
+                // 폼 초기화
+                _newBom = new CreateBomRequest();
+                _selectedParentItemId = 0;
+            
+                await LoadBomsAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating BOM: {ex.Message}");
+        }
+    }
+
+    // BOM 삭제
+    private async Task DeleteBom(Bom bom)
+    {
+        // bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"BOM ID {bom.BomId}를 삭제하시겠습니까?");
+
+        // if (confirmed)
+        // {
+        //     try
+        //     {
+        //         bool result = await BomService.DeleteBomAsync(bom.BomId);
+        //
+        //         if (result)
+        //         {
+        //             await LoadBomsAsync();
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Error deleting BOM: {ex.Message}");
+        //     }
+        // }
+    }
+
+    // 필터링 및 정렬 적용
+    private void ApplyFiltersAndSort()
+    {
+        // 필터링 대상 BOM ID 목록
+        HashSet<int> matchingBomIds = new HashSet<int>();
+        
+        // 검색어가 입력된 경우에만 아이템 이름으로 검색 수행
+        if (!string.IsNullOrEmpty(_searchTerm))
+        {
+            // 아이템 이름으로 검색
+            foreach (var bomId in _bomItemTrees.Keys)
+            {
+                var itemTrees = _bomItemTrees[bomId];
+                
+                // 루트 아이템 또는 자식 아이템 중 하나라도 검색어를 포함하는지 확인
+                bool hasMatchingItem = itemTrees.Any(item => 
+                    item.ItemBom.Item.ItemName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
+                
+                if (hasMatchingItem)
+                {
+                    matchingBomIds.Add(bomId);
+                }
+            }
+        }
+
+        // 기본 필터링 (BOM ID, 버전, 비고 등으로 검색)
+        _filteredBoms = _allBoms
+            .Where(bom => 
+                string.IsNullOrEmpty(_searchTerm) || // 검색어가 없으면 모든 BOM 포함
+                bom.BomId.ToString().Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                bom.BomVersion.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                bom.Remark.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                matchingBomIds.Contains(bom.BomId) // 아이템 이름으로 검색된 BOM ID 포함
+            )
+            .ToList();
+
+        // 정렬
+        _filteredBoms = _sortField switch
+        {
+            "bomId" => _sortAscending
+                ? _filteredBoms.OrderBy(b => b.BomId).ToList()
+                : _filteredBoms.OrderByDescending(b => b.BomId).ToList(),
+            "version" => _sortAscending
+                ? _filteredBoms.OrderBy(b => b.BomVersion).ToList()
+                : _filteredBoms.OrderByDescending(b => b.BomVersion).ToList(),
+            "status" => _sortAscending
+                ? _filteredBoms.OrderBy(b => b.BomStatus).ToList()
+                : _filteredBoms.OrderByDescending(b => b.BomStatus).ToList(),
+            "remark" => _sortAscending
+                ? _filteredBoms.OrderBy(b => b.Remark).ToList()
+                : _filteredBoms.OrderByDescending(b => b.Remark).ToList(),
+            "date" => _sortAscending
+                ? _filteredBoms.OrderBy(b => b.CreatedAt).ToList()
+                : _filteredBoms.OrderByDescending(b => b.CreatedAt).ToList(),
+            _ => _filteredBoms
+        };
+        
+        // 검색 결과에 해당하는 BOM은 자동으로 펼치기 (선택 사항)
+        if (!string.IsNullOrEmpty(_searchTerm))
+        {
+            foreach (var bom in _filteredBoms)
+            {
+                bom.IsExpanded = true;
+            }
+        }
+    }
+
+    // 필터 적용
+    private async Task ApplyFilter(BomStatus? status)
+    {
+        _activeFilter = status;
+        await LoadBomsAsync();
+    }
+
+    // 검색어 지우기
+    private void ClearSearch()
+    {
+        _searchTerm = "";
+        ApplyFiltersAndSort();
+    }
+
+    // 필터 초기화
+    private async Task ClearFilters()
+    {
+        _activeFilter = null;
+        _searchTerm = "";
+        await LoadBomsAsync();
+    }
+
+    // 정렬 방식 변경
+    private void SortItems(string field)
+    {
+        if (_sortField == field)
+        {
+            _sortAscending = !_sortAscending;
+        }
+        else
+        {
+            _sortField = field;
+            _sortAscending = true;
+        }
+
+        ApplyFiltersAndSort();
+    }
+
+    // 정렬 아이콘 가져오기
+    private string GetSortIcon(string field)
+    {
+        if (_sortField != field)
+        {
+            return "";
+        }
+
+        return _sortAscending ? "↑" : "↓";
+    }
+
+    // BOM 상태 표시 이름 가져오기
+    private string GetBomStatusDisplayName(BomStatus status)
+    {
+        return status switch
+        {
+            BomStatus.Active => "활성",
+            BomStatus.Inactive => "비활성",
+            BomStatus.Draft => "임시저장",
+            _ => "알 수 없음"
+        };
+    }
+
+    // BOM 상태 CSS 클래스 가져오기
+    private string GetBomStatusClass(BomStatus status)
+    {
+        return status switch
+        {
+            BomStatus.Active => "status-active",
+            BomStatus.Inactive => "status-inactive",
+            BomStatus.Draft => "status-draft",
+            _ => ""
+        };
+    }
+
+    // BOM 확장/축소 토글
+    private async Task ToggleExpand(Bom bom)
+    {
+        bom.IsExpanded = !bom.IsExpanded;
+    }
+
+    // BOM 상세 보기 페이지로 이동
+    private void ViewBomDetails(Bom bom)
+    {
+        NavigationManager.NavigateTo($"/bom/{bom.BomId}");
+    }
+
+    // BOM 등록 다이얼로그 열기
+    private void OpenAddBomDialog()
+    {
+        _newBom = new CreateBomRequest();
+        _isAddBomDialogOpen = true;
+    }
+
+    // BOM 수정 다이얼로그 열기
+    private void OpenEditBomDialog(Bom bom)
+    {
+        _editingBomId = bom.BomId;
+        _editingBom = new UpdateBomRequest
+        {
+            BomStatus = bom.BomStatus,
+            BomVersion = bom.BomVersion,
+            Remark = bom.Remark
+        };
+        _isEditBomDialogOpen = true;
+    }
+    
+    private void SelectParentItem(int itemId)
+    {
+        _selectedParentItemId = itemId;
+        if (itemId is 0)
+        {
+            var option = _itemOptions.FirstOrDefault(o => o.Value == itemId);
+            if (option != null)
+            {
+                // _editingBom.ItemId = id;
+                // _editingBom.ItemName = option.Label;
+                // 실제 구현에서는 API 호출을 통해 이미지 URL 등의 추가 정보 가져오기
+            }
+        }
+    }
+    
+    private void SelectComponentItem(int itemId)
+    {
+        _newComponentItemId = itemId;
+        if (itemId is 0)
+        {
+            var option = _componentItemOptions.FirstOrDefault(o => o.Value == itemId);
+            if (option != null)
+            {
+                // _editingComponent.ItemId = id;
+                // _editingComponent.ItemName = option.Label;
+                // _editingComponent.Unit = "EA"; // 실제 구현에서는 API 호출을 통해 단위 정보 가져오기
+            }
+        }
+    }
+    
+    private void OpenAddComponentDialog()
+    {
+        // 상위 품목이 선택되었는지 확인
+        if (_selectedParentItemId is 0)
+        {
+            // 알림 표시: "상위 품목을 먼저 선택해주세요"
+            return;
+        }
+
+        _newComponentItemId = 0;
+        _newComponentQuantity = 1;
+        _newComponentRemark = "";
+        _showComponentDialog = true;
+    }
+    
+    // 구성품 추가
+    private async Task AddComponent()
+    {
+        if (_newComponentItemId is 0)
+        {
+            // 알림 표시: "품목을 선택해주세요"
+            return;
+        }
+
+        if (_newComponentQuantity <= 0)
+        {
+            // 알림 표시: "수량은 0보다 커야 합니다"
+            return;
+        }
+
+        try
+        {
+            int itemId = _newComponentItemId;
+            int parentItemId = _selectedParentItemId;
+        
+            // 이미 추가된 아이템인지 확인
+            bool isDuplicate = _newBom.Items.Any(item => 
+                item.ItemId == itemId && 
+                item.ParentItemId == parentItemId);
+            
+            if (isDuplicate)
+            {
+                // 알림 표시: "이미 추가된 품목입니다"
+                return;
+            }
+        
+            // 새 구성품을 직접 _newBom.Items에 추가
+            _newBom.Items.Add(new AddItemToBomRequest
+            {
+                ItemId = itemId,
+                Quantity = _newComponentQuantity,
+                Remark = _newComponentRemark,
+                ParentItemId = parentItemId // 상위 품목의 ID를 부모 ID로 설정
+            });
+
+            // 다이얼로그 닫기
+            _showComponentDialog = false;
+        
+            // 상태 업데이트를 위한 StateHasChanged 호출
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding component: {ex.Message}");
+        }
+    }
+}

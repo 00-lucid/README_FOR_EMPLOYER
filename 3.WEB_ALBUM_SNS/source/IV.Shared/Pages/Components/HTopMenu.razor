@@ -1,0 +1,223 @@
+﻿@using System.Security.Claims
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Model
+@using IV.Web.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
+@using SchemaLens.Client.Utils
+@inject NavigationManager NavigationManager
+@inject ILoginService LoginService
+@inject IAlarmService AlarmService
+@inherits LayoutComponentBase
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div class="top-menu-container">
+    <!-- 왼쪽 로고/타이틀 영역 -->
+    <div @onclick="NavigateToHome" class="logo-area">
+        @* <img src="images/iv-logo.png" alt="IV 로고" /> *@
+        <span class="header-title">IV</span>
+    </div>
+
+    <!-- 햄버거 버튼 (반응형 작은 화면에서 메뉴 열기/닫기) -->
+    <button class="@($"hamburger-button{(_menuState == "open" ? " is-open" : "")}")"
+            @onclick="ToggleMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- 실제 메뉴 영역 -->
+    <nav class="@MenuCssClass">
+        <ul class="menu-list">
+            <li class="nav-item"><NavLink  href="/" Match="NavLinkMatch.All">Home</NavLink></li>
+            <li class="nav-item"><NavLink  href="/feeds">Feeds</NavLink></li>
+            <li class="nav-item"><NavLink  href="/albums">Albums</NavLink></li>
+            <li class="nav-item-bell">
+                <li class="nav-item-bell bell-container">
+                    <button class="bell-button @(isNewAlarm ? "has-unread" : "")" @onclick="ToggleAlarmBox">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z"/></svg>
+                    </button>
+                </li>
+            </li>
+            @if (authUser?.Identity is not null && authUser.Identity.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <NavLink href="@($"/profile/{_userId}")">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                    </NavLink>
+                </li>
+                // 블루스타
+                <HRow AlignItems="center" Gap="8px">
+                    <a href="/credit-recharge" class="coin-container">
+                        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <!-- 코인 바탕 -->
+                            <circle cx="16" cy="16" r="15" fill="#0288D1" />
+                            <!-- 안쪽(연한 파랑) -->
+                            <circle cx="16" cy="16" r="12" fill="#B3E5FC" />
+                            <!-- 텍스트 "BS" -->
+                            <text
+                                x="50%" y="50%"
+                                text-anchor="middle"
+                                alignment-baseline="middle"
+                                fill="#01579B"
+                                font-size="14"
+                                font-weight="900"
+                                font-family="sans-serif"
+                            >
+                                BS
+                            </text>
+                        </svg>
+                    </a>
+                    @* <span>500</span> *@
+                </HRow>
+                <HTextButton Type="HTextButton.ButtonType.Danger" OnClick="Logout">Logout</HTextButton>
+            }
+            else
+            {
+                <HButton OnClick="NavigateToLogin">Login</HButton>
+            }
+        </ul>
+    </nav>
+</div>
+
+@if (_showAlarmBox)
+{
+    <!-- 팝오버 형태로 감싸기 위한 div -->
+    <div class="alarm-popover">
+        <HAlarmBox Alarms="@alarms"/>
+    </div>
+}
+
+@code {
+    private int _userId;
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthState { get; set; }
+    
+    // 인사말 문자열 배열(원하는 만큼 추가 가능)
+    private static readonly string[] Greetings = new[]
+    {
+        "환영합니다",
+        "마음껏 즐기세요",
+        "찾아주셨군요",
+        "행복한 하루가 되길",
+        "웃어보세요"
+    };
+    
+    private string? selectedGreeting; // 무작위로 선택된 인사말을 저장할 변수
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private ClaimsPrincipal? authUser;
+    private bool _isMenuOpen;
+
+    // 메뉴 열림/닫힘 여부에 따라 CSS 클래스를 구분
+    private string _menuState = "close"; // 페이지 로딩 시 기본값: 닫힘 상태
+
+    private string MenuCssClass => $"menu {_menuState}";
+    
+    IEnumerable<AlarmModel> alarms;
+    bool isNewAlarm = false;
+    private HubConnection? _hubConnection;
+    
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // 페이지가 변경되는 시점에 메뉴를 닫기
+        _menuState = "close";
+        
+        // 필요하다면 상태 갱신
+        StateHasChanged();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _userId = Convert.ToInt32(await Common.GetClaimValueAsync(AuthState, "sid") ?? "0");
+
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        // 인증 정보 가져오기
+        var authState = await (AuthenticationStateTask ?? Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+        authUser = authState.User;
+        
+        // 로그인된 사용자의 경우에만 무작위 인사말 선택
+        if (authUser?.Identity is not null && authUser.Identity.IsAuthenticated)
+        {
+            var random = new Random();
+            selectedGreeting = Greetings[random.Next(Greetings.Length)];
+        }
+
+        // SignalR 허브 연결 생성
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/alarmhub")) // 서버의 허브 URL
+            .Build();
+        
+        // 서버에서 알람 갱신 메시지 수신 설정
+        _hubConnection.On("ReceiveAlarmUpdate", async () =>
+        {
+            await LoadAlarms();  // 알람 데이터를 새로 로드
+            await InvokeAsync(StateHasChanged);  // UI를 안전하게 갱신
+        });
+        
+        await _hubConnection.StartAsync(); // SignalR 허브 연결 시작
+        await LoadAlarms();                // 초기 알람 로드
+    }
+
+    private void ToggleMenu()
+    {
+        // 열려 있다면 닫힘으로, 닫혀 있다면 열림으로 전환
+        if (_menuState == "open")
+            _menuState = "close";
+        else
+            _menuState = "open";
+    }
+
+    private async Task Logout()
+    {
+        // 실제 로그아웃 처리
+        await LoginService.LogoutAsync();
+        authUser = new ClaimsPrincipal(new ClaimsIdentity());
+        NavigationManager.NavigateTo("/login", true);
+    }
+    
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo($"/login");
+    }
+    
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+    
+    private async Task LoadAlarms()
+    {
+        alarms = await AlarmService.GetAlarmsByUserId(_userId); // 알람 데이터 서버에서 가져오기
+        isNewAlarm = alarms.Any(alarm => !alarm.IsRead);
+    }
+    
+    public void Dispose()
+    {
+        // 이벤트 구독 해제
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        
+        // SignalR 허브 연결 해제
+        if (_hubConnection != null)
+        {
+            _ = _hubConnection.StopAsync(); // 비동기적으로 연결 정지
+            _hubConnection.DisposeAsync(); // 허브 연결 해제 및 자원 반환
+        }
+        
+        alarms = null;
+        isNewAlarm = false;
+    }
+    
+    private bool _showAlarmBox = false;
+    
+    private void ToggleAlarmBox()
+    {
+        // 알람 창 열림/닫힘 토글
+        _showAlarmBox = !_showAlarmBox;
+    }
+
+}

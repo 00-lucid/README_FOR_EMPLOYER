@@ -1,0 +1,235 @@
+﻿/* 전체 피드 컨테이너 */
+.feed-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto; /* 스크롤 가능 */
+    max-height: 100vh; /* 혹은 calc(100vh - 헤더/푸터 높이) 등 */
+    padding: 1rem 0 50vh;
+}
+
+/* 각 피드 아이템 */
+.feed-item {
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    /* 전역 스타일과 조화되도록 필요하다면 그림자나 radius 조정 가능 */
+}
+
+/* 피드 헤더 (사용자 정보 등) */
+.feed-item-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    object-fit: cover;
+}
+
+.username {
+    padding-left: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.feed-item-image {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    touch-action: pan-x; /* 혹은 none, pan-y 등 조정 가능 */
+    /* 높이는 자동으로 잡히도록 height:auto (생략 가능) */
+}
+
+/* 실제 이미지 표시 영역 */
+.feed-item-image img {
+    display: block;
+    width: 100%;
+    height: auto;      /* 세로 비율 유지 */
+    transition: 0.3s;  /* 드래그 종료 후 부드러운 이동 */
+    transform: translateX(0); /* 초깃값 */
+}
+
+/* 피드 하단(좋아요, 댓글 등) */
+.feed-item-footer {
+    padding: 0.5rem 1rem;
+}
+
+/* 좋아요, 댓글 등의 액션 버튼 */
+.feed-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 피드 하단(좋아요, 댓글 등) */
+.feed-item-footer {
+    padding: 0.5rem 1rem;
+}
+
+/* 캡션을 감싸는 컨테이너 */
+.feed-caption-container {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 실제 본문(캡션) 스타일 */
+.caption {
+    margin: 0;                /* 기본 여백 제거 */
+    font-size: 0.95rem;       /* 읽기 편한 크기로 조절 */
+    line-height: 1.5;         /* 행간 확보 */
+    color: #333;              /* 명도 조정 */
+    white-space: pre-wrap;    /* 줄바꿈, 공백 유지 */
+    word-wrap: break-word;    /* 긴 단어가 있을 경우 줄바꿈 처리 */
+}
+
+
+/* 검색 영역 컨테이너 */
+.search-container {
+    margin: 1rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* 검색창 스타일 */
+.search-input {
+    width: 70%;
+    max-width: 300px;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dbdbdb;
+    font-size: 1rem;
+}
+
+/* 검색 컨테이너를 상대 위치로 설정해 드롭다운을 자식으로 배치 */
+.search-container {
+    position: relative;
+    margin: 1rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* 검색창 */
+.search-input {
+    width: 70%;
+    max-width: 300px;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dbdbdb;
+    font-size: 1rem;
+}
+
+/* 검색 결과 드롭다운 */
+.search-results-dropdown {
+    position: absolute;       /* .search-container 기준 배치 */
+    top: calc(100% + 0.5rem); /* 검색창 바로 아래 */
+    width: 70%;
+    max-width: 300px;
+    background-color: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 9999;            /* 다른 요소 위에 표시 */
+    padding: 0.5rem 0;
+}
+
+.search-results-dropdown ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* 검색 결과 단일 항목 */
+.search-result-item {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dbdbdb;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* 마지막 검색 결과 하단 구분선 제거 */
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+/* 검색 버튼 스타일 */
+.search-button {
+    padding: 0.5rem 0.8rem;
+    margin-left: 0.5rem;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* 모바일에서 버튼을 더 크고 보기 좋게 만들고 싶다면 */
+@media (max-width: 480px) {
+    .search-button {
+        padding: 0.6rem 1rem;
+        font-size: 1.1rem;
+    }
+}
+
+.comment-item strong {
+    margin-right: 0.3rem;
+}
+
+.comment-date {
+    width: 5rem;
+    color: var(--disabled-color);
+    font-size: 0.7rem;
+    font-weight: lighter;
+}
+
+/* 인디케이터(현재 인덱스/총 개수 등) */
+.image-controls {
+    position: absolute; /* 캐러셀 영역 우측/하단 등에 배치할 수 있음 */
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* 모바일 환경에서 border, border-radius 제거 */
+@media (max-width: 480px) {
+    .feed-item {
+        border: none;
+        border-radius: 0;
+    }
+}
+
+/* 프로필 이미지를 원형으로 만들기 위한 컨테이너 */
+.profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden; /* 테두리를 벗어난 부분은 숨김 처리 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 내부 이미지는 부모 크기에 맞춰 채우되, 비율이 깨지지 않도록 설정 */
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

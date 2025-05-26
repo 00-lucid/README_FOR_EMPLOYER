@@ -1,0 +1,73 @@
+﻿@page "/projects"
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@inject IProjectService ProjectService
+@inject TooltipService TooltipService
+
+<PageTitle>Project</PageTitle>
+
+<div id="project-container">
+    <div id="sidebar"></div>
+    <div id="project-detail-container">
+        <div id="breadcrumb-width-option-container">
+            @* BreadCrumbUI *@
+            <RadzenBreadCrumb>
+                <RadzenBreadCrumbItem Path="/" Text="Home" />
+            </RadzenBreadCrumb>
+            <div id="option-container">
+                @* OptionButtonUI *@
+                <RadzenButton Icon="bookmark" ButtonStyle="ButtonStyle.Primary" />
+                @* <RadzenButton Icon="lightbulb" ButtonStyle="ButtonStyle.Secondary" /> *@
+                @* <RadzenButton Icon="description" ButtonStyle="ButtonStyle.Base" /> *@
+            </div>
+        </div>
+
+        @if (project is not null)
+        {
+            <div id="object-title-container">
+                <span>@(project.ProjectName)</span>
+                <RadzenIcon Style="margin-left: 1rem; font-variation-settings: 'FILL' 1; cursor: default;"
+                            Icon="check_circle"
+                            IconColor="@Colors.Primary"
+                            MouseEnter="@(args => ShowTooltip("검증됨", args, new TooltipOptions(){ Position = TooltipPosition.Top, Duration = 500 }))">
+                </RadzenIcon>
+            </div>
+            <ul id="object-subtitle-container">
+                <li>
+                    <RadzenText>
+                        등록일 @project.CreatedAt
+                    </RadzenText>
+                </li>
+                <li>
+                    <RadzenText>
+                        등록자 @project.Username
+                    </RadzenText>
+                </li>
+            </ul>
+        }
+        
+        @* <PeersGroup/> *@
+        <GroupTable/>
+    </div>
+    <div id="project-additional-container"></div>
+</div>
+
+
+@code {
+    [SupplyParameterFromQuery]
+    public int ProjectId { get; set; }
+
+    ProjectModel project;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+         List<ProjectModel> projects = await ProjectService.GetProjectById(ProjectId);
+         project = projects.First();
+    }
+    private void ShowTooltip(string text, ElementReference elementReference, TooltipOptions options = null)
+    {
+        TooltipService.Open(elementReference, text, options);
+    }
+}

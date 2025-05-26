@@ -1,0 +1,104 @@
+@page "/login"
+@using MESALL.Shared.Interfaces
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.utils
+@inject NavigationManager NavigationManager
+@inject ILoginService LoginService
+
+@* <HSpinner IsLoading="@_isLoading" /> *@
+
+<HLayoutCenter>
+    <HColumn Gap="1rem">
+        <form @onsubmit="HandleLogin">
+            <HColumn Gap="1rem" MinWidth="20rem">
+                <HTextInput 
+                    Label="이메일"
+                    Type="email"
+                    Id="email"
+                    @bind-Value="@_email" 
+                    PlaceHolder="이메일을 입력하세요" 
+                    Validation="Validator.ValidateEmail"
+                />
+                <HTextInput 
+                    Label="비밀번호" 
+                    Type="password" 
+                    Id="password" 
+                    @bind-Value="@_password" 
+                    PlaceHolder="비밀번호를 입력하세요"
+                    Validation="Validator.ValidatePassword"
+                />
+                @* <HRow AlignItems="center"> *@
+                @*     <HSlider @bind-Value="@RememberMe" /> *@
+                @*     <HLabel>Remember Me</HLabel> *@
+                @* </HRow> *@
+                <HButton>로그인</HButton>
+            </HColumn>
+        </form>
+        @* @if (!string.IsNullOrEmpty(ErrorMessage)) *@
+        @* { *@
+        @*     <p class="error-message">@ErrorMessage</p> *@
+        @* } *@
+
+        <!-- 회원가입 리디렉션 및 계정 복구 -->
+        <div class="auxiliary-links">
+            <p>
+                계정이 없나요?
+                <a href="@($"/signup{(string.IsNullOrEmpty(ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(ReturnUrl)}")}")">
+                    회원가입
+                </a>
+            </p>
+            <p>
+                비밀번호를 잊었나요?
+                <a href="@($"/recover-account{(string.IsNullOrEmpty(ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(ReturnUrl)}")}")">
+                    비밀번호 찾기
+                </a>
+            </p>
+        </div>
+    </HColumn>
+</HLayoutCenter>
+
+@code {
+    private string _email { get; set; } = string.Empty;
+    private string _password { get; set; } = string.Empty;
+    private bool _rememberMe { get; set; } = false;
+    private bool _isLoading { get; set; } = false; // 로딩 상태 변수 추가
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private async Task HandleLogin()
+    {
+        _isLoading = true; // 로딩 시작
+
+        try
+        {
+            AuthToken? token = await LoginService.LoginAsync(_email, _password);
+            if (token != null)
+            {
+                if (ReturnUrl is not null)
+                {
+                    NavigationManager.NavigateTo(Uri.UnescapeDataString(ReturnUrl), true, true);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/", true, true);
+                }
+            }
+            else
+            {
+                // 로그인 실패 메시지
+                // ErrorMessage = "Invalid email or password. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // 에러 처리
+            // ErrorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false; // 로딩 종료
+        }
+    }
+}

@@ -1,0 +1,98 @@
+﻿@page "/verify-recover-account"
+@using System.ComponentModel.DataAnnotations
+@using IV.Shared.Interfaces
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Pages.Components
+@inject NavigationManager NavigationManager
+@inject IEmailService EmailService
+
+<HSpinner IsLoading="@IsLoading" />
+
+<HLayoutCenter>
+    <div class="verify-container">
+        <HRow AlignItems="center" JustifyContent="center">
+            <h1>IV</h1>
+        </HRow>
+        <HColumn Gap="1rem">
+            <form @onsubmit="HandleVerifyCode">
+                <HColumn Gap="1rem">
+                    <HTextInput Label="Verification Code" Type="text" Id="verificationCode"
+                                Value="@_verificationModel.Code"
+                                ValueChanged="val => _verificationModel.Code = val"
+                                PlaceHolder="Enter the 6-digit code"
+                                MaxLength="6" />
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </HColumn>
+            </form>
+
+            @* 에러 메시지 *@
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <p class="error-message">@ErrorMessage</p>
+            }
+
+            <!-- 인증 코드 만료 시 다시 이메일 요청 -->
+            <div class="auxiliary-links">
+                <p>
+                    Didn’t receive a code? <a href="/recover-account">Resend Email</a>
+                </p>
+            </div>
+        </HColumn>
+    </div>
+</HLayoutCenter>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? email { get; set; } 
+    
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private readonly VerificationModel _verificationModel = new();
+    private string ErrorMessage { get; set; } = string.Empty;
+    private bool IsLoading { get; set; } = false; // 로딩 상태 변수 추가
+
+    private async Task HandleVerifyCode()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            // 인증 코드 유효성 검증
+            if (string.IsNullOrEmpty(_verificationModel.Code) || _verificationModel.Code.Length != 6)
+            {
+                ErrorMessage = "Please enter a valid 6-digit verification code.";
+                return;
+            }
+
+            // 서비스 호출하여 인증 코드 검증
+            var isValid = await EmailService.ValidateCodeAsync(_verificationModel.Code);
+
+            if (isValid)
+            {
+                // 인증 성공 후 이메일 정보를 쿼리 파라미터로 전달하며 페이지 이동
+                NavigationManager.NavigateTo(!string.IsNullOrEmpty(ReturnUrl) ? $"/reset-password?email={email}&returnUrl={ReturnUrl}" : $"/reset-password?email={email}");
+            }
+            else
+            {
+                ErrorMessage = "The verification code is invalid or has expired.";
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "An error occurred while verifying the code. Please try again.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    public class VerificationModel
+    {
+        [Required(ErrorMessage = "Verification code is required.")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "The code must be 6 digits.")]
+        public string Code { get; set; } = string.Empty;
+    }
+}

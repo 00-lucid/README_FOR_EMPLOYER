@@ -1,0 +1,17 @@
+﻿<td class="htable-cell @CssClass" @onclick="@HandleClick">
+    @ChildContent
+</td>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public EventCallback Clicked { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (Clicked.HasDelegate)
+        {
+            await Clicked.InvokeAsync();
+        }
+    }
+}

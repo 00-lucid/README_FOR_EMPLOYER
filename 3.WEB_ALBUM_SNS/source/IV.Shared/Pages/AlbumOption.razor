@@ -1,0 +1,334 @@
+﻿@page "/album-option/{AlbumId:int}"
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+
+@inject IAlbumService AlbumService
+@inject IUserService UserService
+@inject IEmailService EmailService
+@inject NavigationManager NavigationManager
+
+@if (_album is not null)
+{
+    <HLayoutScroll>
+        @* <HColumn Gap="1rem" IsBottomSpace="true"> *@
+            <div class="album-settings">
+                <HColumn Gap="1rem" IsBottomSpace="true">
+                    <HTextInput Label="앨범 제목" Placeholder="앨범 제목 입력" @bind-Value="@_album.AlbumTitle"/>
+
+                    <HTextArea Label="앨범 설명" Placeholder="앨범 설명 입력" Rows="4" @bind-Value="@_album.AlbumDescription"/>
+
+                    <HRowRigid LabelWidth="120px">
+                        <LabelContent>
+                            <HText TextType="HText.HTextType.Button">비공개</HText>
+                        </LabelContent>
+                        <ChildContent>
+                            <HToggleSwitch @bind-IsToggled="_album.IsPrivate"/>
+                        </ChildContent>
+                    </HRowRigid>
+
+                    <HRowRigid LabelWidth="120px">
+                        <LabelContent>
+                            <HText TextType="HText.HTextType.Button">수익창출</HText>
+                        </LabelContent>
+                        <ChildContent>
+                            <HToggleSwitch @bind-IsToggled="_album.IsPaid" Disabled="@(!_album.IsPrivate)"/>
+                        </ChildContent>
+                    </HRowRigid>
+
+                    @if (_album.IsPaid)
+                    {
+                        <div class="paid-options">
+                            <HNumberInput Label="앨범 가격" @bind-Value="@_album.Price" Placeholder="가격 입력 (원)"/>
+                            <HSelectDropdown Label="요금제 선택" Options="@pricingOptions" @bind-SelectedValue="@_album.PlanType"/>
+                        </div>
+                    }
+
+                    <HButton Type="HButton.ButtonType.Primary" OnClick="SaveAlbum">저장</HButton>
+
+                    <div class="subscriber-management">
+                        @if (_subscribers is null)
+                        {
+                            <HSpinner/>
+                        }
+                        else if (!_subscribers.Any())
+                        {
+                            <HNotingText Title="¯\_(ツ)_/¯" SubTitle="현재 구독자가 없습니다." Compare="_subscribers"/>
+                        }
+                        else
+                        {
+                            <HTable>
+                                <HeaderContent>
+                                    <HTableRow>
+                                        <HTableCell>구독자 이름</HTableCell>
+                                        <HTableCell>이메일</HTableCell>
+                                    </HTableRow>
+                                </HeaderContent>
+                                <RowContent>
+                                    @foreach (var subscriber in _subscribers)
+                                    {
+                                        <HTableRow>
+                                            <HTableCell>@subscriber.Username</HTableCell>
+                                            <HTableCell>@subscriber.Email</HTableCell>
+                                        </HTableRow>
+                                    }
+                                </RowContent>
+                            </HTable>
+                        }
+
+                        <!-- 초대 발송된 리스트 -->
+                        @if ( _emailInvitations.Any())
+                        {
+                            <HTable>
+                                <HeaderContent>
+                                    <HTableRow>
+                                        <HTableCell>이메일</HTableCell>
+                                        <HTableCell>상태</HTableCell>
+                                        <HTableCell>만료일</HTableCell>
+                                    </HTableRow>
+                                </HeaderContent>
+                                <RowContent>
+                                    @foreach (var invitation in _emailInvitations)
+                                    {
+                                        <HTableRow>
+                                            <!-- 이름 정보가 따로 없으면 공백이거나 별도 표기 -->
+                                            <HTableCell>@invitation.RecipientEmail</HTableCell>
+                                            <HTableCell>
+                                                <HText TextColorType="@GetStatusColor(invitation.InvitationStatus)">
+                                                    @invitation.InvitationStatus
+                                                </HText>
+                                            </HTableCell>
+                                            <HTableCell>@invitation.ExpiresAt</HTableCell>
+                                        </HTableRow>
+                                    }
+                                </RowContent>
+                            </HTable>
+                        }
+                        else
+                        {
+                            <!-- 초대 내역이 전혀 없을 때 표시할 내용 (선택 사항) -->
+                        }
+
+                        <HRow Gap="8px" AlignItems="center">
+                            <HTextInput Placeholder="초대할 사용자 이메일 입력" @bind-Value="_inviteEmail">
+                                <HButton Type="HButton.ButtonType.Primary" OnClick="SendInvitation">초대</HButton>
+                            </HTextInput>
+                        </HRow>
+                    </div>
+
+                    <HTextButton Type="HTextButton.ButtonType.Danger" OnClick="OpenDeleteConfirmDialog">앨범 삭제</HTextButton>
+                </HColumn>
+            </div>
+        @* </HColumn> *@
+    </HLayoutScroll>
+    
+    @* 삭제 확인 모달 *@
+    @if(showDeleteConfirmDialog)
+    {
+        <!-- 앨범삭제 다이얼로그 -->
+        <HDialog Title="정말 앨범을 삭제하시겠습니까?"
+                 IsOpen="@showDeleteConfirmDialog"
+                 IsOpenChanged="@(value => showDeleteConfirmDialog = value)">
+            <ChildContent>
+                <HText TextType="HText.HTextType.Caption" TextColorType="HText.HTextColorType.Error">삭제 시 복원할 수 없습니다. 계속 진행하시겠습니까?</HText>
+            </ChildContent>
+            <FooterContent>
+                <HButton OnClick="() => showDeleteConfirmDialog = false">
+                    아니오
+                </HButton>
+                <HButton OnClick="ConfirmDeleteHandler">
+                    예
+                </HButton>
+            </FooterContent>
+        </HDialog>
+    }
+    
+    <HSnackbar @bind-IsOpen="isSnackbarOpen"
+               Message="앨범 정보가 성공적으로 업데이트되었습니다."
+               Duration="3000" />
+    
+    <HAlertContainer @ref="_alertContainer" />
+}
+
+@code {
+    private int _userId;
+    private string _username;
+    private AlbumModel? _album;
+    
+    private bool IsLoading { get; set; } = false; // 로딩 상태 변수 추가
+    private HAlertContainer? _alertContainer;
+    
+    private bool isSnackbarOpen = false; // Snackbar 상태 추가
+    private bool _isDeleteDialogOpen = false;  
+
+    private bool showDeleteConfirmDialog = false;
+
+    private IEnumerable<string> pricingOptions = new[] { "월정액", "일시불" };
+
+    private List<UserModel>? _subscribers = null; // 현재 구독자 리스트
+    private string _inviteEmail = string.Empty; // 초대할 사용자 이메일
+    private bool isInviteSnackbarOpen; // 초대 Snackbar 상태
+    private string snackbarMessage = ""; // Snackbar 메시지
+
+    private List<EmailInvitationModel> _emailInvitations;
+    
+    [Parameter] public int AlbumId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _userId = await UserService.GetUserIdAsync();
+        _username = await UserService.GetUserNameAsync();
+        _album = await AlbumService.GetAlbumById(AlbumId, _userId);
+        await LoadSubscribersAsync();
+
+        _emailInvitations = await AlbumService.GetInvitationByAlbumId(AlbumId);
+    }
+
+    private async Task SaveAlbum()
+    {
+        if (_album is null)
+        {
+            // 필요 시 사용자에게 알림 처리
+            return;
+        }
+
+        bool updateResult = await AlbumService.UpdateAlbumAsync(_album);
+        if (updateResult)
+        {
+            // 성공적으로 업데이트 되었을 때 처리 (예: 성공 메시지)
+            snackbarMessage = "앨범 정보 업데이트 성공!";
+            isSnackbarOpen = true;
+        }
+        else
+        {
+            // 업데이트에 실패했을 때 처리 (예: 오류 메시지)
+        }
+    }
+
+    void OpenDeleteConfirmDialog()
+    {
+        showDeleteConfirmDialog = true;
+    }
+
+    private async Task ConfirmDeleteHandler()
+    {
+        if (_album is null) return;
+
+        try
+        {
+            IsLoading = true;
+            var isDeleted = await AlbumService.DeleteAlbumAsyncById(_album.AlbumId);
+            if (isDeleted)
+            {
+                _alertContainer?.ShowAlert(new HAlertModel
+                {
+                    Title = "앨범 삭제 성공",
+                    Subtitle = "앨범이 정상적으로 삭제되었습니다.",
+                    Type = HAlert.AlertType.Success
+                });
+
+                // 필요하다면 다른 페이지로 이동 또는 목록 새로고침 등 후속 처리
+                NavigationManager.NavigateTo("/albums");
+            }
+            else
+            {
+                _alertContainer?.ShowAlert(new HAlertModel
+                {
+                    Title = "앨범 삭제 실패",
+                    Subtitle = "해당 앨범을 삭제할 수 없습니다.",
+                    Type = HAlert.AlertType.Error
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            _alertContainer?.ShowAlert(new HAlertModel
+            {
+                Title = "오류 발생",
+                Subtitle = "앨범 삭제 중 오류가 발생했습니다.",
+                Type = HAlert.AlertType.Error
+            });
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+    
+    // 구독자 로딩 함수 추가
+    private async Task LoadSubscribersAsync()
+    {
+        try
+        {
+            _subscribers = await AlbumService.GetSubscribersByAlbumId(AlbumId);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"구독자 목록 로딩 중 오류: {ex.Message}");
+            _subscribers = new List<UserModel>();
+        }
+    }
+
+    // 초대 보내기 함수 추가
+    private async Task SendInvitation()
+    {
+        IsLoading = true;
+        if (string.IsNullOrWhiteSpace(_inviteEmail))
+        {
+            snackbarMessage = "이메일을 입력해 주세요.";
+            isInviteSnackbarOpen = true;
+            return;  
+        }
+        
+        try
+        {
+            if (_album is null) return;
+            
+            string token = await AlbumService.InviteUserToAlbumAsync(_inviteEmail, AlbumId, _userId);
+
+            List<AlbumPhotoModel> albumPhotoModels = await AlbumService.GetAlbumThumbnailByIdAsync(AlbumId);
+            
+            if (!String.IsNullOrEmpty(token))
+            {
+                // 초대 메일 발송
+                var subject = "앨범 초대가 도착했습니다!";
+                var body = $@"
+                    <h3>앨범 초대 안내</h3>
+                    <p>앨범에 참여하시려면 아래 링크를 클릭해 주세요.</p>
+                    <p>
+                        <a href=""https://iv-webapp.azurewebsites.net/invitation?email={_inviteEmail}&albumId={_album.AlbumId}&albumName={_album.AlbumTitle}&token={token}&senderId={_userId}&senderName={_username}&thumbnailUrl={albumPhotoModels[0].PhotoUrl}"">앨범 바로가기</a>
+                    </p>";
+                await EmailService.SendAsync(_inviteEmail, subject, body);
+            
+                IsLoading = false;
+            
+                // UI 처리
+                snackbarMessage = "초대를 성공적으로 보냈습니다!";
+                _inviteEmail = string.Empty; // 이메일 입력 필드 비우기
+                _emailInvitations = await AlbumService.GetInvitationByAlbumId(AlbumId);
+
+                isSnackbarOpen = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            snackbarMessage = $"초대 보내는 중 오류 발생: {ex.Message}";
+            isSnackbarOpen = true;
+            IsLoading = false;
+        }
+        IsLoading = false;
+    }
+    
+    private HText.HTextColorType GetStatusColor(string status)
+        => status switch
+        {
+            "Accepted" => HText.HTextColorType.Success,
+            "Declined" => HText.HTextColorType.Error,
+            "Expired"  => HText.HTextColorType.Warning,
+            "Pending"  => HText.HTextColorType.Info,
+            _          => HText.HTextColorType.Base
+        };
+}

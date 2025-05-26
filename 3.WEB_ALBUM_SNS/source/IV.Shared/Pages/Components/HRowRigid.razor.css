@@ -1,0 +1,17 @@
+﻿.h-row-rigid {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.h-row-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.h-row-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}

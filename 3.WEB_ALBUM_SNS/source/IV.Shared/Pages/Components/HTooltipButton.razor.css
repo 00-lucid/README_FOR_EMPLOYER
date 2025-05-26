@@ -1,0 +1,57 @@
+﻿.h-tooltip-button-container {
+    position: relative; /* 툴팁 흐름 제어 */
+    display: inline-block;
+    /* 필요 시 margin, padding, 정렬 등을 추가 */
+}
+
+/* 물음표가 들어간 동그라미 버튼 스타일 */
+.tooltip-icon {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 24px; /* 세로 가운데 정렬을 위해 아이콘 높이와 동일하게 설정 */
+    padding: 0;        /* 기본 버튼 여백 제거 */
+    transition: background-color 0.2s ease;
+}
+
+.tooltip-icon:hover {
+    background-color: #0056b3;
+}
+
+/* Xs 사이즈 (가장 작음) */
+.tooltip-icon-xsmall {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    line-height: 18px;
+}
+
+/* Small 사이즈 */
+.tooltip-icon-small {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+/* Medium 사이즈 */
+.tooltip-icon-medium {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 24px;
+}
+
+/* Large 사이즈 */
+.tooltip-icon-large {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    line-height: 28px;
+}

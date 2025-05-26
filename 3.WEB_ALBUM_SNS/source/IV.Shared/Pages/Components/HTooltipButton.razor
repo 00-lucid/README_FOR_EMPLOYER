@@ -1,0 +1,58 @@
+﻿<div class="h-tooltip-button-container"
+     @onmouseover="OnMouseOver"
+     @onmouseout="OnMouseOut">
+    <!-- 동그라미 안에 물음표를 표시 -->
+    <button class="tooltip-icon @GetSizeClass()" @onclick="ToggleTooltip">?</button>
+    
+    @if (IsTooltipVisible)
+    {
+        <!-- 표시할 툴팁 내용 -->
+        <HTooltipBox Text="@Text" />
+    }
+</div>
+
+@code {
+    private bool IsTooltipVisible { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    private void OnMouseOver()
+    {
+        IsTooltipVisible = true;
+    }
+
+    private void OnMouseOut()
+    {
+        // 클릭 토글을 유지하고 싶다면, 조건에 따라 알맞게 처리
+        IsTooltipVisible = false;
+    }
+
+    private void ToggleTooltip()
+    {
+        IsTooltipVisible = !IsTooltipVisible;
+    }
+    
+    /// <summary>
+    /// Tooltip 아이콘의 크기(Small, Medium, Large).
+    /// </summary>
+    [Parameter]
+    public TooltipButtonSize Size { get; set; } = TooltipButtonSize.Medium;
+    
+    private string GetSizeClass() => Size switch
+    {
+        TooltipButtonSize.XSmall => "tooltip-icon-xsmall",
+        TooltipButtonSize.Small => "tooltip-icon-small",
+        TooltipButtonSize.Medium => "tooltip-icon-medium",
+        TooltipButtonSize.Large => "tooltip-icon-large",
+        _ => "tooltip-icon-medium"
+    };
+    
+    public enum TooltipButtonSize
+    {
+        XSmall,
+        Small,
+        Medium,
+        Large
+    }
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="com.gmin.multi-server" target="17" />
+      <module name="com.gmin.multi-server.main" target="17" />
+      <module name="com.gmin.multi-server.test" target="17" />
+      <module name="server-eaglered" target="17" />
+      <module name="server-eaglered.main" target="17" />
+      <module name="server-eaglered.multi-server" target="17" />
+      <module name="server-eaglered.multi-server.main" target="17" />
+      <module name="server-eaglered.multi-server.test" target="17" />
+      <module name="server-eaglered.test" target="17" />
+      <module name="server-standard" target="17" />
+      <module name="server-standard.main" target="17" />
+      <module name="server-standard.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="multi-server.server-eaglered" options="-parameters" />
+      <module name="multi-server.server-eaglered.main" options="-parameters" />
+      <module name="multi-server.server-eaglered.test" options="-parameters" />
+      <module name="multi-server.server-standard" options="-parameters" />
+      <module name="multi-server.server-standard.main" options="-parameters" />
+      <module name="multi-server.server-standard.test" options="-parameters" />
+    </option>
+  </component>
+</project>

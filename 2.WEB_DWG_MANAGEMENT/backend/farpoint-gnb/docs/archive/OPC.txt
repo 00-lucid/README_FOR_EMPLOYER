@@ -1,0 +1,147 @@
+        public void move_OPC(string Intelligent)
+        {
+                string sSql = string.Empty;
+                string Intelligent_tmp1 = string.Empty;
+                string Intelligent_tmp2 = string.Empty;
+                DataTable dt;
+
+                if (Intelligent.Length == 10)
+                {
+                    sSql = " SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT, B.HOGI_GUBUN FROM IDS_DOC A ,IDS_FOLDER B "
+                        + " WHERE A.FOLID = B.FOLID AND SUBSTR(A.DOCNUMBER,1,1) = '" + Intelligent.Substring(0, 1) + "' "
+                        + " AND SUBSTR(A.DOCNUMBER,3,3) = '" + Intelligent.Substring(1, 3) + "'"
+                        + " AND SUBSTR(A.DOCNUMBER,12,3) = '" + Intelligent.Substring(5, 3) + "' AND A.CURRENT_YN = '001'"
+                        + " AND A.PLANTCODE = (SELECT PLANTCODE FROM IDS_DOC WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "') "
+                        + " ORDER BY B.HOGI_GUBUN ";
+
+                    dt = iDsws.getDataSet(sSql).Tables[0];
+
+                    //공용인 경우
+                    if (dt.Rows.Count == 1)
+                    {
+                        //도면 다운로드
+                        f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                        m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                    }
+                    else if (dt.Rows.Count == 2)    //공통인 경우
+                    {
+                        fOPC(m_FOLID, dt.Rows[0]["HOGI_GUBUN"].ToString(), dt.Rows[0]["DOCNO"].ToString(), dt.Rows[1]["DOCNO"].ToString());
+                    }
+                }
+                else    //OPC가 10자리보다 크거나 작은 경우(뒷 영역 제거 후 검색)
+                {
+                    //도면명이 전체로 써있는경우
+                    Intelligent_tmp1 = Intelligent.Replace("-", "");
+
+                    switch (m_FOLID.Substring(0, 17))
+                    {
+                        case "00000000000000211":
+                            {
+                                Intelligent_tmp2 = fSubstr(Intelligent_tmp1);
+                                break;
+                            }
+                        default:
+                            {
+                                Intelligent_tmp2 = Intelligent_tmp1.Substring(0, Intelligent_tmp1.Length - 2);
+                                break;
+                            }
+                    }
+
+                    sSql = "SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT, B.HOGI_GUBUN FROM IDS_DOC A ,IDS_FOLDER B "
+                            + " WHERE A.FOLID = B.FOLID AND REPLACE(A.DOCNUMBER,'-','') = '" + Intelligent_tmp2 + "' "
+                            + " AND A.CURRENT_YN = '001' "
+                            + " AND A.PLANTCODE = (SELECT PLANTCODE FROM IDS_DOC WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "') "
+                            + " ORDER BY B.HOGI_GUBUN ";
+
+                    dt = iDsws.getDataSet(sSql).Tables[0];
+
+                    //공용
+                    if (dt.Rows.Count == 1)
+                    {
+                        //도면 다운로드
+                        f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                        m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                    }
+                    else if (dt.Rows.Count == 2)    //공통
+                    {
+                        fOPC(m_FOLID, dt.Rows[0]["HOGI_GUBUN"].ToString(), dt.Rows[0]["DOCNO"].ToString(), dt.Rows[1]["DOCNO"].ToString());
+                    }
+                    else    //OPC 뒷 영역 안 자르고 검색(도면명으로만 지능화한 경우)
+                    {
+                        sSql = "SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT, B.HOGI_GUBUN FROM IDS_DOC A ,IDS_FOLDER B "
+                        + " WHERE A.FOLID = B.FOLID AND REPLACE(A.DOCNUMBER,'-','') = '" + Intelligent_tmp1 + "' "
+                        + " AND A.CURRENT_YN = '001' "
+                        + " AND A.PLANTCODE = (SELECT PLANTCODE FROM IDS_DOC WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "') "
+                        + " ORDER BY B.HOGI_GUBUN ";
+
+                        dt = iDsws.getDataSet(sSql).Tables[0];
+
+                        //공용
+                        if (dt.Rows.Count == 1)
+                        {
+                            //도면 다운로드
+                            f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                            m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                        }
+                        else if (dt.Rows.Count == 2)    //공통
+                        {
+                            fOPC(m_FOLID, dt.Rows[0]["HOGI_GUBUN"].ToString(), dt.Rows[0]["DOCNO"].ToString(), dt.Rows[1]["DOCNO"].ToString());
+                        }
+                        else
+                        {
+                            sSql = "SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT FROM IDS_DOC A ,IDS_FOLDER B "
+                                    + " WHERE A.FOLID = B.FOLID AND REPLACE(A.DOCNUMBER,'-','') = '" + Intelligent_tmp1.Substring(0, Intelligent_tmp1.Length - 3) + "' "
+                                    + " AND A.CURRENT_YN = '001'"
+                                    + " AND A.PLANTCODE = (SELECT PLANTCODE FROM IDS_DOC WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "') ";
+
+                            dt = iDsws.getDataSet(sSql).Tables[0];
+                            if (dt.Rows.Count == 1)
+                            {
+                                //도면 다운로드
+                                f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                                m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                            }
+                            else
+                            {
+                                sSql = "SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT FROM IDS_DOC A ,IDS_FOLDER B "
+                                    + " WHERE A.FOLID = B.FOLID AND REPLACE(A.DOCNUMBER,'-','') = '" + Intelligent_tmp1.Substring(0, Intelligent_tmp1.Length - 2) + "' "
+                                    + " AND A.CURRENT_YN = '001'"
+                                    + " AND A.PLANTCODE = (SELECT PLANTCODE FROM IDS_DOC WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "') ";
+
+                                dt = iDsws.getDataSet(sSql).Tables[0];
+                                if (dt.Rows.Count == 1)
+                                {
+                                    f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                                    m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                                }
+                                else    //전체 사업소에서 검색
+                                {
+                                    sSql = "SELECT A.DOCNO,A.DOCVR,A.DOCNM,A.DOCNUMBER, B.FOLPT FROM IDS_DOC A ,IDS_FOLDER B "
+                                            + " WHERE A.FOLID = B.FOLID AND REPLACE(A.DOCNUMBER,'-','') = '" + Intelligent_tmp1 + "' AND A.CURRENT_YN = '001'";
+
+                                    dt = iDsws.getDataSet(sSql).Tables[0];
+                                    if (dt.Rows.Count == 1)
+                                    {
+                                        f_TreeView.gFindNode(dt.Rows[0]["DOCNO"].ToString(), true);
+                                        m_Lib_Run = true;                             //도면 로드시 기능위치 이동 가능하게 만들기(onPaint에서 처리)
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("도면이 존재하지 않습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                sSql = "SELECT FUNCTION, TAGNO FROM IDS_TAG WHERE DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "' AND REPLACE(INTELLIGENT,'-','') = '"
+                            + m_Connection.Replace("-", "") + "' AND REPLACE(CONNECTION,'-','') = '" + Intelligent.Replace("-", "") + "' ";
+
+                dt = iDsws.getDataSet(sSql).Tables[0];
+
+                //위치찾기(onPaint에서 처리)
+                m_Start_Function = dt.Rows[0]["FUNCTION"].ToString();
+                m_Start_Tagno = dt.Rows[0]["TAGNO"].ToString();
+        }

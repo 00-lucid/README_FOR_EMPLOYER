@@ -1,0 +1,53 @@
+﻿@code {
+    // 아코디언 섹션 정보를 담을 모델
+    public class AccordionItem
+    {
+        public string Title { get; set; } = "";
+        public RenderFragment? Content { get; set; } // 섹션 안에 들어갈 내용
+        public bool IsOpen { get; set; } // 열림/닫힘 여부
+    }
+
+    [Parameter]
+    public List<AccordionItem> Items { get; set; } = new();
+
+    // 오로지 하나만 열 수 있도록 설정하는 옵션 (기본값: false)
+    [Parameter]
+    public bool IsSingleSelection { get; set; } = false;
+
+    private void ToggleItem(AccordionItem item)
+    {
+        bool newState = !item.IsOpen;
+
+        // IsSingleSelection이 true라면, 다른 모든 Item은 닫기
+        if (IsSingleSelection)
+        {
+            foreach (var i in Items)
+            {
+                i.IsOpen = false;
+            }
+        }
+
+        // 현재 항목의 상태를 토글
+        item.IsOpen = newState;
+    }
+}
+
+<!-- 아코디언 UI 출력 부분 -->
+<div class="accordion-section">
+    @if (Items != null)
+    {
+        @foreach (var item in Items)
+        {
+            <button class="accordion-title" @onclick="@(() => ToggleItem(item))">
+                @item.Title
+            </button>
+
+            @if (item.IsOpen && item.Content != null)
+            {
+                <div class="accordion-content">
+                    @item.Content
+                </div>
+            }
+        }
+    }
+</div>

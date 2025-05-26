@@ -1,0 +1,123 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+
+<div class="org-tree-node">
+    <!-- 조직 카드 -->
+    @if (Organization.IsDeleting)
+    {
+        <HTooltip 
+            Text="삭제된 조직에 속한 구성원을 모두 옮겨 주세요" 
+            Position="TooltipPosition.Top" 
+            Size="TooltipSize.Small"
+            Title="주의">
+            <div class="org-card deleting" @onclick="() => OnSelect.InvokeAsync(Organization)">
+                <!-- 카드 헤더 -->
+                <div class="org-card-header">
+                    <div class="org-name">@Organization.OrganizationName</div>
+                    <div class="org-actions">
+                        <!-- 삭제된 조직에는 되돌리기 버튼 표시 -->
+                        <button class="icon-btn restore-btn" title="되돌리기" @onclick:stopPropagation="true" @onclick="@((e) =>
+                                                                                {
+                                                                                    OnRestore.InvokeAsync(Organization);
+                                                                                })">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 10C2 10 5.5 7 12 7C18.5 7 22 10 22 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 14C22 14 18.5 17 12 17C5.5 17 2 14 2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 20V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 7V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 20L12 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 4L12 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 카드 내용 -->
+                <div class="org-card-content">
+                    <div class="org-members-count">
+                        <i class="fas fa-users"></i> @Organization.Users.Count 명
+                    </div>
+                </div>
+
+                <!-- 삭제된 조직에는 조직 추가 버튼 없음 -->
+            </div>
+        </HTooltip>
+    }
+    else
+    {
+        <div class="org-card" @onclick="() => OnSelect.InvokeAsync(Organization)">
+            <!-- 카드 헤더 -->
+            <div class="org-card-header">
+                <div class="org-name">@Organization.OrganizationName</div>
+                <div class="org-actions">
+                    @if (!Organization.IsRoot)
+                    {
+                        <button class="icon-btn delete-btn" title="삭제" @onclick:stopPropagation="true" @onclick="@((e) =>
+                                                                      {
+                                                                          OnDelete.InvokeAsync(Organization);
+                                                                      })">
+                            x
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- 카드 내용 -->
+            <div class="org-card-content">
+                <div class="org-members-count">
+                    <i class="fas fa-users"></i> @Organization.Users.Count 명
+                </div>
+            </div>
+
+            <!-- 조직 추가 버튼 (일반 조직에만 표시) -->
+            <button class="add-org-btn" @onclick:stopPropagation="true" @onclick="@((e) =>
+                                                  {
+                                                      OnAddChild.InvokeAsync(Organization);
+                                                  })">
+                +
+            </button>
+        </div>
+    }
+
+    <!-- 자식 조직들 -->
+    @if (Organization.Children.Any())
+    {
+        <div class="org-children @(LayoutDirection == LayoutDirection.Horizontal ? "horizontal" : "")">
+            @foreach (var child in Organization.Children)
+            {
+                <div class="org-child-container">
+                    <HOrganizationTreeNode
+                        Organization="child"
+                        OnSelect="OnSelect"
+                        OnDelete="OnDelete"
+                        OnRestore="OnRestore"
+                        OnAddChild="OnAddChild"
+                        LayoutDirection="LayoutDirection" />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Organization Organization { get; set; }
+
+    [Parameter]
+    public EventCallback<Organization> OnSelect { get; set; }
+
+    [Parameter]
+    public EventCallback<Organization> OnDelete { get; set; }
+    
+    [Parameter]
+    public EventCallback<Organization> OnRestore { get; set; }
+
+    [Parameter]
+    public EventCallback<Organization> OnAddChild { get; set; }
+
+    [Parameter]
+    public LayoutDirection LayoutDirection { get; set; }
+}

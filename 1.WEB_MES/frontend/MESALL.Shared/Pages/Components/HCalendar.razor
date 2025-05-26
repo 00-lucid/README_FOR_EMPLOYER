@@ -1,0 +1,924 @@
+﻿@using System.Globalization
+@using MESALL.Shared.Models;
+
+<div class="h-calendar">
+    <div class="h-calendar-header">
+        <div class="h-calendar-title">
+            @switch (CurrentView)
+            {
+                case CalendarView.Day:
+                    <h2>@CurrentDate.ToString("yyyy년 MM월 dd일 dddd", new CultureInfo("ko-KR"))</h2>
+                    break;
+                case CalendarView.Week:
+                    var weekStart = GetStartOfWeek(CurrentDate);
+                    var weekEnd = weekStart.AddDays(6);
+                    <h2>
+                        @if (weekStart.Month == weekEnd.Month)
+                        {
+                            @($"{weekStart.Year}년 {weekStart.Month}월 {weekStart.Day}일 - {weekEnd.Day}일")
+                        }
+                        else if (weekStart.Year == weekEnd.Year)
+                        {
+                            @($"{weekStart.Year}년 {weekStart.Month}월 {weekStart.Day}일 - {weekEnd.Month}월 {weekEnd.Day}일")
+                        }
+                        else
+                        {
+                            @($"{weekStart.Year}년 {weekStart.Month}월 {weekStart.Day}일 - {weekEnd.Year}년 {weekEnd.Month}월 {weekEnd.Day}일")
+                        }
+                    </h2>
+                    break;
+                case CalendarView.Month:
+                    <h2>@CurrentDate.ToString("yyyy년 MM월", new CultureInfo("ko-KR"))</h2>
+                    break;
+                case CalendarView.Year:
+                    <h2>@CurrentDate.Year 년</h2>
+                    break;
+            }
+        </div>
+        
+        <div class="h-calendar-tools">
+            <button class="h-calendar-today-btn" @onclick="GoToToday" aria-label="오늘로 이동">오늘</button>
+            
+            <div class="h-calendar-nav">
+                <button class="h-calendar-nav-btn" @onclick="NavigatePrevious" aria-label="이전">
+                    <span class="h-calendar-nav-icon">&#10094;</span>
+                </button>
+                <button class="h-calendar-nav-btn" @onclick="NavigateNext" aria-label="다음">
+                    <span class="h-calendar-nav-icon">&#10095;</span>
+                </button>
+            </div>
+            
+            <div class="h-calendar-view-selector">
+                <button class="@GetViewButtonClass(CalendarView.Day)" @onclick="() => SetView(CalendarView.Day)">일</button>
+                <button class="@GetViewButtonClass(CalendarView.Week)" @onclick="() => SetView(CalendarView.Week)">주</button>
+                <button class="@GetViewButtonClass(CalendarView.Month)" @onclick="() => SetView(CalendarView.Month)">월</button>
+                <button class="@GetViewButtonClass(CalendarView.Year)" @onclick="() => SetView(CalendarView.Year)">년</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="h-calendar-body">
+        @switch (CurrentView)
+        {
+            case CalendarView.Day:
+                <div class="h-calendar-day-view">
+                    <div class="h-calendar-all-day-events">
+                        @foreach (var evt in FilteredEvents.Where(e => 
+                            e.Start.Date == CurrentDate.Date && e.IsAllDay))
+                        {
+                            <div class="h-calendar-event h-calendar-all-day-event" 
+                                 style="background-color: @evt.Color;"
+                                 @onclick="() => HandleEventClick(evt)">
+                                @evt.Title
+                            </div>
+                        }
+                    </div>
+                    <div class="h-calendar-time-grid">
+                        @for (int hour = 0; hour < 24; hour++)
+                        {
+                            int currentHour = hour; // 클로저를 위한 로컬 변수
+                            <div class="h-calendar-time-slot" @onclick="async () => await HandleDayTimeSlotClick(CurrentDate.Date.AddHours(currentHour))">
+                                <div class="h-calendar-time-label">@($"{currentHour:00}:00")</div>
+                                <div class="h-calendar-time-content">
+                                    <!-- 여기는 비워둠 - 이벤트는 그리드 위에 배치 -->
+                                </div>
+                            </div>
+                        }
+
+                        @{
+                            var dayEventsByDay = FilteredEvents.Where(e =>
+                                e.Start.Date <= CurrentDate.Date &&
+                                e.End.Date >= CurrentDate.Date &&
+                                !e.IsAllDay).ToList();
+
+                            var arrangedEventsByDay = ArrangeOverlappingEvents(dayEventsByDay);
+                        }
+
+                        @foreach (var (evt, column, columns) in arrangedEventsByDay)
+                        {
+                            var startHour = evt.Start.Date == CurrentDate.Date ? evt.Start.Hour : 0;
+                            var startMinute = evt.Start.Date == CurrentDate.Date ? evt.Start.Minute : 0;
+                            var endHour = evt.End.Date == CurrentDate.Date ? evt.End.Hour : 24;
+                            var endMinute = evt.End.Date == CurrentDate.Date ? evt.End.Minute : 0;
+        
+                            var top = (startHour * 60 + startMinute) * (50.0 / 60);
+                            var height = ((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) * (50.0 / 60);
+                            if (height < 10) height = 10; // 최소 높이
+        
+                            // 칼럼 위치를 기반으로 이벤트의 너비와 위치 계산
+                            var width = $"calc((100% - 60px) / {columns})";
+                            var left = $"calc(60px + (100% - 60px) * {column} / {columns})";
+        
+                            <div class="h-calendar-event h-calendar-day-event" 
+                                 style="background-color: @evt.Color; top: @(top)px; height: @(height)px; width: @width; left: @left;"
+                                 @onclick="() => HandleEventClick(evt)">
+                                @evt.Title
+                            </div>
+                        }
+                    </div>
+                </div>
+                break;
+            case CalendarView.Week:
+                <div class="h-calendar-week-view">
+                    <div class="h-calendar-week-header">
+                        <div class="h-calendar-week-time-label-header"></div> <!-- 시간 레이블 헤더 추가 -->
+                        @{
+                            var weekStart = GetStartOfWeek(CurrentDate);
+                            var dayNames = new[] { "일", "월", "화", "수", "목", "금", "토" };
+                        }
+                        @for (int i = 0; i < 7; i++)
+                        {
+                            var day = weekStart.AddDays(i);
+                            var isToday = day.Date == DateTime.Today;
+                            var isWeekend = i == 0 || i == 6;
+                            
+                            <div class="h-calendar-week-day @(isToday ? "today" : "") @(isWeekend ? "weekend" : "")">
+                                <div>@dayNames[i]</div>
+                                <div>@day.Day</div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="h-calendar-week-body">
+                        <div class="h-calendar-week-all-day-row">
+                            <div class="h-calendar-week-time-label">종일</div>
+                            <div class="h-calendar-week-grid">
+                                @for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+                                {
+                                    int currentDayIndex = dayIndex;
+                                    var currentDayByWeek = GetStartOfWeek(CurrentDate).AddDays(currentDayIndex);
+                                    
+                                    <div class="h-calendar-week-all-day-cell">
+                                        @foreach (var evt in FilteredEvents.Where(e => 
+                                            e.Start.Date <= currentDayByWeek.Date && 
+                                            e.End.Date >= currentDayByWeek.Date && 
+                                            e.IsAllDay))
+                                        {
+                                            <div class="h-calendar-event h-calendar-all-day-event" 
+                                                 style="background-color: @evt.Color;"
+                                                 @onclick="() => HandleEventClick(evt)">
+                                                @evt.Title
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="h-calendar-week-time-grid">
+                            @for (int hour = 0; hour < 24; hour++)
+                            {
+                                int currentHour = hour;
+                                <div class="h-calendar-week-row">
+                                    <div class="h-calendar-time-label">@($"{currentHour:00}:00")</div>
+                                    <div class="h-calendar-week-grid">
+                                        @for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+                                        {
+                                            int currentDayIndex = dayIndex;
+                                            var currentDayByWeek = GetStartOfWeek(CurrentDate).AddDays(currentDayIndex);
+
+                                            <div class="h-calendar-week-time-slot"
+                                                 @onclick="async () => await HandleWeekTimeSlotClick(currentDayByWeek.Date.AddHours(currentHour))">
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+                            {
+                                int currentDayIndex = dayIndex;
+                                var currentDayByWeek = GetStartOfWeek(CurrentDate).AddDays(currentDayIndex);
+
+                                var dayEvents = FilteredEvents.Where(e =>
+                                    e.Start.Date <= currentDayByWeek.Date &&
+                                    e.End.Date >= currentDayByWeek.Date &&
+                                    !e.IsAllDay).ToList();
+
+                                var arrangedEvents = ArrangeOverlappingEvents(dayEvents);
+
+                                @foreach (var (evt, column, columns) in arrangedEvents)
+                                {
+                                    var startHour = evt.Start.Date == currentDayByWeek.Date ? evt.Start.Hour : 0;
+                                    var startMinute = evt.Start.Date == currentDayByWeek.Date ? evt.Start.Minute : 0;
+                                    var endHour = evt.End.Date == currentDayByWeek.Date ? evt.End.Hour : 24;
+                                    var endMinute = evt.End.Date == currentDayByWeek.Date ? evt.End.Minute : 0;
+
+                                    var top = (startHour * 60 + startMinute) * (50.0 / 60);
+                                    var height = ((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) * (50.0 / 60);
+                                    if (height < 10) height = 10; // 최소 높이
+
+                                    const int timeLabelWidth = 50; // 시간 레이블 너비
+                                    var dayWidth = $"calc((100% - {timeLabelWidth}px) / 7)";
+                                    var cellWidth = $"calc({dayWidth} / {columns})";
+                                    var left = $"calc({timeLabelWidth}px + {dayWidth} * {currentDayIndex} + {cellWidth} * {column})";
+
+                                    <div class="h-calendar-event h-calendar-week-event"
+                                         style="background-color: @evt.Color; top: @(top)px; height: @(height)px; width: @cellWidth; left: @left;"
+                                         @onclick="() => HandleEventClick(evt)">
+                                        @evt.Title
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                break;
+            case CalendarView.Month:
+                <div class="h-calendar-month-view">
+                    <div class="h-calendar-day-names">
+                        @foreach (var dayName in new[] { "일", "월", "화", "수", "목", "금", "토" })
+                        {
+                            var isWeekend = dayName == "토" || dayName == "일";
+                            <div class="h-calendar-day-name @(isWeekend ? "weekend" : "")">@dayName</div>
+                        }
+                    </div>
+                    
+                    @{
+                        var today = DateTime.Today;
+                        var firstDayOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+                        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                        
+                        // 월의 첫날이 속한 주의 일요일부터 시작
+                        var firstDayToShow = firstDayOfMonth;
+                        int diff = (7 + (firstDayOfMonth.DayOfWeek - DayOfWeek.Sunday)) % 7;
+                        if (diff > 0)
+                        {
+                            firstDayToShow = firstDayOfMonth.AddDays(-diff);
+                        }
+                        
+                        // 날짜 목록 생성 (최대 6주)
+                        for (int week = 0; week < 6; week++)
+                        {
+                            for (int day = 0; day < 7; day++)
+                            {
+                                // 각 반복에서 새로운 날짜 변수 생성
+                                var iterationDay = firstDayToShow.AddDays(week * 7 + day);
+                                bool isOtherMonth = iterationDay.Month != CurrentDate.Month;
+                                bool isToday = iterationDay.Date == today;
+                                bool isWeekend = day == 0 || day == 6;
+                                
+                                string cssClass = "h-calendar-month-day";
+                                if (isOtherMonth) cssClass += " other-month";
+                                if (isToday) cssClass += " today";
+                                if (isWeekend) cssClass += " weekend";
+                                
+                                // 직접 계산한 날짜를 전달
+                                <div class="@cssClass" @onclick="async () => await HandleMonthDateClick(iterationDay)">
+                                    <div class="h-calendar-date-number">@iterationDay.Day</div>
+                                    <div class="h-calendar-month-events">
+                                        @{
+                                            var dayEvents = FilteredEvents.Where(e => 
+                                                e.Start.Date <= iterationDay.Date && 
+                                                e.End.Date >= iterationDay.Date).Take(3).ToList();
+                                            
+                                            foreach (var evt in dayEvents)
+                                            {
+                                                <div class="h-calendar-event" 
+                                                     style="background-color: @evt.Color;"
+                                                     @onclick:stopPropagation="true"
+                                                     @onclick="() => HandleEventClick(evt)">
+                                                    @evt.Title
+                                                </div>
+                                            }
+                                            
+                                            var moreEventsCount = FilteredEvents.Count(e => 
+                                                e.Start.Date <= iterationDay.Date && 
+                                                e.End.Date >= iterationDay.Date) - 3;
+                                            
+                                            if (moreEventsCount > 0)
+                                            {
+                                                <div class="h-calendar-more-events" @onclick:stopPropagation="true" @onclick="() => HandleMoreEventsClick(iterationDay)">
+                                                    + @moreEventsCount 더보기
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                break;
+            case CalendarView.Year:
+                <div class="h-calendar-year-view">
+                    @for (int month = 1; month <= 12; month++)
+                    {
+                        var currentMonth = new DateTime(CurrentDate.Year, month, 1);
+                        var monthName = currentMonth.ToString("MM월", new CultureInfo("ko-KR"));
+                        
+                        <div class="h-calendar-year-month" @onclick="() => HandleYearMonthClick(currentMonth)">
+                            <div class="h-calendar-year-month-header">@monthName</div>
+                            <div class="h-calendar-year-month-grid">
+                                @foreach (var dayName in new[] { "일", "월", "화", "수", "목", "금", "토" })
+                                {
+                                    <div class="h-calendar-year-month-day-name">@dayName[0]</div>
+                                }
+                                
+                                @{
+                                    var firstDayOfMonthByYear = new DateTime(CurrentDate.Year, month, 1);
+                                    var lastDayOfMonthByYear = firstDayOfMonthByYear.AddMonths(1).AddDays(-1);
+                                    
+                                    // 공백으로 시작 요일 맞추기
+                                    for (int i = 0; i < (int)firstDayOfMonthByYear.DayOfWeek; i++)
+                                    {
+                                        <div class="h-calendar-year-month-day other-month"></div>
+                                    }
+                                    
+                                    // 날짜 표시
+                                    for (int day = 1; day <= lastDayOfMonthByYear.Day; day++)
+                                    {
+                                        var currentDayByYear = new DateTime(CurrentDate.Year, month, day);
+                                        bool hasEvent = FilteredEvents.Any(e => 
+                                            e.Start.Date <= currentDayByYear.Date && 
+                                            e.End.Date >= currentDayByYear.Date);
+                                        
+                                        <div class="h-calendar-year-month-day @(hasEvent ? "has-event" : "")">
+                                            @day
+                                        </div>
+                                    }
+                                    
+                                    // 남은 공간 채우기
+                                    int remainingCells = 42 - ((int)firstDayOfMonthByYear.DayOfWeek + lastDayOfMonthByYear.Day);
+                                    for (int i = 0; i < remainingCells && i < 14; i++) // 최대 2주만 추가
+                                    {
+                                        <div class="h-calendar-year-month-day other-month"></div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                break;
+        }
+    </div>
+    
+    @* @if (IsEventModalOpen) *@
+    @* { *@
+    @*     <div class="h-calendar-modal-overlay" @onclick="CloseEventModal"> *@
+    @*         <div class="h-calendar-modal" @onclick:stopPropagation="true"> *@
+    @*             <div class="h-calendar-modal-header"> *@
+    @*                 <h3>@(EditingEvent.Id == 0 ? "새 일정 추가" : "일정 수정")</h3> *@
+    @*                 <button class="h-calendar-modal-close" @onclick="CloseEventModal">×</button> *@
+    @*             </div> *@
+    @*             <div class="h-calendar-modal-body"> *@
+    @*                 <div class="h-calendar-form-group"> *@
+    @*                     <label for="event-title">제목</label> *@
+    @*                     <input id="event-title" type="text" @bind="EditingEvent.Title" /> *@
+    @*                 </div> *@
+    @*                 <div class="h-calendar-form-group"> *@
+    @*                     <label for="event-start">시작</label> *@
+    @*                     <input id="event-start" type="datetime-local" @bind="EditingEvent.Start" /> *@
+    @*                 </div> *@
+    @*                 <div class="h-calendar-form-group"> *@
+    @*                     <label for="event-end">종료</label> *@
+    @*                     <input id="event-end" type="datetime-local" @bind="EditingEvent.End" /> *@
+    @*                 </div> *@
+    @*                 <div class="h-calendar-form-group"> *@
+    @*                     <label for="event-description">설명</label> *@
+    @*                     <textarea id="event-description" @bind="EditingEvent.Description"></textarea> *@
+    @*                 </div> *@
+    @*                 <div class="h-calendar-form-group"> *@
+    @*                     <label for="event-color">색상</label> *@
+    @*                     <select id="event-color" @bind="EditingEvent.Color"> *@
+    @*                         <option value="#3788d8">파랑</option> *@
+    @*                         <option value="#e74c3c">빨강</option> *@
+    @*                         <option value="#27ae60">초록</option> *@
+    @*                         <option value="#f39c12">주황</option> *@
+    @*                         <option value="#9b59b6">보라</option> *@
+    @*                     </select> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*             <div class="h-calendar-modal-footer"> *@
+    @*                 @if (EditingEvent.Id != 0) *@
+    @*                 { *@
+    @*                     <button class="h-calendar-btn h-calendar-btn-danger" @onclick="DeleteEvent">삭제</button> *@
+    @*                 } *@
+    @*                 <button class="h-calendar-btn h-calendar-btn-secondary" @onclick="CloseEventModal">취소</button> *@
+    @*                 <button class="h-calendar-btn h-calendar-btn-primary" @onclick="SaveEvent">저장</button> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </div> *@
+    @* } *@
+
+    <HDialog IsOpen="@IsEventModalOpen" IsOpenChanged="@((val) => IsEventModalOpen = val)" Title="일정">
+        <ChildContent>
+            <div class="h-calendar-form-group">
+                <label for="event-title">제목</label>
+                <HTextInput Id="event-title" @bind-Value="EditingEvent.Title" />
+            </div>
+            <div class="h-calendar-form-group">
+                <label for="event-start">시작 시간</label>
+                <HDateTimeInput @bind-Value="EditingEvent.Start" />
+                @* <input id="event-start" type="datetime-local" @bind="EditingEvent.Start" @bind:format="yyyy-MM-ddTHH:mm" /> *@
+            </div>
+            <div class="h-calendar-form-group">
+                <label for="event-end">종료 시간</label>
+                <HDateTimeInput @bind-Value="EditingEvent.End"/>
+                @* <input id="event-end" type="datetime-local" @bind="EditingEvent.End" @bind:format="yyyy-MM-ddTHH:mm" /> *@
+            </div>
+            @* <div class="h-calendar-form-group"> *@
+            @*     <label for="event-all-day">종일 이벤트</label> *@
+            @*     <input id="event-all-day" type="checkbox" @bind="EditingEvent.IsAllDay" /> *@
+            @* </div> *@
+            <div class="h-calendar-form-group">
+                <label for="event-color">색상</label>
+                <HColorInput @bind-Value="EditingEvent.Color"/>
+                @* <input id="event-color" type="color" @bind="EditingEvent.Color" /> *@
+            </div>
+            <div class="h-calendar-form-group">
+                <label for="event-description">설명</label>
+                <HTextArea Id="event-description" @bind-Value="EditingEvent.Description" ></HTextArea>
+            </div>
+        </ChildContent>
+        <FooterContent>
+            @if (EditingEvent.Id != 0)
+            {
+                <button class="h-calendar-btn h-calendar-btn-danger" @onclick="DeleteEvent">삭제</button>
+            }
+            <button class="h-calendar-btn h-calendar-btn-primary" @onclick="SaveEvent">저장</button>
+        </FooterContent>
+    </HDialog>
+</div>
+
+@code {
+    /// <summary>
+    /// 캘린더에 표시될 이벤트 목록.
+    /// </summary>
+    [Parameter]
+    public List<CalendarEvent> Events { get; set; } = new();
+
+    /// <summary>
+    /// 새 이벤트가 추가될 때 호출되는 콜백.
+    /// </summary>
+    [Parameter]
+    public EventCallback<CalendarEvent> OnEventAdded { get; set; }
+
+    /// <summary>
+    /// 이벤트가 업데이트될 때 호출되는 콜백.
+    /// </summary>
+    [Parameter]
+    public EventCallback<CalendarEvent> OnEventUpdated { get; set; }
+
+    /// <summary>
+    /// 이벤트가 삭제될 때 호출되는 콜백.
+    /// </summary>
+    [Parameter]
+    public EventCallback<CalendarEvent> OnEventDeleted { get; set; }
+
+    /// <summary>
+    /// 캘린더의 초기 뷰 모드.
+    /// </summary>
+    [Parameter]
+    public CalendarView InitialView { get; set; } = CalendarView.Month;
+    
+    /// <summary>
+    /// 캘린더의 초기 날짜, 기본값은 오늘.
+    /// </summary>
+    [Parameter]
+    public DateTime InitialDate { get; set; } = DateTime.Today;
+
+    // 현재 캘린더의 뷰 모드
+    private CalendarView CurrentView { get; set; }
+    
+    // 현재 캘린더에 표시되는 날짜
+    private DateTime CurrentDate { get; set; }
+    
+    // 이벤트 모달이 열려있는지 여부
+    private bool IsEventModalOpen { get; set; } = false;
+    
+    // 현재 편집/추가 중인 이벤트
+    private CalendarEvent EditingEvent { get; set; } = new();
+    
+    // 현재 뷰에서 필터링된 이벤트 목록
+    private List<CalendarEvent> FilteredEvents => GetFilteredEvents();
+
+    protected override void OnInitialized()
+    {
+        CurrentView = InitialView;
+        CurrentDate = InitialDate;
+    }
+    
+    /// <summary>
+    /// 이벤트 클릭 시 처리
+    /// </summary>
+    private void HandleEventClick(CalendarEvent evt)
+    {
+        EditingEvent = new CalendarEvent
+        {
+            Id = evt.Id,
+            Title = evt.Title,
+            Description = evt.Description,
+            Start = evt.Start,
+            End = evt.End,
+            Color = evt.Color,
+            IsAllDay = evt.IsAllDay
+        };
+    
+        IsEventModalOpen = true;
+    }
+    
+    /// <summary>
+    /// 월별 뷰에서 "더보기" 클릭 시 해당 날짜의 일별 뷰로 이동
+    /// </summary>
+    private void HandleMoreEventsClick(DateTime date)
+    {
+        // 해당 날짜로 이동
+        CurrentDate = date;
+    
+        // 일별 뷰로 전환
+        CurrentView = CalendarView.Day;
+    }
+    
+    /// <summary>
+    /// 현재 뷰에 맞게 이벤트를 필터링하여 반환
+    /// </summary>
+    private List<CalendarEvent> GetFilteredEvents()
+    {
+        switch (CurrentView)
+        {
+            case CalendarView.Day:
+                return Events.Where(e => 
+                    e.Start.Date <= CurrentDate.Date && 
+                    e.End.Date >= CurrentDate.Date).ToList();
+            
+            case CalendarView.Week:
+                var weekStart = GetStartOfWeek(CurrentDate);
+                var weekEnd = weekStart.AddDays(6);
+                return Events.Where(e => 
+                    e.Start.Date <= weekEnd.Date && 
+                    e.End.Date >= weekStart.Date).ToList();
+            
+            case CalendarView.Month:
+                var monthStart = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+                var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+                return Events.Where(e => 
+                    e.Start.Date <= monthEnd.Date && 
+                    e.End.Date >= monthStart.Date).ToList();
+            
+            default:
+                return Events;
+        }
+    }
+
+    // 겹치는 이벤트들을 그룹화하고 각 이벤트에 위치 정보 할당
+    private List<(CalendarEvent Event, int Column, int Columns)> ArrangeOverlappingEvents(IEnumerable<CalendarEvent> events)
+    {
+        var result = new List<(CalendarEvent Event, int Column, int Columns)>();
+        var sortedEvents = events.OrderBy(e => e.Start).ThenByDescending(e => e.End - e.Start).ToList();
+        
+        if (!sortedEvents.Any()) return result;
+        
+        // 겹치는 이벤트들을 식별하여 그룹화
+        var groups = new List<List<CalendarEvent>>();
+        
+        foreach (var evt in sortedEvents)
+        {
+            bool added = false;
+            
+            // 기존 그룹에 추가할 수 있는지 확인
+            foreach (var group in groups)
+            {
+                if (group.Any(e => Overlaps(e, evt)))
+                {
+                    group.Add(evt);
+                    added = true;
+                    break;
+                }
+            }
+            
+            // 어떤 그룹에도 추가할 수 없으면 새 그룹 생성
+            if (!added)
+            {
+                groups.Add(new List<CalendarEvent> { evt });
+            }
+        }
+        
+        // 각 그룹 내에서 이벤트들의 칼럼 위치를 결정
+        foreach (var group in groups)
+        {
+            var columns = new List<List<CalendarEvent>>();
+            var tempResults = new List<(CalendarEvent Event, int Column, int MaxColumns)>();
+            
+            foreach (var evt in group)
+            {
+                bool placed = false;
+                
+                // 기존 컬럼에 배치 가능한지 확인
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    if (!columns[i].Any(e => Overlaps(e, evt)))
+                    {
+                        columns[i].Add(evt);
+                        tempResults.Add((evt, i, 0)); // 임시로 열 수를 0으로 설정
+                        placed = true;
+                        break;
+                    }
+                }
+                
+                // 모든 컬럼이 차 있으면 새 컬럼 추가
+                if (!placed)
+                {
+                    columns.Add(new List<CalendarEvent> { evt });
+                    tempResults.Add((evt, columns.Count - 1, 0)); // 임시로 열 수를 0으로 설정
+                }
+            }
+            
+            // 모든 이벤트에 대해 총 열 수를 설정
+            int totalColumns = columns.Count;
+            foreach (var (evt, col, _) in tempResults)
+            {
+                result.Add((evt, col, totalColumns));
+            }
+        }
+        
+        return result;
+    }
+    
+    // 두 이벤트가 시간적으로 겹치는지 확인
+    private bool Overlaps(CalendarEvent a, CalendarEvent b)
+    {
+        return a.Start < b.End && a.End > b.Start;
+    }
+    
+    /// <summary>
+    /// 주의 시작일(일요일)을 반환
+    /// </summary>
+    private DateTime GetStartOfWeek(DateTime date)
+    {
+        int diff = (7 + (date.DayOfWeek - DayOfWeek.Sunday)) % 7;
+        return date.AddDays(-1 * diff).Date;
+    }
+
+    /// <summary>
+    /// 뷰 모드 변경 버튼의 CSS 클래스 결정
+    /// </summary>
+    private string GetViewButtonClass(CalendarView view)
+    {
+        return view == CurrentView 
+            ? "h-calendar-view-btn h-calendar-view-btn-active" 
+            : "h-calendar-view-btn";
+    }
+
+    /// <summary>
+    /// 현재 날짜를 오늘로 변경
+    /// </summary>
+    private void GoToToday()
+    {
+        CurrentDate = DateTime.Today;
+    }
+
+    /// <summary>
+    /// 이전 기간으로 이동 (뷰 모드에 따라)
+    /// </summary>
+    private void NavigatePrevious()
+    {
+        switch (CurrentView)
+        {
+            case CalendarView.Day:
+                CurrentDate = CurrentDate.AddDays(-1);
+                break;
+            case CalendarView.Week:
+                CurrentDate = CurrentDate.AddDays(-7);
+                break;
+            case CalendarView.Month:
+                CurrentDate = CurrentDate.AddMonths(-1);
+                break;
+            case CalendarView.Year:
+                CurrentDate = CurrentDate.AddYears(-1);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 다음 기간으로 이동 (뷰 모드에 따라)
+    /// </summary>
+    private void NavigateNext()
+    {
+        switch (CurrentView)
+        {
+            case CalendarView.Day:
+                CurrentDate = CurrentDate.AddDays(1);
+                break;
+            case CalendarView.Week:
+                CurrentDate = CurrentDate.AddDays(7);
+                break;
+            case CalendarView.Month:
+                CurrentDate = CurrentDate.AddMonths(1);
+                break;
+            case CalendarView.Year:
+                CurrentDate = CurrentDate.AddYears(1);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 뷰 모드 변경
+    /// </summary>
+    private void SetView(CalendarView view)
+    {
+        CurrentView = view;
+    }
+
+    /// <summary>
+    /// 일별 뷰에서 시간대 클릭 시 처리
+    /// </summary>
+    private async Task HandleDayTimeSlotClick(DateTime dateTime)
+    {
+        // 클릭한 시간으로 1시간 지속되는 새 이벤트를 바로 생성
+        var newEvent = new CalendarEvent
+        {
+            Title = "새일정",
+            Start = dateTime,
+            End = dateTime.AddHours(1),
+            Color = "#3788d8",
+            IsAllDay = false
+        };
+
+        // ID 생성
+        var maxId = Events.Count > 0 ? Events.Max(e => e.Id) : 0;
+        newEvent.Id = maxId + 1;
+
+        // 이벤트 추가
+        if (OnEventAdded.HasDelegate)
+        {
+            await OnEventAdded.InvokeAsync(newEvent);
+        }
+        else
+        {
+            Events.Add(newEvent);
+        }
+    }
+
+    /// <summary>
+    /// 주별 뷰에서 시간대 클릭 시 처리
+    /// </summary>
+    private async Task HandleWeekTimeSlotClick(DateTime dateTime)
+    {
+        // 클릭한 시간으로 1시간 지속되는 새 이벤트를 바로 생성
+        var newEvent = new CalendarEvent
+        {
+            Title = "새일정",
+            Start = dateTime,
+            End = dateTime.AddHours(1),
+            Color = "#3788d8"
+        };
+    
+        // ID 생성
+        var maxId = Events.Count > 0 ? Events.Max(e => e.Id) : 0;
+        newEvent.Id = maxId + 1;
+    
+        // 이벤트 추가
+        if (OnEventAdded.HasDelegate)
+        {
+            await OnEventAdded.InvokeAsync(newEvent);
+        }
+        else
+        {
+            Events.Add(newEvent);
+        }
+    }
+
+    /// <summary>
+    /// 월별 뷰에서 날짜 클릭 시 처리
+    /// </summary>
+    private async Task HandleMonthDateClick(DateTime date)
+    {
+        // 클릭한 날짜로 이벤트를 바로 생성 (오전 9시 시작)
+        // var startDate = date.Date.AddHours(9);
+        // var newEvent = new CalendarEvent
+        // {
+        //     Title = "이름없음",
+        //     Start = startDate,
+        //     End = startDate.AddHours(1),
+        //     Color = "#3788d8"
+        // };
+        //
+        // // ID 생성
+        // var maxId = Events.Count > 0 ? Events.Max(e => e.Id) : 0;
+        // newEvent.Id = maxId + 1;
+        //
+        // // 이벤트 추가
+        // if (OnEventAdded.HasDelegate)
+        // {
+        //     await OnEventAdded.InvokeAsync(newEvent);
+        // }
+        // else
+        // {
+        //     Events.Add(newEvent);
+        // }
+        CurrentDate = date;
+        CurrentView = CalendarView.Day;
+    }
+
+    /// <summary>
+    /// 연별 뷰에서 월 클릭 시 처리
+    /// </summary>
+    private void HandleYearMonthClick(DateTime date)
+    {
+        // 해당 월로 이동하고 월별 뷰로 전환
+        CurrentDate = date;
+        CurrentView = CalendarView.Month;
+    }
+
+    /// <summary>
+    /// 이벤트 모달 닫기
+    /// </summary>
+    private void CloseEventModal()
+    {
+        IsEventModalOpen = false;
+        EditingEvent = new CalendarEvent();
+    }
+
+    /// <summary>
+    /// 이벤트 저장 (추가 또는 업데이트)
+    /// </summary>
+    private async Task SaveEvent()
+    {
+        if (string.IsNullOrWhiteSpace(EditingEvent.Title))
+        {
+            EditingEvent.Title = "새 일정";
+        }
+
+        if (EditingEvent.Id == 0)
+        {
+            // 새 이벤트 추가
+            var maxId = Events.Count > 0 ? Events.Max(e => e.Id) : 0;
+            EditingEvent.Id = maxId + 1;
+            
+            if (OnEventAdded.HasDelegate)
+            {
+                await OnEventAdded.InvokeAsync(EditingEvent);
+            }
+            else
+            {
+                Events.Add(EditingEvent);
+            }
+        }
+        else
+        {
+            // 기존 이벤트 업데이트
+            var existingEvent = Events.FirstOrDefault(e => e.Id == EditingEvent.Id);
+            if (existingEvent != null)
+            {
+                int index = Events.IndexOf(existingEvent);
+                Events[index] = EditingEvent;
+                
+                if (OnEventUpdated.HasDelegate)
+                {
+                    await OnEventUpdated.InvokeAsync(EditingEvent);
+                }
+            }
+        }
+        
+        IsEventModalOpen = false;
+        EditingEvent = new CalendarEvent();
+    }
+
+    /// <summary>
+    /// 이벤트 삭제
+    /// </summary>
+    private async Task DeleteEvent()
+    {
+        var eventToDelete = Events.FirstOrDefault(e => e.Id == EditingEvent.Id);
+        if (eventToDelete != null)
+        {
+            if (OnEventDeleted.HasDelegate)
+            {
+                await OnEventDeleted.InvokeAsync(eventToDelete);
+            }
+            else
+            {
+                Events.Remove(eventToDelete);
+            }
+        }
+        
+        IsEventModalOpen = false;
+        EditingEvent = new CalendarEvent();
+    }
+
+    /// <summary>
+    /// 캘린더 뷰 모드 (일/주/월/년)
+    /// </summary>
+    public enum CalendarView
+    {
+        Day,
+        Week,
+        Month,
+        Year
+    }
+}
+
+@* 캘린더 이벤트 모델 *@
+@code {
+    public class CalendarEvent
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public string Color { get; set; } = "#3788d8";
+        public bool IsAllDay { get; set; }
+    }
+}

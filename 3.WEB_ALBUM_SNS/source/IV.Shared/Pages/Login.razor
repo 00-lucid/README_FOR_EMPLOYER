@@ -1,0 +1,101 @@
+@page "/login"
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@using IV.Web.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ILoginService LoginService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<HSpinner IsLoading="@IsLoading" />
+
+<HLayoutCenter>
+    <div class="login-container">
+        <HRow AlignItems="center" JustifyContent="center">
+            <h1>IV</h1>
+        </HRow>
+        <HColumn Gap="1rem">
+            <form @onsubmit="HandleLogin">
+                <HColumn Gap="1rem">
+                    <HTextInput Label="Email" Type="email" Id="email" Value="@Email"
+                                ValueChanged="val => Email = val" PlaceHolder="Enter your email" />
+                    <HTextInput Label="Password" Type="password" Id="password" Value="@Password"
+                                ValueChanged="val => Password = val" PlaceHolder="Enter your password" />
+                    @* <HRow AlignItems="center"> *@
+                    @*     <HSlider @bind-Value="@RememberMe" /> *@
+                    @*     <HLabel>Remember Me</HLabel> *@
+                    @* </HRow> *@
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </HColumn>
+            </form>
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <p class="error-message">@ErrorMessage</p>
+            }
+
+            <!-- 회원가입 리디렉션 및 계정 복구 -->
+            <div class="auxiliary-links">
+                <p>
+                    Don't have an account?
+                    <a href="@($"/signup{(string.IsNullOrEmpty(ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(ReturnUrl)}")}")">
+                        Sign up
+                    </a>
+                </p>
+                <p>
+                    Forgot your password?
+                    <a href="@($"/recover-account{(string.IsNullOrEmpty(ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(ReturnUrl)}")}")">
+                        Recover your account
+                    </a>
+                </p>
+            </div>
+        </HColumn>
+    </div>
+</HLayoutCenter>
+
+@code {
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private bool RememberMe { get; set; } = false;
+    private bool IsLoading { get; set; } = false; // 로딩 상태 변수 추가
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private async Task HandleLogin()
+    {
+        IsLoading = true; // 로딩 시작
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            UserModel? user = await LoginService.LoginAsync(Email, Password);
+            if (user != null)
+            {
+                // 로그인 성공
+                if (ReturnUrl is not null)
+                {
+                    NavigationManager.NavigateTo(Uri.UnescapeDataString(ReturnUrl), true);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/", true); // 리다이렉트
+                }
+            }
+            else
+            {
+                // 로그인 실패 메시지
+                ErrorMessage = "Invalid email or password. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // 에러 처리
+            ErrorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false; // 로딩 종료
+        }
+    }
+}

@@ -1,0 +1,25 @@
+.form-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* textarea 기본 스타일 */
+textarea.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(#ccc); /* 필요한 경우 변수 적용 */
+    border-radius: 5px;
+    font-size: 14px;
+    resize: vertical; /* 수직 크기 조절만 허용 */
+}
+
+/* 폼 레이블 스타일(필요 시 조정) */
+label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+textarea.form-control {
+    resize: none; /* 사용자가 크기 조절을 하지 못하도록 설정 */
+}

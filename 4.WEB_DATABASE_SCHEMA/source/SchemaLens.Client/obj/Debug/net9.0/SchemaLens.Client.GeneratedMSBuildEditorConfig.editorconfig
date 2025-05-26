@@ -1,0 +1,81 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = SchemaLens.Client
+build_property.RootNamespace = SchemaLens.Client
+build_property.ProjectDir = C:\Users\GMIN\source\repos\SchemaLens\SchemaLens.Client\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\GMIN\source\repos\SchemaLens\SchemaLens.Client
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/PeersGroup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQZWVyc0dyb3VwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/GroupTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xHcm91cFRhYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-n5cq4rr97p
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/Main.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNYWluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-5wpu8a84ca
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/PeerExamine.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQZWVyRXhhbWluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-pvtty1wpmd
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/PeersGroupDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQZWVyc0dyb3VwRGV0YWlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-8x2wl6stpd
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/PeerWrite.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQZWVyV3JpdGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-n7gofud1sd
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/Project.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9qZWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-xdfyvc8jq2
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/Pages/Recommend.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZWNvbW1lbmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-oh7r19klk5
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/PeerAddDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQZWVyQWRkRGlhbG9nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-vwwsqdd4c0
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Components/PeerItemSection.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQZWVySXRlbVNlY3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-zsxrjsemau
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-kuc67wz4fj
+
+[C:/Users/GMIN/source/repos/SchemaLens/SchemaLens.Client/Layout/TopMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFRvcE1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-zcyn50xkeq

@@ -1,0 +1,166 @@
+@page "/signup"
+@using IV.Shared.Helpers
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Pages.Components
+@using IV.Web.Services
+@inject ILoginService LoginService
+@inject IEmailService EmailService
+@inject NavigationManager NavigationManager
+
+<HLayoutCenter>
+    <div class="signup-container">
+        <HRow AlignItems="center" JustifyContent="center">
+            <h1>IV</h1>
+        </HRow>
+        <HColumn Gap="1rem">
+            <form @onsubmit="HandleSignup">
+                <HColumn Gap="1rem">
+                    @* <HTextInput Label="User Name" Type="text" Id="full-name" Value="@Username" *@
+                    @*             ValueChanged="val => Username = val" PlaceHolder="Enter your user name"/> *@
+                    <HTextInput Label="Email" Type="email" Id="email" Value="@Email"
+                                ValueChanged="val => Email = val" PlaceHolder="Enter your email"/>
+                    @* <HTextInput Label="Password" Type="password" Id="password" Value="@Password" *@
+                    @*             ValueChanged="val => Password = val" PlaceHolder="Enter your password"/> *@
+                    @* <HTextInput Label="Confirm Password" Type="password" Id="confirm-password" Value="@ConfirmPassword" *@
+                    @*             ValueChanged="val => ConfirmPassword = val" PlaceHolder="Confirm your password"/> *@
+
+                    <button type="submit">Sign Up</button>
+                </HColumn>
+            </form>
+            @if (ErrorMessages.Count > 0)
+            {
+                <ul class="error-messages">
+                    @foreach (var error in ErrorMessages)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            }
+
+
+            <!-- 로그인 리디렉션 -->
+            <div class="auxiliary-links">
+                <p>
+                    Already have an account?
+                    <a href="/login">Log In</a>
+                </p>
+            </div>
+        </HColumn>
+    </div>
+</HLayoutCenter>
+
+@code {
+    private string Username { get; set; } = string.Empty;
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string ConfirmPassword { get; set; } = string.Empty;
+    private List<string> ErrorMessages { get; set; } = new();
+
+    /** 이메일 인증 */
+    private bool _isEmailSent = false;
+    private bool IsLoading { get; set; } = false;
+    private string ErrorMessage { get; set; } = string.Empty;
+    
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private async Task HandleSignup()
+    {
+        // 에러 메시지 리스트 초기화
+        ErrorMessages.Clear();
+
+        // 유효성 검사 (이메일 형식 여부 추가)
+        if (string.IsNullOrWhiteSpace(Email) 
+            || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(Email))
+        { 
+            ErrorMessages.Add("Please provide a valid email address.");
+        }
+
+        // if (string.IsNullOrWhiteSpace(Username))
+        // {
+        //     ErrorMessages.Add("Enter a user name.");
+        // }
+        //
+        // if (string.IsNullOrWhiteSpace(Email))
+        // {
+        //     ErrorMessages.Add("Enter an email.");
+        // }
+        //
+        // if (string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword))
+        // {
+        //     ErrorMessages.Add("Enter a password and confirm it.");
+        // }
+        //
+        // if (Password != ConfirmPassword)
+        // {
+        //     ErrorMessages.Add("Passwords do not match.");
+        // }
+
+        // 비밀번호 규칙 유효성 검사
+        // ValidatePassword(Password);
+
+        // 에러 처리
+        if (ErrorMessages.Count > 0)
+        {
+            return;
+        }
+
+        // API 호출 및 회원가입 처리
+        try
+        {
+            // 이메일 인증 로직 추가
+            // 1) 인증 코드 생성
+            var verificationCode = new Random().Next(100000, 999999).ToString();
+            // 2) 인증 메일 전송
+            await EmailService.SendAsync(
+                        Email,
+                        "Verify Your Email",
+                        $"Your verification code is: {verificationCode}");
+            // 3) 인증 코드 저장
+            await SaveVerificationCodeAsync(Email, verificationCode);
+            // 4) 이메일 암호화 후 인증 페이지 이동
+            var encryptedEmail = AesEncryptionHelper.Encrypt(Email);
+            var verificationUrl = !string.IsNullOrEmpty(ReturnUrl) 
+                ? $"/verify-signup?email={Uri.EscapeDataString(encryptedEmail)}&returnUrl={Uri.EscapeDataString(ReturnUrl)}" 
+                : $"/verify-signup?email={Uri.EscapeDataString(encryptedEmail)}";
+
+            NavigationManager.NavigateTo(verificationUrl);
+            _isEmailSent = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessages.Add("An error occurred. Try again.");
+            Console.WriteLine($"Signup error: {ex.Message}");
+        }
+    }
+
+    private void ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            ErrorMessages.Add("Password cannot be empty.");
+            return;
+        }
+
+        if (password.Length < 8)
+        {
+            ErrorMessages.Add("Use at least 8 characters.");
+        }
+
+        if (!password.Any(char.IsUpper))
+        {
+            ErrorMessages.Add("Include an uppercase letter.");
+        }
+
+        if (!password.Any(c => "@#!$%&".Contains(c)))
+        {
+            ErrorMessages.Add("Add a special character (@#!$%&).");
+        }
+    }
+    
+    private Task SaveVerificationCodeAsync(string email, string code)
+    {
+        EmailService.SaveVerificationCode(email, code);
+        return Task.CompletedTask;
+    }
+}

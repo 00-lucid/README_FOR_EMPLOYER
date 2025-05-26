@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="/crypto-js.min.js"></script>
+        <script>
+            function encrypt(source) {
+                const secret = CryptoJS.enc.Utf8.parse('d4g7u2db7g0l2r1dhy3svgt871segu09')
+
+                const opt = { iv: CryptoJS.enc.Utf8.parse(''), padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
+                const encrypted = CryptoJS.AES.encrypt(source, secret, opt).toString()
+
+                return encodeURIComponent(encrypted)
+            }
+        </script>
+    </head>
+    <body>
+        <script>
+            const userId = encrypt('root')
+            const drawing = encrypt('000000000000000000000000005146')
+            const revision = encrypt('001')
+            const plant = encrypt('5100')
+            const equipments = encrypt('00000000000000000012')
+
+            window.location.href = `/index.html?mode=basic&user=${userId}&drawing=${drawing}&revision=${revision}&plant=${plant}&equipments=${equipments}`
+        </script>
+    </body>
+</html>

@@ -1,0 +1,43 @@
+.CommonComponent .ListViewControl::-webkit-scrollbar {
+    display: none;
+}
+
+.CommonComponent .ListViewControl table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.CommonComponent .ListViewControl tr {
+    height: 40px;
+    color: var(--Text-Normal);
+}
+
+.CommonComponent .ListViewControl td {
+    padding: 10px 0 10px 0;
+    font-size: 13px;
+}
+
+.CommonComponent .ListViewControl th {
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.CommonComponent .ListViewControl tbody tr:nth-child(odd) {
+    background-color: var(--Table-Row-Highlight);
+}
+.CommonComponent .ListViewControl tbody tr:hover {
+    background-color: var(--Table-Row-Hover);
+}
+.CommonComponent .ListViewControl tbody tr:active {
+    background-color: var(--Table-Row-Active);
+}
+
+.CommonComponent .ListViewControl td:first-child {
+    border-top-left-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+
+.CommonComponent .ListViewControl td:last-child {
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+}

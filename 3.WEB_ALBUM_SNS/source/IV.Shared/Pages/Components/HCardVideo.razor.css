@@ -1,0 +1,68 @@
+﻿/* 전체 카드 스타일 */
+.h-card-video {
+    aspect-ratio: 3 / 2; /* 3:2 비율 유지 */
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: var(--light-color);
+    color: var(--text-color);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+/* 비디오를 화면 가득 표시하기 위한 스타일 */
+.h-card-video-element {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비디오 콘텐츠를 객체에 꽉 채움 */
+    z-index: 1;
+}
+
+/* 호버 시 카드 효과 */
+.h-card-video:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 카드 하단 영역(푸터) 스타일 */
+.h-card-video-footer {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+    text-align: start;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    position: relative;
+    z-index: 2;
+}
+
+/* 마우스가 카드에 호버될 때, 푸터가 아래쪽으로 사라짐 */
+.h-card-video:hover .h-card-video-footer {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+/* 타이틀 스타일 */
+.h-card-video-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+}
+
+/* 서브타이틀 스타일 */
+.h-card-video-subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #fff;
+}

@@ -1,0 +1,49 @@
+﻿IP : 49.238.205.37
+PORT : 1521
+
+Oracle DB ID : ids
+Oracle DB PASSWD : ids
+SID : ORAKOSPO
+ //도면 폴더
+            //관리자인 경우
+            if (m_Folder_Authority == "000001")
+            {
+                sSql = "SELECT A.FOLID,A.FOLNM,A.FOLPT,A.FOLLV,A.SEQ FROM IDS_FOLDER A WHERE FOLID IN (";
+                sSql += "SELECT FOLID FROM IDS_ACL_FOLDER WHERE ACLTP = '001' GROUP BY FOLID) ";
+                sSql += "ORDER BY A.FOLLV, A.PLANTCODE, A.FOLPT, A.SEQ";
+            }
+            else	//일반사용자인 경우
+           {
+               sSql = "SELECT A.FOLID,A.FOLNM,A.FOLPT,A.FOLLV,A.SEQ FROM IDS_FOLDER A WHERE FOLID IN (";
+                sSql += "SELECT FOLID FROM IDS_ACL_FOLDER WHERE ACLTP = '001' AND ACLNO IN(" + m_Folder_Authority + ") GROUP BY FOLID) ";
+                sSql += "ORDER BY A.FOLLV, A.PLANTCODE, A.FOLPT, A.SEQ";
+            }
+
+            //도면폴더에 도면리스트 추가
+            sSql = "SELECT DOCNO,DOCVR,DOCNM,FOLID,DOCNUMBER,PLANTCODE,PIPEDOC_YN,PIPE_YN FROM IDS_DOC WHERE CURRENT_YN = '001' ORDER BY DOCNUMBER";
+
+	//도면 파일
+           sql = "SELECT DOCCT FROM IDS_DOC WHERE DOCNO = '" + DocNo + "' AND DOCVR = '" + DocVR + "'";
+
+            //기기심볼 폴더
+            sSql = "SELECT B.LIBNO, B.LIBNM, B.LIBDS, B.LIBPT, B.LIBLV, A.DOCNO FROM IDS_TAG A, IDS_LIB B ";
+            sSql += "WHERE A.DOCNO = '" + m_DOCNO + "' AND A.DOCVR = '" + m_DOCVR + "' ";
+            sSql += "AND B.LIBLV != '9' AND B.PLANTCODE = '" + m_PlantCode + "' AND A.GUBUN = 'Y' AND A.LIBNO = B.LIBNO ";
+            sSql += "GROUP BY B.LIBNO, B.LIBNM, B.LIBDS, B.LIBPT, B.LIBLV, A.DOCNO ";
+            sSql += "UNION ALL ";
+            sSql += "SELECT LIBNO, LIBNM, LIBDS, LIBPT, LIBLV, '' AS DOCNO FROM IDS_LIB WHERE PLANTCODE = '" + m_PlantCode + "' AND LIBLV != '9' AND LIBDS = 'VALVE' ";
+            sSql += "AND LIBNO IN ";
+            sSql += "    (SELECT LIBPT FROM ";
+            sSql += "    IDS_TAG A, IDS_LIB B ";
+            sSql += "    WHERE A.DOCNO = '" + m_DOCNO + "' AND A.DOCVR = '" + m_DOCVR + "' ";
+            sSql += "    AND A.DOCVR = '001' AND B.LIBLV != '9' AND B.PLANTCODE = '" + m_PlantCode + "' AND A.GUBUN = 'Y' AND A.LIBNO = B.LIBNO ";
+            sSql += "    GROUP BY B.LIBPT) ";
+            sSql += "ORDER BY LIBDS ";
+
+            //기기심볼 폴더에 설비 추가
+            sSql = "SELECT TAGNO,LIBDS,A.LIBNO,A.DOCVR,A.INTELLIGENT,A.FUNCTION FROM IDS_TAG A, IDS_LIB B WHERE A.DOCNO = '" + m_DOCNO + "' ";
+            sSql += "AND A.DOCVR = '" + m_DOCVR + "' ";
+            sSql += "AND B.LIBLV != '9' AND B.PLANTCODE = '" + m_PlantCode + "' AND A.GUBUN = 'Y' AND A.LIBNO = B.LIBNO ORDER BY LIBDS";
+
+	 //기기심볼 폴더에 개인설비 추가
+	 SELECT GRPNO,DOCNO,GRPNM FROM IDS_USER_GRP WHERE DOCNO = '{0}' AND USERID = '{1}'

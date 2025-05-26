@@ -1,0 +1,31 @@
+(SELECT (CASE WHEN HOGI_GUBUN = '0' THEN '공용' ELSE HOGI_GUBUN || '호기' END) FROM IDS_FOLDER WHERE FOLID = A.FOLID) AS HOGINM ";
+
+SELECT A.TAGNO, A.TAG_TYPE, A.GUBUN, A.INTELLIGENT, A.CONNECTION, A.FUNCTION, A.LIBNO, A.FOLID,
+FROM IDS_TAG A
+WHERE A.TAGNO IN (SELECT TAGNO FROM IDS_TAG_DETAIL WHERE TAGHANDLE = '" + shandle + "' AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "'";
+ GROUP BY TAGNO) AND A.DOCNO = '" + m_DOCNO + "' AND A.DOCVR = '" + m_DOCVR + "'";
+ ORDER BY A.INTELLIGENT, HOGINM ";
+
+배관/설비
+설비번호[유형:$2 설명:$3]
+                   설비번호                  설명          설비유형
+SELECT DISTINCT (EQUIPMENT),INTELLIGENT,FUNCTION_DETAIL,OBJECT
+FROM IDS_MASTER
+WHERE  INTELLIGENT is not null AND FUNCTION = 'm_Function[i]'
+AND PLANTCODE = 'm_PLANTCODE'
+
+
+OPC
+도면번호영역=선택한 tag의 INTELLIGENT
+$1호기 도면번호영역
+0='공용'
+
+
+mid - A.INTELLIGENT, A.CONNECTION
+
+
+in - docId, docVer, plantCode, handle
+
+out - EQUIPMENT,FUNCTION_DETAIL,OBJECT,
+      tagType,
+      newDocId, newDocVer, newHogi, newTagId, newPlantCode

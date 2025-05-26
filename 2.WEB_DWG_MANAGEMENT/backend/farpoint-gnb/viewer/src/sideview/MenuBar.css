@@ -1,0 +1,72 @@
+.MenuBar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 13px;
+}
+
+.MenuBar > .Logo {
+    margin: 7px;
+    margin-bottom: 30px;
+}
+
+@media screen and (max-height: 500px) {
+    .MenuBar > .line {
+        display: none;
+    }
+}
+
+.MenuBar .MenuItem {
+    position: relative;
+    margin-top: 6px;
+    margin-left: 7px;
+    width: 66px;
+    height: 66px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.MenuItem .MenuIcon {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.MenuItem .MenuLabel {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+
+.MenuBar .MenuItemOn {
+    background-color: var(--Background-Highlight);
+}
+.MenuBar .MenuItemOn:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.MenuBar .MenuItemOn:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.MenuBar .MenuItemOff:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.MenuBar .MenuItemOff:active {
+    background-color: var(--Background-Normal-Active);
+}
+
+.MenuItemOn .MenuLabel {
+    color: var(--Stroke-Highlight);
+}
+.MenuItemOff .MenuLabel {
+    color: var(--Stroke-Normal);
+}
+
+.MenuBar .line {
+    position: relative;
+    margin: 19px;
+    margin-top: 30px;
+    width: 43px;
+    height: 1px;
+    background-color: var(--Separate-Line);
+}

@@ -1,0 +1,234 @@
+﻿@layout NoMenuLayout
+@page "/invitation"
+@using IV.Shared.Interfaces.Services
+@using IV.Shared.Layout
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@using Microsoft.Extensions.Configuration
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject IAlbumService AlbumService
+@inject IAlbumSubscriptionService AlbumSubscriptionService
+@inject IUserService UserService
+@inject IAlbumPhotoService AlbumPhotoService
+
+<div class="invitation-page">
+    <div class="infinite-gallery">
+        @if (_repeatedImages.Count > 0)
+        {
+            @for (int colIndex = 0; colIndex < 20; colIndex++)
+            {
+                // 짝수/홀수 구분하여 위로/아래로
+                var colAnimationClass = (colIndex % 2 == 0) ? "scroll-up" : "scroll-down";
+
+                <div class="image-column @colAnimationClass">
+                    <!-- 첫 번째 세트 -->
+                    @for (int rowIndex = 0; rowIndex < 10; rowIndex++)
+                    {
+                        var imageUrl = _repeatedImages[colIndex * 10 + rowIndex];
+                        <div class="pinterest-item" style="background-image: url('@imageUrl');"></div>
+                    }
+
+                    <!-- 두 번째 세트 (동일한 목록) -->
+                    @for (int rowIndex = 0; rowIndex < 10; rowIndex++)
+                    {
+                        var imageUrl = _repeatedImages[colIndex * 10 + rowIndex];
+                        <div class="pinterest-item" style="background-image: url('@imageUrl');"></div>
+                    }
+                </div>
+            }
+        }
+    </div>
+    <HLayoutCenter IsAbsolute="true">
+        <HCard
+            Padding="1rem"
+            IsAspectRatio="false"
+            Title="초대"
+            Subtitle=@($"{SenderName} 님이 보낸 {AlbumName} 앨범으로 초대")>
+            <!-- 앨범 썸네일 이미지 -->
+            <HCard
+                Width="300px" Height="180px" IsAspectRatio="false" ImageUrl="@ThumbnailUrl" />
+            <!-- 수락/거절 버튼 -->
+            <HRow JustifyContent="end" Gap="1rem" Padding="1rem">
+                <HButton OnClick="OnAcceptClicked">수락</HButton>
+                <HTextButton Type="HTextButton.ButtonType.Danger" OnClick="OnDeclineClicked">거절</HTextButton>
+            </HRow>
+        </HCard>
+    </HLayoutCenter>
+</div>
+
+@code {
+    private int _userId;
+    
+    private bool _isLoading = true;
+    private bool _isValid = false;
+    private bool? _acceptState = null;
+    
+    private List<string> _repeatedImages = [];
+
+    [SupplyParameterFromQuery(Name = "email")]
+    private string? Email { get; set; }
+
+    [SupplyParameterFromQuery(Name = "token")]
+    private string? Token { get; set; }
+
+    [SupplyParameterFromQuery(Name = "albumId")]
+    private string? AlbumId { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "albumName")]
+    private string? AlbumName { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "senderId")]
+    private string? SenderId { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "senderName")]
+    private string? SenderName { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "thumbnailUrl")]
+    private string? ThumbnailUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _userId = await UserService.GetUserIdAsync();
+
+        bool isValidUri = await ValidateUri();
+        if (!isValidUri)
+        {
+            NavigateError();
+            return;
+        };
+        
+        bool isValid = await ValidateInvitation();
+        if (!isValid)
+        {
+            NavigateError();
+            return;
+        }
+        
+        List<AlbumPhotoModel> albumPhotoModels = await AlbumPhotoService.GetAlbumPhotoByIdAsync(Int32.Parse(AlbumId));
+        
+        List<string> Images = albumPhotoModels
+            .Where(ap => !string.IsNullOrEmpty(ap.PhotoUrl)) // 필요 시 추가
+            .Select(ap => ap.PhotoUrl + "?" + Configuration.GetConnectionString("BlobStorageToken"))
+            .ToList();
+
+        // 200장 미만이면 모자란 수만큼 반복해서 채우기
+        if (Images.Count < 200)
+        {
+            int needed = 200 - Images.Count;
+            while (Images.Count < 200)
+                Images.AddRange(Images.Take(needed));
+        }
+
+        _repeatedImages = Images.Take(200).ToList();
+        StateHasChanged();
+    }
+
+    private async Task OnAcceptClicked(MouseEventArgs e)
+    {
+        bool isValidUri = await ValidateUri();
+        if (!isValidUri) return;
+
+        bool isLoggedIn = await UserService.IsLoggedInAsync();
+        
+        if (!isLoggedIn)
+        {
+            // 로그인 페이지로 이동
+            NavigateLogin();
+            return;
+        }
+        else
+        {
+            UserModel userModel = await UserService.GetCurrentUserAsync(_userId);
+
+            if (!userModel.Email.Equals(Email))
+            {
+                return;
+            }
+            
+            bool isValid = await ValidateInvitation();
+            if (isValid)
+            {
+                await AlbumSubscriptionService.SubscribeToAlbumAsync(_userId, Int32.Parse(AlbumId));
+                await AlbumService.UpdateInvitationStatus(Email, Token, DateTime.Now, Int32.Parse(SenderId), "Accepted");
+                NavigateAlbum();
+            }
+        }
+    }
+
+    private async Task OnDeclineClicked(MouseEventArgs e)
+    {
+        bool isValidUri = await ValidateUri();
+        if (!isValidUri) return; 
+        
+        bool isValid = await ValidateInvitation();
+        if (isValid)
+        {
+            // 거절완료
+            await AlbumService.UpdateInvitationStatus(Email, Token, DateTime.Now, Int32.Parse(SenderId), "Declined");
+            NavigateHome();
+        }
+    }
+
+    private void NavigateAlbum()
+    {
+        if (!string.IsNullOrEmpty(AlbumId))
+        {
+            NavigationManager.NavigateTo($"/albums/detail/{AlbumId}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+    
+    private void NavigateLogin()
+    { 
+        // 현재 페이지의 전체 URL 가져오기
+        var currentUrl = NavigationManager.Uri;
+
+        // URL 인코딩
+        var encodedUrl = Uri.EscapeDataString(currentUrl);
+
+        // 로그인 페이지로 이동하며 returnUrl 쿼리 파라미터에 현재 페이지 주소 전달
+        NavigationManager.NavigateTo($"/login?returnUrl={encodedUrl}");
+    }
+    
+    private void NavigateError()
+    {
+        NavigationManager.NavigateTo($"/Error");
+    }
+    
+    private void NavigateHome()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+    
+    /// <summary>
+    /// 이메일, 토큰 등 초대 정보를 검증하고 결과를 반환합니다.
+    /// </summary>
+    private async Task<bool> ValidateInvitation()
+    {
+        bool isValidUri = await ValidateUri();
+        if (!isValidUri) return false; 
+        
+        bool isValid = await AlbumService.ValidateInvitation(Email, Token, DateTime.Now, Int32.Parse(SenderId));
+
+        return isValid;
+    }
+
+    private async Task<bool> ValidateUri()
+    {
+        if (string.IsNullOrWhiteSpace(Email) || 
+            string.IsNullOrWhiteSpace(Token) ||
+            string.IsNullOrWhiteSpace(SenderId) ||
+            string.IsNullOrWhiteSpace(AlbumId)
+           )
+        {
+            return false;
+        }
+
+        return true;
+    }
+}

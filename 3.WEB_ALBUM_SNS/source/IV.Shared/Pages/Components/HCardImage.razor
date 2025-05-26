@@ -1,0 +1,49 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@* HCardImage.razor *@
+<div class="h-card-image"
+     style="width: @(Width ?? "auto");
+     height: @(Height ?? "auto");"
+     @onclick="HandleClick">
+
+    <!-- 실제 이미지 출력 -->
+    <img 
+        src="@(ImageUrl + "?" + Configuration.GetConnectionString("BlobStorageToken"))" 
+        alt="Card Image" 
+        class="h-card-image-img" 
+        loading="lazy"
+        style="@((IsBlur ? "filter: blur(12px);" : ""))"
+    />
+
+    @ChildContent
+
+    @if (IsFooter)
+    {
+        <div class="h-card-image-footer">
+            <h3 class="h-card-image-title">@Title</h3>
+            <p class="h-card-image-subtitle">@Subtitle</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Image Card Title";
+    [Parameter] public string Subtitle { get; set; } = "Image Card Subtitle";
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? ImageUrl { get; set; }
+    [Parameter] public bool IsFooter { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter] public bool IsBlur { get; set; } = false;
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+}

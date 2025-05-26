@@ -1,0 +1,20 @@
+.picture-list-skeleton {
+    background-color: #eee;
+    justify-content: center;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    height: 8px;
+    width: 8px;
+    border-radius: 0.325rem;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

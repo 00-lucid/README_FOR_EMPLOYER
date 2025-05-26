@@ -1,0 +1,33 @@
+.TreeViewComponent {
+    position: absolute;
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.TreeViewComponent.PldTreeViewComponent {
+    height: 57%;
+}
+
+.TreeViewComponent.PldTreeViewComponent.Loading {
+    opacity: 50%;
+    pointer-events: none;
+}
+
+.TreeViewComponent::-webkit-scrollbar {
+    display: none;
+}
+
+.TreeViewComponent .TreeViewItem {
+    position: absolute;
+    width: 100%;
+    transition: all 0.2s ease-out;
+}
+
+.TreeViewComponent .TreeViewItem .Children {
+    position: absolute;
+    overflow: hidden;
+    transition: all 0.2s ease-out, background-color 0s;
+    width: 100%;
+}

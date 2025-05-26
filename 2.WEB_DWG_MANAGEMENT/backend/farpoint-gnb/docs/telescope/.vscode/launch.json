@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "preLaunchTask": "npm: start",
+            "url": "http://localhost:3000/?user=root&host=mock"
+        }
+    ]
+}

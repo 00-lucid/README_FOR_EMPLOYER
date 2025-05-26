@@ -1,0 +1,36 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@* HCircleCard.razor *@
+<div class="@($"h-circle-card-container {Class}")">
+    <div class="h-circle-card"
+         style="@((!string.IsNullOrEmpty(ImageUrl)) ? $"background: url('{ImageUrl + "?" + Configuration.GetConnectionString("BlobStorageToken")}') no-repeat center center / cover;" : "")"
+         @onclick="HandleClick">
+        @ChildContent
+    </div>
+
+    @* <div class="h-circle-card-text"> *@
+    @*     <h3 class="h-circle-card-title">@Title</h3> *@
+    @*     <p class="h-circle-card-subtitle">@Subtitle</p> *@
+    @* </div> *@
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Circle Card Title";
+    [Parameter] public string Subtitle { get; set; } = "Circle Card Subtitle";
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? ImageUrl { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter]
+    public string? Class { get; set; }
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+}

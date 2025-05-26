@@ -1,0 +1,76 @@
+﻿@page "/peer/examine"
+@using SchemaLens.Client.Enums
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@rendermode InteractiveServer
+@* @using Microsoft.AspNetCore.Components.Authorization *@
+@inject IPeerService PeerService
+@* @inject AuthenticationStateProvider AuthenticationStateProvider *@
+
+<div id="peer-examine-container">
+    <div id="peer-examine-sidebar"></div>
+    <div id="peer-examine-detail-container">
+        @if (peers is not null)
+        {
+            <PeerItemSection isExamine="true" isOnline="true" OnPeerUpdate="@HandlePeerUpdate" OnPeerDelete="@HandlePeerDelete" peers="@onlinePeers"/>
+            <PeerItemSection isExamine="true" isOnline="false" OnPeerUpdate="@HandlePeerUpdate" OnPeerDelete="@HandlePeerDelete" peers="@offlinePeers"/>
+        }
+    </div>
+    <div id="peer-examine-additional-container"></div>
+</div>
+
+
+@code {
+    Variant variant = Variant.Outlined;
+    IEnumerable<PeerModel> peers;
+    IList<PeerModel> onlinePeers;
+    IList<PeerModel> offlinePeers;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        peers = await PeerService.GetPeersByAllAsync();
+        SetPeers(peers);
+    }
+
+    private async Task HandlePeerUpdate((int PeerId, Enums.PeerType PeerType) updateInfo)
+    {
+        int peerId = updateInfo.PeerId;
+        PeerType peerType = updateInfo.PeerType;
+
+        // 필요한 로직 수행
+        await PeerService.UpdatePeerStateByIdAsync(peerId, peerType);
+        peers = await PeerService.GetPeersByAllAsync();
+        SetPeers(peers);
+    }
+
+    private async Task HandlePeerDelete(int peerId)
+    {
+        // 필요한 로직 수행
+
+        StateHasChanged();
+    }
+    
+    private void SetPeers(IEnumerable<PeerModel> peers)
+    {
+        List<PeerModel> tempOnlinePeers = new List<PeerModel>();
+        List<PeerModel> tempOfflinePeers = new List<PeerModel>();
+        
+        foreach (PeerModel peer in peers)
+        {
+            if (peer.State.Equals("Pending"))
+            {
+                tempOnlinePeers.Add(peer);
+            }
+            else
+            {
+                tempOfflinePeers.Add(peer);
+            }
+        }
+
+        onlinePeers = tempOnlinePeers;
+        offlinePeers = tempOfflinePeers;
+        StateHasChanged();
+    }
+}

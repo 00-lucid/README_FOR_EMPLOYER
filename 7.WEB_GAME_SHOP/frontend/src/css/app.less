@@ -1,0 +1,107 @@
+@import "line-awesome.min.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import url("~dropzone/dist/dropzone.css");
+@import "swiper/components/pagination/pagination.less";
+@import "./items.less";
+/* iOS Cordova Tweak */
+
+// #032739
+
+.device-ios {
+  height: 100vh;
+}
+
+:root {
+  --f7-theme-color: #ffffff;
+  --f7-theme-color-rgb: 255, 59, 48;
+  --f7-theme-color-shade: #ffffff;
+  --f7-theme-color-tint: #ffffff;
+  --f7-page-bg-color: #011019;
+  --f7-text-editor-text-color: #ffffff;
+  --f7-input-text-color: #ffffff;
+}
+.device-android {
+  --f7-page-transition-duration: 250ms;
+}
+.device-android .page-next {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 56px, 0);
+}
+.device-android .page-next.page-next-on-right {
+  transform: translate3d(100%, 0, 0);
+}
+.device-android .router-transition-forward .page-next {
+  animation: md-page-next-to-current var(--f7-page-transition-duration) forwards;
+}
+.device-android .router-transition-forward .page-current {
+  animation: none;
+}
+
+.device-android .router-transition-backward .page-current {
+  animation: md-page-current-to-next var(--f7-page-transition-duration) forwards;
+}
+.device-android .router-transition-backward .page-previous {
+  animation: none;
+}
+.ios.device-android .page-previous {
+  transform: translate3d(0, 0, 0);
+}
+
+.ios.device-android .router-transition-forward .page-next:before {
+  animation: none;
+}
+
+.grid-list-item {
+  .item-link {
+    width: 100%;
+    .item-content {
+      padding: 0;
+      display: inline;
+    }
+  }
+  .item-media {
+    padding-bottom: 0;
+    & + .item-inner {
+      width: 1rem;
+      margin: auto;
+      padding-right: 0 !important;
+      .item-title-row {
+        padding: 0;
+      }
+      .item-title-row::before {
+        content: none;
+      }
+      &::after {
+        content: none;
+      }
+    }
+  }
+}
+
+#file {
+  color: white;
+}
+.navbar-inner {
+  color: #ffffff;
+  background-color: #011019;
+  border-bottom: 2px solid #ffffff;
+}
+.toolbar-inner {
+  color: #ffffff;
+  background-color: #011019;
+}
+.tab-link-active {
+  border-top: 2px solid #ffffff;
+}
+.tabbar-label {
+  color: #ffffff;
+}
+.icon {
+  color: #f3ead7;
+}
+button:focus {
+  outline: none;
+}

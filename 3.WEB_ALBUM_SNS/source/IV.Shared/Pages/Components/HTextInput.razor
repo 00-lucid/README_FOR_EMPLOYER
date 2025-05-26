@@ -1,0 +1,56 @@
+<div class="form-group" style="position: relative; display: inline-block;">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">@Label:</label>
+    }
+    <div style="position: relative;">
+        <input
+            type="@Type"
+            id="@Id"
+            value="@Value"
+            placeholder="@PlaceHolder"
+            maxlength="@MaxLength"
+            class="form-control"
+        @oninput="HandleInput" />
+
+        <!-- 여기서 실제로는 input 옆(오른쪽)에 버튼이 겹쳐서 보이도록 설정 -->
+        <div style="position: absolute; top: 50%; right: 0.5rem; transform: translateY(-50%);">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty; // 레이블 텍스트
+
+    [Parameter]
+    public string Type { get; set; } = "text"; // input 타입 (email, password 등)
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty; // ID 속성
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty; // 바인딩 값
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; } // 값 변경 이벤트
+
+    [Parameter]
+    public string? PlaceHolder { get; set; } // Placeholder 텍스트
+
+    [Parameter]
+    public int? MaxLength { get; set; } // 입력 가능 문자수 제한
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (e.Value is string newValue)
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+        }
+    }
+}

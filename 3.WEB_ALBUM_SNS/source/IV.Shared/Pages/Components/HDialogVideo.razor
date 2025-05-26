@@ -1,0 +1,109 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@if (IsOpen)
+{
+    <div class="h-video-dialog-mask" @onclick="CloseDialog">
+        
+        <!-- 닫기 버튼 -->
+        <button class="h-video-dialog-close"
+                @onclick="CloseDialog"
+                @onclick:stopPropagation="true">×</button>
+        
+        <!-- 비디오 영역 -->
+        @if (VideoUrls is not null && VideoUrls.Count > 0)
+        {
+            <video class="h-video-dialog-element"
+                   src="@(VideoUrls[SafeIndex] + "?" + Configuration.GetConnectionString("ShortBlobStorageToken"))"
+                   controls autoplay loop
+                   @onclick="StopPropagation">
+            </video>
+        }
+        else
+        {
+            <p @onclick="StopPropagation" class="no-video-message">표시할 비디오가 없습니다.</p>
+        }
+
+        <!-- 이전/다음/삭제 버튼 -->
+        <div class="h-video-dialog-navigation" @onclick="StopPropagation">
+            <button class="nav-button"
+                    @onclick="OnPrevVideo"
+                    @onclick:stopPropagation="true"
+                    disabled="@(CanPrev is false)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M560-280 360-480l200-200v400Z"/></svg>
+            </button>
+            <button class="nav-button"
+                    @onclick="OnNextVideo"
+                    @onclick:stopPropagation="true"
+                    disabled="@(CanNext is false)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M400-280v-400l200 200-200 200Z"/></svg>
+            </button>
+            <button class="nav-button delete-button"
+                    @onclick="OnDeleteVideoClicked"
+                    @onclick:stopPropagation="true"
+                    disabled="@(!HasAnyVideo)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter] public List<string>? VideoUrls { get; set; }
+    [Parameter] public int CurrentIndex { get; set; }
+    [Parameter] public EventCallback<int> CurrentIndexChanged { get; set; }
+
+    [Parameter] public EventCallback OnDeleteVideo { get; set; }
+
+    private int SafeIndex => 
+        (VideoUrls is not null && VideoUrls.Count > 0)
+            ? Math.Clamp(CurrentIndex, 0, VideoUrls.Count - 1)
+            : 0;
+
+    private bool HasAnyVideo => VideoUrls is not null && VideoUrls.Count > 0;
+    private bool CanPrev => HasAnyVideo && VideoUrls!.Count > 1 && SafeIndex > 0;
+    private bool CanNext => HasAnyVideo && VideoUrls!.Count > 1 && SafeIndex < VideoUrls.Count - 1;
+
+    private async Task OnPrevVideo()
+    {
+        if (CanPrev)
+        {
+            int newIndex = SafeIndex - 1;
+            await CurrentIndexChanged.InvokeAsync(newIndex);
+        }
+    }
+
+    private async Task OnNextVideo()
+    {
+        if (CanNext)
+        {
+            int newIndex = SafeIndex + 1;
+            await CurrentIndexChanged.InvokeAsync(newIndex);
+        }
+    }
+
+    private void CloseDialog()
+    {
+        IsOpen = false;
+        IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    private void StopPropagation(MouseEventArgs e)
+    {
+        // 이벤트 전파 방지용
+    }
+
+    private async Task OnDeleteVideoClicked()
+    {
+        if (OnDeleteVideo.HasDelegate)
+        {
+            await OnDeleteVideo.InvokeAsync();
+        }
+    }
+}

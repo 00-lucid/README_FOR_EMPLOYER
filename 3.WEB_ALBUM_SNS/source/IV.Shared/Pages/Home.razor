@@ -1,0 +1,222 @@
+﻿@page "/"
+@using IV.Shared.Pages.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using SchemaLens.Client.Utils
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Home</PageTitle>
+
+<HLayoutScroll Id="layoutScroll" @onscroll="OnScroll">
+    <HLayoutCenter>
+        <div id="home-container" class="home-container">
+            <HRow AlignItems="center" JustifyContent="center">
+                @* <h1 class="home-title">IV</h1> *@
+                <!-- home-title에 I, V를 나눠서 렌더링 -->
+                <h1 class="home-title">
+                    <span class="floating-letter float-i">I</span>
+                    <span class="floating-letter float-v">V</span>
+                </h1>
+            </HRow>
+            <HColumn AlignItems="center">
+                <p class="home-subtitle">안전하고, 가치있게 이미지와 비디오를 공유하세요.</p>
+                <button class="home-button" @onclick="NavigateToCreateAlbum">Create Album</button>
+                @* <button class="home-button-sub" @onclick="NavigateToJoinAlbum">Join Album</button> *@
+            </HColumn>
+        </div>
+    </HLayoutCenter>
+    <div class="timeline-container">
+        <!-- 타임라인 -->
+        <div id="timeline" class="timeline" style="background: linear-gradient(to bottom, var(--primary-color) 0%, var(--primary-color) @(FillPercentage)%, var(--disabled-color) @(FillPercentage)%, var(--disabled-color) 100%);">
+            @for (int i = 0; i < _timelinePoints.Length; i++)
+            {
+                <!-- 활성화 상태에 따라 클래스 적용 -->
+                <div class="timeline-point @(_activatedPoints[i] ? "activated" : "")" style="top: @(_timelinePoints[i])%;"></div>
+            }
+            <!-- HCard UI -->
+            @for (int i = 0; i < _predefinedCards.Count; i++)
+            {
+                @if (_activatedPoints[i])
+                {
+                    <!-- 왼쪽/오른쪽 번갈아서 카드 출력 -->
+                    <div class="h-card-wrapper @(i % 2 == 0 ? "left" : "right") @(GetFadeInClass(i))" style="top: @(_timelinePoints[i])%;">
+                        <HCard Title="@_predefinedCards[i].Title"
+                               Subtitle="@_predefinedCards[i].Subtitle"
+                               Width="300px"
+                               Height="200px">
+                        </HCard>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    @* Info Section *@
+    <HLayoutCenter>
+        <div id="info-container" class="info-container">
+            <HRow AlignItems="center" JustifyContent="center">
+                <h1 id="info-title" class="info-title">사진과 영상 공유 특화 플랫폼 IV 전부 무료 입니다.</h1>
+            </HRow>
+        </div>
+    </HLayoutCenter>
+    
+    <HFooter/>
+</HLayoutScroll>
+
+@code {
+    private int _userId;
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthState { get; set; }
+    
+    private double FillPercentage { get; set; } = 0;
+    private readonly bool[] _activatedPoints = [false, false, false, false, false]; // 5개 포인트 활성화 상태
+    private readonly double[] _timelinePoints = [0, 25, 50, 75, 100]; // 각 포인트의 위치 (0~100%)
+    private readonly List<bool> _fadeInApplied = [false, false, false, false, false];
+    // 타이핑 효과가 실행되었는지를 추적하는 플래그
+    private bool _isTypeEffectTriggered = false;
+    // 미리 정의된 카드 콘텐츠
+    private readonly List<CardData> _predefinedCards =
+    [
+        new CardData
+        {
+            Title = "Open",
+            Subtitle = "공유 앨범을 만들어 모든 사람에게 공개하고 반응을 얻어보세요",
+        },
+
+        new CardData
+        {
+            Title = "Close",
+            Subtitle = "공유 앨범을 만들어 한정된 인원들만 초대하고 우리끼리 즐기세요",
+        },
+
+        new CardData
+        {
+            Title = "Security",
+            Subtitle = "모든 사진과 영상은 암호화 되어 누구도 보지 못하게 보관합니다",
+        },
+
+        new CardData
+        {
+            Title = "Earn",
+            Subtitle = "자신만의 사진과 영상을 보관하는 공유 앨범을 만들어 고정적인 수익을 얻으세요",
+        },
+
+        new CardData
+        {
+            Title = "Network",
+            Subtitle = "다른 사용자와 교류하고 소통해서 새로운 인맥을 쌓으세요",
+        }
+
+    ];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        bool isLogin = await Common.GetIsAuthenticationAsync(AuthState);
+
+        if (isLogin)
+        {
+            NavigationManager.NavigateTo("/feeds");
+        }
+    }
+    
+    private async Task OnScroll()
+    {
+        string layoutScrollId = "layoutScroll"; // 스크롤 대상 요소의 ID
+        string homeContainerId = "home-container"; // 제외할 요소의 ID
+        string infoContainerId = "info-container"; // 제외할 요소의 ID
+        string timelineId = "timeline"; // Timeline의 ID
+        
+        // JavaScript를 사용해 스크롤 정보 가져오기
+        var scrollTop = await JSRuntime.InvokeAsync<double>("getScrollTop", layoutScrollId);
+        var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", layoutScrollId);
+        var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", layoutScrollId);
+        
+        // Retrieve height of home-container
+        var homeContainerHeight = await JSRuntime.InvokeAsync<double>("getElementHeight", homeContainerId);
+        var infoContainerHeight = await JSRuntime.InvokeAsync<double>("getElementHeight", infoContainerId);
+        var timelineHeight = await JSRuntime.InvokeAsync<double>("getElementHeight", timelineId);
+        
+        // Check if the timeline is visible within the layoutScroll container
+        var infoTitleVisible = await JSRuntime.InvokeAsync<bool>("isElementVisible", ["info-title", layoutScrollId]);
+        
+        // 스크롤 활성화 범위 계산
+        // Calculate the fill percentage, excluding home-container height
+        var scrollableHeight = timelineHeight;
+        
+        // FillPercentage 계산
+        if (scrollableHeight > 0)
+        {
+            FillPercentage = ((scrollTop - homeContainerHeight) / scrollableHeight) * 100; // 현재 스크롤 위치에 따라 FillPercentage 계산
+        }
+        else
+        {
+            FillPercentage = 100; // 스크롤 가능 영역이 없다면 100%로 설정
+        }
+        
+        if (infoTitleVisible && !_isTypeEffectTriggered)
+        {
+            _isTypeEffectTriggered = true;
+            await JSRuntime.InvokeVoidAsync("typeEffect", "info-title", 100); // 타이핑 효과 실행, 속도 100ms
+        }
+        
+        // 현재 FillPercentage에 따라 포인트 활성화
+        UpdateActivatedPoints();
+        StateHasChanged();
+    }
+
+    private void UpdateActivatedPoints()
+    {
+        // FillPercentage에 따라 timeline-point 활성화 확인
+        for (int i = 0; i < _timelinePoints.Length; i++)
+        {
+            if (FillPercentage >= _timelinePoints[i] && !_activatedPoints[i])
+            {
+                _activatedPoints[i] = true; // 특정 포인트 활성화
+                TriggerPointAnimation(i);
+                TriggerFadeIn(i); // 해당 카드 페이드인 트리거
+            }
+        }
+    }
+
+    private string GetFadeInClass(int index)
+    {
+        if (!_fadeInApplied[index]) return string.Empty;
+
+        return index % 2 == 0 ? "fade-in-left" : "fade-in-right"; // left와 right에 각각 다른 클래스 적용
+    }
+
+    
+    private void TriggerFadeIn(int index)
+    {
+        // 이미 페이드인이 적용되었다면 무시
+        if (_fadeInApplied[index]) return;
+
+        _fadeInApplied[index] = true;
+        Console.WriteLine($"Card {index + 1} fade-in triggered!");
+    }
+
+    
+    private void TriggerPointAnimation(int index)
+    {
+        Console.WriteLine($"Point {index} activated!"); // 디버그 출력
+    }
+
+    private void NavigateToCreateAlbum()
+    {
+        NavigationManager.NavigateTo("/albums");
+    }
+    
+    private void NavigateToJoinAlbum()
+    {
+        NavigationManager.NavigateTo("/albums");
+    }
+    
+    private class CardData
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Subtitle { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public Action FooterAction { get; set; } = () => Console.WriteLine("No action defined");
+    }
+
+}

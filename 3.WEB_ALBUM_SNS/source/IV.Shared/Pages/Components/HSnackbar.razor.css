@@ -1,0 +1,61 @@
+﻿.h-snackbar {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    /* 원하는 색상/테마 사용 가능 */
+    background-color: #323232;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 200px;
+    z-index: 9999;
+    animation: snackbar-slide-in 0.3s ease forwards;
+    font-size: 0.9rem;
+    font-family: sans-serif;
+}
+
+.h-snackbar-message {
+    flex-grow: 1;
+}
+
+/* 닫기(×) 버튼 */
+.h-snackbar-close {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    padding: 0;
+}
+
+/* 액션 버튼 */
+.h-snackbar-action {
+    background-color: transparent;
+    border: none;
+    color: #ffca28;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 0.5rem;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.h-snackbar-action:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes snackbar-slide-in {
+    0% {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

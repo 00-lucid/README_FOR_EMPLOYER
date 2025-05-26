@@ -1,0 +1,208 @@
+﻿/* 툴팁 컨테이너 */
+.tooltip-container {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+/* 툴팁 트리거 영역 */
+.tooltip-trigger {
+    display: inline-flex;
+}
+
+/* 툴팁 콘텐츠 */
+.tooltip-content {
+    position: absolute;
+    z-index: 1000;
+    background-color: var(--popup-bg, #fff);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+    pointer-events: none;
+    border: 1px solid var(--gray-200, #e9ecef);
+    transform-origin: center center;
+    transform: scale(0.95);
+}
+
+/* 툴팁 화살표 */
+.tooltip-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--popup-bg, #fff);
+    border: 1px solid var(--gray-200, #e9ecef);
+    transform: rotate(45deg);
+}
+
+/* 툴팁 내용 */
+.tooltip-body {
+    padding: 0.75rem;
+    position: relative;
+    z-index: 2;
+    background-color: var(--popup-bg, #fff);
+    border-radius: 0.5rem;
+}
+
+/* 툴팁 제목 */
+.tooltip-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+    color: var(--primary-color);
+}
+
+/* 툴팁 텍스트 */
+.tooltip-text {
+    font-size: 0.875rem;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+/* 툴팁 표시 상태 */
+.tooltip-container:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+/* 툴팁 위치: 위쪽 */
+.tooltip-top .tooltip-content {
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+}
+
+.tooltip-top:hover .tooltip-content {
+    transform: translateX(-50%) scale(1);
+}
+
+.tooltip-top .tooltip-arrow {
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    border-top: 0;
+    border-left: 0;
+}
+
+/* 툴팁 위치: 오른쪽 */
+.tooltip-right .tooltip-content {
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.95);
+}
+
+.tooltip-right:hover .tooltip-content {
+    transform: translateY(-50%) scale(1);
+}
+
+.tooltip-right .tooltip-arrow {
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    border-top: 0;
+    border-right: 0;
+}
+
+/* 툴팁 위치: 아래쪽 */
+.tooltip-bottom .tooltip-content {
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+}
+
+.tooltip-bottom:hover .tooltip-content {
+    transform: translateX(-50%) scale(1);
+}
+
+.tooltip-bottom .tooltip-arrow {
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    border-bottom: 0;
+    border-right: 0;
+}
+
+/* 툴팁 위치: 왼쪽 */
+.tooltip-left .tooltip-content {
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.95);
+}
+
+.tooltip-left:hover .tooltip-content {
+    transform: translateY(-50%) scale(1);
+}
+
+.tooltip-left .tooltip-arrow {
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    border-bottom: 0;
+    border-left: 0;
+}
+
+/* 툴팁 크기 */
+.tooltip-small {
+    max-width: 200px;
+}
+
+.tooltip-small .tooltip-body {
+    padding: 0.5rem;
+}
+
+.tooltip-small .tooltip-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.tooltip-small .tooltip-text {
+    font-size: 0.75rem;
+}
+
+.tooltip-medium {
+    max-width: 300px;
+}
+
+.tooltip-large {
+    max-width: 400px;
+}
+
+.tooltip-large .tooltip-body {
+    padding: 1rem;
+}
+
+.tooltip-large .tooltip-title {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-large .tooltip-text {
+    font-size: 0.9375rem;
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+    .tooltip-content {
+        background-color: var(--popup-bg-dark, #2d3748);
+        border-color: var(--gray-700, #4a5568);
+    }
+
+    .tooltip-arrow {
+        background-color: var(--popup-bg-dark, #2d3748);
+        border-color: var(--gray-700, #4a5568);
+    }
+
+    .tooltip-body {
+        background-color: var(--popup-bg-dark, #2d3748);
+    }
+
+    .tooltip-title {
+        color: var(--primary-400, #63b3ed);
+    }
+
+    .tooltip-text {
+        color: var(--text-color-dark, #e2e8f0);
+    }
+}

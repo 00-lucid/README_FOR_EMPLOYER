@@ -1,0 +1,105 @@
+{
+    "name": "migration",
+    "version": "1.0.0",
+    "private": true,
+    "main": "output/bin",
+    "scripts": {
+        "start": "node output/bin",
+        "load": "node output/bin load",
+        "convert": "node output/bin convert",
+        "build": "npm-run-all -s build:*",
+        "build:clean": "rm -rf output",
+        "build:bundle": "webpack --mode production"
+    },
+    "dependencies": {
+        "@babel/runtime": "^7.16.0",
+        "class-transformer": "^0.4.0",
+        "dotenv": "^10.0.0",
+        "oracledb": "^5.3.0",
+        "reflect-metadata": "^0.1.13"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.16.0",
+        "@babel/plugin-proposal-class-properties": "^7.16.0",
+        "@babel/plugin-proposal-decorators": "^7.16.4",
+        "@babel/plugin-transform-runtime": "^7.16.4",
+        "@babel/preset-env": "^7.16.4",
+        "@babel/preset-typescript": "^7.16.0",
+        "@types/oracledb": "^5.2.1",
+        "@typescript-eslint/eslint-plugin": "^5.4.0",
+        "@typescript-eslint/parser": "^5.4.0",
+        "babel-jest": "^27.3.1",
+        "babel-loader": "^8.2.3",
+        "babel-plugin-module-resolver": "^4.1.0",
+        "clean-webpack-plugin": "^4.0.0",
+        "eslint": "^8.3.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-import-resolver-typescript": "^2.5.0",
+        "eslint-plugin-import": "^2.25.3",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^5.1.1",
+        "nock": "^13.2.1",
+        "typescript": "^4.5.2",
+        "webpack": "^5.64.2",
+        "webpack-cli": "^4.9.1",
+        "webpack-node-externals": "^3.0.0"
+    },
+    "babel": {
+        "presets": [
+            "@babel/preset-typescript",
+            "@babel/preset-env"
+        ],
+        "plugins": [
+            [
+                "@babel/plugin-proposal-decorators",
+                {
+                    "legacy": true
+                }
+            ],
+            "@babel/plugin-proposal-class-properties",
+            [
+                "@babel/plugin-transform-runtime",
+                {
+                    "regenerator": true
+                }
+            ]
+        ]
+    },
+    "eslintConfig": {
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking",
+            "prettier"
+        ],
+        "env": {
+            "es2020": true,
+            "node": true,
+            "jest": true,
+            "commonjs": true
+        },
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "project": "./tsconfig.json",
+            "ecmaVersion": 2020,
+            "sourceType": "module"
+        },
+        "plugins": [
+            "@typescript-eslint",
+            "import",
+            "node",
+            "promise"
+        ],
+        "ignorePatterns": [
+            "**/*.js"
+        ],
+        "rules": {
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    "argsIgnorePattern": "^_"
+                }
+            ]
+        }
+    }
+}

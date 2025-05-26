@@ -1,0 +1,119 @@
+@page "/recover-account"
+@using System.ComponentModel.DataAnnotations
+@using IV.Shared.Helpers
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@using IV.Shared.Interfaces
+@using IV.Shared.Interfaces.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject IEmailService EmailService
+@inject NavigationManager NavigationManager
+
+<HSpinner IsLoading="@IsLoading" />
+
+<HLayoutCenter>
+    <div class="recover-container">
+        <HRow AlignItems="center" JustifyContent="center">
+            <h1>IV</h1>
+        </HRow>
+        <HColumn Gap="1rem">
+            <form @onsubmit="HandleRecoverAccount">
+                <HColumn Gap="1rem">
+                    <HTextInput Label="Email" Type="email" Id="email" Value="@_recoveryModel.Email"
+                                ValueChanged="val => _recoveryModel.Email = val"
+                                PlaceHolder="Enter your email" />
+                    <button type="submit" class="btn btn-primary">Send Verification Code</button>
+                </HColumn>
+            </form>
+
+            @* 에러 메시지 *@
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <p class="error-message">@ErrorMessage</p>
+            }
+
+            @* 인증 메일 발송 완료 메시지 *@
+            @if (_isEmailSent)
+            {
+                <p class="success-message">A verification email has been sent to your inbox.</p>
+            }
+
+            <!-- 로그인 페이지로 돌아가는 버튼 -->
+            <div class="auxiliary-links">
+                <p>
+                    Remembered your password?
+                    <a href="/login">Back to Login</a>
+                </p>
+            </div>
+        </HColumn>
+    </div>
+</HLayoutCenter>
+
+@code {
+    private readonly RecoveryModel _recoveryModel = new();
+    private bool _isEmailSent = false;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private bool IsLoading { get; set; } = false; // 로딩 상태 변수 추가
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+    
+    private async Task HandleRecoverAccount()
+    {
+        IsLoading = true;
+        ErrorMessage = string.Empty;
+
+        try
+        {
+            // 유효성 검증
+            if (string.IsNullOrEmpty(_recoveryModel.Email) ||
+                !new EmailAddressAttribute().IsValid(_recoveryModel.Email))
+            {
+                ErrorMessage = "Please provide a valid email address.";
+                return;
+            }
+
+            // 인증번호 생성
+            var verificationCode = new Random().Next(100000, 999999).ToString();
+
+            // 이메일 서비스 호출
+            await EmailService.SendAsync(
+                _recoveryModel.Email,
+                "Recover Your Account",
+                $"Your verification code is: {verificationCode}");
+
+            _isEmailSent = true;
+
+            // 인증 코드를 저장 (DB 또는 캐시)
+            await SaveVerificationCodeAsync(_recoveryModel.Email, verificationCode);
+            
+            // 이메일 암호화
+            var encryptedEmail = AesEncryptionHelper.Encrypt(_recoveryModel.Email);
+            
+            // 인증 메일 발송 완료 후 리디렉션
+            NavigationManager.NavigateTo(!string.IsNullOrEmpty(ReturnUrl) ? $"/verify-recover-account?email={Uri.EscapeDataString(encryptedEmail)}&returnUrl={ReturnUrl}" : $"/verify-recover-account?email={Uri.EscapeDataString(encryptedEmail)}");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while sending the email. Please try again.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private Task SaveVerificationCodeAsync(string email, string code)
+    {
+        // 인증 코드를 저장하거나 필요한 로직 구현 추가
+        EmailService.SaveVerificationCode(email, code);
+        return Task.CompletedTask;
+    }
+
+    public class RecoveryModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+    }
+}

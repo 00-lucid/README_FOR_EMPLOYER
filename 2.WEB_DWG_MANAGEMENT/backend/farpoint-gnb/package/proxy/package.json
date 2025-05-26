@@ -1,0 +1,14 @@
+{
+    "name": "proxy",
+    "version": "1.0.0",
+    "private": true,
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "LISTENING_PORT=3000 FORWARDING_HOST=172.17.0.3 FORWARDING_PORT=3700 node index.js"
+    },
+    "dependencies": {
+        "node-tcp-proxy": "0.0.22"
+    },
+    "devDependencies": {}
+}

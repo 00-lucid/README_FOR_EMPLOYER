@@ -1,0 +1,285 @@
+﻿.page-container {
+    max-width: 720px; /* 모바일 우선 */
+    margin: 0 auto;
+    padding: 1rem;
+    font-family: sans-serif;
+}
+
+/* 배너 영역(필요 시 사용) */
+.banner {
+    position: relative;
+    margin-bottom: 1rem;
+}
+.banner img {
+    width: 100%;
+    border-radius: 8px;
+}
+.banner-text {
+    position: absolute;
+    bottom: 10%;
+    left: 5%;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* 사용자 정보(필요 시 사용) */
+.user-credit-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+.profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+.history-button {
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #666;
+    color: #fff;
+}
+
+/* 상품 목록 */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+}
+.product-header {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+.product-header h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+.badge {
+    margin-left: 0.5rem;
+    display: inline-block;
+    background-color: #ff5722;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* 인기 상품 강조 (예시) */
+.popular-product {
+    border-color: #ff5722;
+}
+
+.price {
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+.buy-button {
+    align-self: flex-end;
+    background-color: #03a9f4;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* 더보기 버튼 */
+.more-button {
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* 결제 모달 */
+.payment-modal {
+    position: fixed;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    padding: 1rem;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.modal-content header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.payment-options button,
+.other-pay button {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #03a9f4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+}
+
+/* 하단 정보 */
+.footer-info {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* 페이드인 효과 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 반응형(예시) */
+@media (min-width: 768px) {
+    .page-container {
+        max-width: 640px;
+    }
+    .product-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+/* 상품 카드 공통 스타일 */
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: 60px auto; /* 배경 크기 조정 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 1) BS 100개 - 코인이 조금 쌓인 형태 */
+.bs-100 {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0i...==");
+}
+
+/* 2) BS 1,000개 - 코인이 좀 더 쌓인 형태 */
+.bs-1000 {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0i...==");
+}
+
+/* 3) BS 3,000개 - 코인 가득 찬 박스 한 개 */
+.bs-3000 {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0i...==");
+}
+
+/* 4) BS 6,000개 - 코인 가득 찬 박스 여러 개 */
+.bs-6000 {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0i...==");
+}
+
+/* 5) BS 12,000개 - 박스 여러 개 + 코인이 많이 쌓인 더미 */
+.bs-12000 {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0i...==");
+}
+
+.selected-product-card {
+    border-color: var(--primary-color); /* 또는 원하는 primary color */
+    box-shadow: 0 0 4px rgba(3, 169, 244, 0.4); /* 선택 시 살짝 강조 효과 */
+}
+
+/* 선택된 상품 정보 */
+.selected-product-info {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: box-shadow 0.2s ease;
+}
+
+.selected-product-info h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.selected-product-info p {
+    margin-bottom: 1rem;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+/* 결제 방식 라디오 버튼 */
+.payment-methods {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.payment-methods label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: #444;
+}
+.payment-methods input[type="radio"] {
+    margin-right: 0.3rem;
+    cursor: pointer;
+}
+
+/* 결제하기 버튼 */
+.selected-product-info button {
+    background-color: #03a9f4;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 4px;
+    padding: 0.75rem 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.selected-product-info button:hover {
+    background-color: #0288d1;
+}
+.selected-product-info button:focus {
+    box-shadow: 0 0 4px rgba(3, 169, 244, 0.5);
+}

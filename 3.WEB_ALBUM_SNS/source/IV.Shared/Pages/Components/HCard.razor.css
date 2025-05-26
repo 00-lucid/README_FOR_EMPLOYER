@@ -1,0 +1,44 @@
+﻿/* 전체 카드 */
+.h-card {
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    background-color: var(--light-color); /* 카드 배경색 */
+    color: var(--text-color); /* 텍스트 색상 */
+    /*border: 1px solid var(--disabled-color); !* 카드 외곽선 *!*/
+    border-radius: 0.5rem; /* 둥근 테두리 */
+    overflow: hidden; /* 내용이 넘치지 않도록 처리 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* 호버 시 애니메이션 */
+    cursor: pointer;
+}
+
+/* 카드 호버 효과 */
+.h-card:hover {
+    /*transform: translateY(-3px); !* 살짝 올라오는 효과 *!*/
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); !* 더 강한 그림자 *!*/
+}
+
+/* 카드 헤더 */
+.h-card-header {
+    padding: 1rem;
+}
+
+.h-card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0; /* 내부 여백 제거 */
+}
+
+.h-card-subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* HCard 커스텀 클래스 */
+.hcard-custom {
+    /* 추가적인 스타일을 여기에 작성하세요 */
+}

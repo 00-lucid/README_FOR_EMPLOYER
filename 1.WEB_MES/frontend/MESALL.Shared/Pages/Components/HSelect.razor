@@ -1,0 +1,326 @@
+﻿
+@typeparam TValue
+@using System.Linq.Expressions
+@implements IDisposable
+
+<div class="form-group" style="@GetMarginBottomStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">
+            @Label
+            @if (Required)
+            {
+                <span class="required-mark">*</span>
+            }
+        </label>
+    }
+    <div class="input-wrapper" style="@GetWidthStyle()">
+        <div class="h-select @(IsOpen ? "open" : "") @(HasError ? "error" : "") @(Disabled ? "disabled" : "")"
+             @onclick="ToggleDropdown" @onclick:stopPropagation>
+            <div class="h-select-value">
+                @if (SelectedOption != null)
+                {
+                    if (CustomItemTemplate != null)
+                    {
+                        <div class="h-select-custom-item selected">
+                            @CustomItemTemplate(SelectedOption)
+                        </div>
+                    }
+                    else
+                    {
+                        <span>@SelectedOption.Label</span>
+                    }
+                }
+                else
+                {
+                    <span class="placeholder">@PlaceHolder</span>
+                }
+            </div>
+            
+            <div class="h-select-indicators">
+                @if (SelectedOption != null && AllowClear)
+                {
+                    <button type="button" class="h-select-clear" @onclick:stopPropagation @onclick="ClearSelection">
+                        <i class="fas fa-times"></i>
+                    </button>
+                }
+                <div class="h-select-indicator">
+                    <i class="fas @(IsOpen ? "fa-chevron-up" : "fa-chevron-down")"></i>
+                </div>
+            </div>
+        </div>
+        
+        @if (IsOpen)
+        {
+            <div class="h-select-dropdown" @ref="DropdownElement" style="@GetDropdownWidthStyle()">
+                @if (EnableSearch)
+                {
+                    <div class="h-select-search">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+
+                        <input type="text"
+                               placeholder="검색..."
+                               @bind-value="SearchText"
+                               @bind-value:event="oninput"
+                               @onclick:stopPropagation />
+                        @if (!string.IsNullOrEmpty(SearchText))
+                        {
+                            <button type="button" class="h-select-search-clear" @onclick="ClearSearch" @onclick:stopPropagation>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        }
+                    </div>
+                }
+
+                @if (FilteredOptions.Count == 0)
+                {
+                    <div class="h-select-no-options">
+                        @(string.IsNullOrEmpty(SearchText) ? "옵션이 없습니다" : "검색 결과가 없습니다")
+                    </div>
+                }
+                else
+                {
+                    <div class="h-select-option-list">
+                        @foreach (var option in FilteredOptions)
+                        {
+                            bool isSelected = IsOptionSelected(option);
+                            <div class="h-select-option @(isSelected ? "selected" : "")" 
+                                 @onclick="() => HandleOptionSelect(option)" 
+                                 @onclick:stopPropagation>
+                                @if (CustomItemTemplate != null)
+                                {
+                                    @CustomItemTemplate(option)
+                                }
+                                else
+                                {
+                                    <span>@option.Label</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">@ErrorMessage</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string PlaceHolder { get; set; } = "선택하세요";
+    [Parameter] public bool Required { get; set; } = false;
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public bool EnableSearch { get; set; } = false;
+    [Parameter] public bool AllowClear { get; set; } = true;
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public List<SelectOption> Options { get; set; } = new List<SelectOption>();
+    [Parameter] public string Width { get; set; } = "100%";
+    [Parameter] public string MarginBottom { get; set; } = "20px"; // 기본값 HTextInput과 동일하게
+    [Parameter] public string DropdownMinWidth { get; set; } = "480px"; // 드롭다운 최소 너비
+    [Parameter] public RenderFragment<SelectOption> CustomItemTemplate { get; set; }
+    [Parameter] public Func<TValue, string> Validation { get; set; }
+    
+    private bool IsOpen { get; set; } = false;
+    private ElementReference DropdownElement;
+    private string SearchText { get; set; } = "";
+    private string ErrorMessage { get; set; }
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    
+    // 외부 클릭 감지를 위한 필드
+    private bool _isMouseDown = false;
+    private bool _isDropdownMouseDown = false;
+    
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    
+    public class SelectOption
+    {
+        public TValue Value { get; set; }
+        public string Label { get; set; }
+        public bool Disabled { get; set; }
+        public object Data { get; set; }
+    }
+    
+    protected SelectOption SelectedOption => 
+        Options.FirstOrDefault(o => EqualityComparer<TValue>.Default.Equals(Value, o.Value));
+    
+    protected List<SelectOption> FilteredOptions
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(SearchText))
+                return Options;
+                
+            return Options
+                .Where(o => o.Label.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+    
+    // 스타일 적용 메서드 (HTextInput과 동일한 패턴)
+    private string GetWidthStyle()
+    {
+        return !string.IsNullOrEmpty(Width) ? $"width: {Width};" : "";
+    }
+    
+    private string GetMarginBottomStyle()
+    {
+        return !string.IsNullOrEmpty(MarginBottom) ? $"margin-bottom: {MarginBottom};" : "";
+    }
+    
+    private string GetDropdownWidthStyle()
+    {
+        return !string.IsNullOrEmpty(DropdownMinWidth) ? $"min-width: {DropdownMinWidth};" : "";
+    }
+    
+    // 컴포넌트 초기화 시 이벤트 구독
+    protected override void OnInitialized()
+    {
+        // 네비게이션 이벤트 발생 시 드롭다운을 닫습니다
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+    
+    // 컴포넌트 해제 시 이벤트 구독 해제
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+    
+    // 네비게이션 변경 시 드롭다운 닫기
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        IsOpen = false;
+        StateHasChanged();
+    }
+    
+    private bool IsOptionSelected(SelectOption option)
+    {
+        return EqualityComparer<TValue>.Default.Equals(Value, option.Value);
+    }
+    
+    private void ToggleDropdown()
+    {
+        if (Disabled)
+            return;
+            
+        IsOpen = !IsOpen;
+    }
+    
+    // 마우스 다운 이벤트 핸들러
+    private void HandleMouseDown()
+    {
+        _isMouseDown = true;
+    }
+    
+    // 드롭다운 내부 마우스 다운 핸들러
+    private void HandleDropdownMouseDown()
+    {
+        _isDropdownMouseDown = true;
+    }
+    
+    // 문서 마우스 업 이벤트 핸들러
+    private void HandleMouseUp()
+    {
+        if (_isMouseDown && !_isDropdownMouseDown && IsOpen)
+        {
+            // 드롭다운 외부를 클릭했을 때 닫기
+            IsOpen = false;
+            StateHasChanged();
+        }
+        
+        _isMouseDown = false;
+        _isDropdownMouseDown = false;
+    }
+    
+    private async Task HandleOptionSelect(SelectOption option)
+    {
+        if (option.Disabled)
+            return;
+        
+        // TValue로 변환 필요 없음, 이미 올바른 타입
+        TValue newValue = option.Value;
+    
+        // 유효성 검사
+        if (Validation != null)
+        {
+            ErrorMessage = Validation(newValue);
+        }
+    
+        await ValueChanged.InvokeAsync(newValue);
+    
+        IsOpen = false;
+    }
+    
+    private async Task ClearSelection()
+    {
+        if (Disabled)
+            return;
+            
+        await ValueChanged.InvokeAsync(default);
+    }
+    
+    private void ClearSearch()
+    {
+        SearchText = "";
+    }
+    
+    // 외부 클릭 감지 메서드
+    public void CloseDropdown()
+    {
+        if (IsOpen)
+        {
+            IsOpen = false;
+            StateHasChanged();
+        }
+    }
+    
+    // 키보드 이벤트 처리
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "Escape":
+                if (IsOpen)
+                {
+                    IsOpen = false;
+                    StateHasChanged();
+                }
+                break;
+            case "ArrowDown":
+                if (!IsOpen)
+                {
+                    IsOpen = true;
+                    StateHasChanged();
+                }
+                break;
+            case "ArrowUp":
+                if (IsOpen)
+                {
+                    // 옵션 선택 로직 (확장 가능)
+                }
+                break;
+        }
+    }
+    
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        
+        // 유효성 검사
+        if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+        }
+    }
+}

@@ -1,0 +1,14 @@
+.RefreshSideMenu {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    right: 25px;
+    top: 75px;
+    fill: var(--background);
+}
+.RefreshSideMenu:hover {
+    filter: drop-shadow(0px 0px 5px rgb(0 0 0 / 0.8));
+}
+.RefreshSideMenu:active {
+    filter: drop-shadow(0px 0px 2px rgb(0 0 0 / 1));
+}

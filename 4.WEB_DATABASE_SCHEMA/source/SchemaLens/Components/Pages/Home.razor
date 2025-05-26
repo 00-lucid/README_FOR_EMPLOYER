@@ -1,0 +1,83 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+
+<RadzenStack Style="width: 100%; height: calc(100vh - 3.5rem); padding-left: 5rem;" JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" >
+    <RadzenText Style="font-weight: bolder" TextStyle="TextStyle.H1" >@currentText</RadzenText>
+    <RadzenStack Gap="0" Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal">
+        <RadzenText TextStyle="TextStyle.Subtitle1"><b>글로벌제조혁신네트웍</b> 직원이신가요?</RadzenText>
+        <RadzenButton Click="OnMoveLoginPage" Style="width: max-content;" ButtonStyle="ButtonStyle.Primary">시작하기</RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    private string targetWord = "SchemaLens"; // 최종 글자
+    private string currentText = ""; // 현재 화면에 랜더링된 랜덤 텍스트
+    private Random random = new(); // 랜덤 생성기
+    
+    [CascadingParameter]
+    public Task<AuthenticationState> authState { get; set; }
+    
+    // 구성 컴포넌트 로드 시 애니메이션 시작
+    protected override async Task OnInitializedAsync()
+    {
+        // 만약 로그인 상태라면 /main으로 이동
+        AuthenticationState _authState = await authState;
+        if (_authState.User.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/main");
+        }
+        while (true) // 무한 반복
+        {
+            // 랜덤 텍스트 애니메이션
+            await AnimateRandomTextAsync(targetWord, 2000);
+
+            // 최종 글자 표시 유지 시간
+            await Task.Delay(5000);
+        }
+    }
+
+    private async Task AnimateRandomTextAsync(string finalText, int durationMs)
+    {
+        int interval = 50; // 렌더링 간격 (50ms)
+        int steps = durationMs / interval;
+
+        for (int i = 0; i < steps; i++)
+        {
+            // 현재 텍스트를 랜덤 문자로 구성
+            currentText = GenerateRandomText(finalText.Length);
+            StateHasChanged();
+
+            await Task.Delay(interval); // 지정된 간격으로 업데이트
+        }
+
+        // 최종 단계에서 SchemaLens 고정
+        currentText = finalText;
+        StateHasChanged();
+    }
+    
+    // 대소문자 랜덤 텍스트 생성 메서드
+    private string GenerateRandomText(int length)
+    {
+        char[] randomChars = new char[length];
+        for (int i = 0; i < length; i++)
+        {
+            bool isUpperCase = random.Next(0, 2) == 0; // 0이면 대문자, 1이면 소문자
+            if (isUpperCase)
+            {
+                randomChars[i] = (char)random.Next(65, 91); // ASCII 'A'-'Z' (대문자)
+            }
+            else
+            {
+                randomChars[i] = (char)random.Next(97, 123); // ASCII 'a'-'z' (소문자)
+            }
+        }
+        return new string(randomChars);
+    }
+    
+    void OnMoveLoginPage()
+    {
+        var url = $"/signin";
+        NavigationManager.NavigateTo(url);
+    }
+}

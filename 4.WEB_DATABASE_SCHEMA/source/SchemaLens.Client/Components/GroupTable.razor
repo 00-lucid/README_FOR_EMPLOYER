@@ -1,0 +1,310 @@
+﻿@using System.Security.Claims
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@inject IPeersGroupService PeersGroupService
+@inject IPeerService PeerService
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<RadzenRow>
+    <RadzenButton Click="OnClickAddPeersGroupDialog" Style="margin-top:  1rem; width: 150px;"Variant="Variant.Flat" Icon="add_circle" Text="테이블" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton Click="OnClickDeletePeersGroupDialog" Style="margin-top:  1rem; width: 30px;"Variant="Variant.Flat" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+</RadzenRow>
+
+<RadzenRow Gap="1rem" Style="height: 100%; margin-top: 1rem;">
+    @*리스트*@
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenDataGrid Style="height: 100%" ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="10"
+                        AllowSorting="true" Data="@tasks" @bind-Value="@selectedTask">
+            <Columns>
+                <RadzenDataGridColumn Property="group.GroupName" Title="테이블" Width="200px"/>
+                <RadzenDataGridColumn Property="group.Description" Title="요약" Width="140px"/>
+                <RadzenDataGridColumn Property="group.CreatedAt" Title="생성일" Width="140px"/>
+                <RadzenDataGridColumn Property="group.Username" Title="생성자" Width="140px"/>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+    @*디테일*@
+    @if (selectedGroup is not null)
+    {
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack Gap="1rem">
+                    <RadzenCard Variant="Variant.Text"
+                                class="rz-background-color-primary-lighter rz-color-on-primary-lighter">
+                        테이블:
+                        <b>@selectedTask.FirstOrDefault()?.group.GroupName</b>
+                    </RadzenCard>
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="컬럼">
+                                <RadzenDataGrid PageSize="5" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+                                                Data="@(selectedTask.FirstOrDefault()?.groupDetails)">
+                                    <Columns>
+                                        <RadzenDataGridColumn Property="RelatedTerm" Title="이름"/>
+                                        <RadzenDataGridColumn Property="SearchTerm" Title="의미"/>
+                                        <RadzenDataGridColumn Property="DataType" Title="타입"/>
+                                        <RadzenDataGridColumn Property="DataSize" Title="크기"/>
+                                        <RadzenDataGridColumn Property="IsNull" Title="널여부"/>
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </RadzenTabsItem>
+                            @*추가탭 - 미정*@
+                            @*<RadzenTabsItem Text="Products">
+                                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(selectedGroup.FirstOrDefault()?.OrderDetails)" PageSize="10">
+                                    <Template Context="detail">
+                                        <RadzenCard Variant="Variant.Outlined"Style="width:100px; height:100px">
+                                            <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Product" class="rz-mb-1" />
+                                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">@detail?.Product?.ProductName</RadzenText>
+                                        </RadzenCard>
+                                    </Template>
+                                </RadzenDataList>
+                            </RadzenTabsItem>*@
+                        </Tabs>
+                    </RadzenTabs>
+                    <RadzenButton Click="() => OnMovePeersGroupDetailPage(selectedTask.FirstOrDefault().group.PeersGroupId)" Style="margin-top:  1rem;" Variant="Variant.Flat" Icon="" Text="수정" ButtonStyle="ButtonStyle.Primary" />
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+@code {
+    string groupName;
+    string discription;
+    string deleteGroupName;
+    int userId;
+    bool isLogin = false;
+    
+    IList<PeersGroupModel> selectedGroup;
+    IEnumerable<PeersGroupModel> peersGroups;
+    IEnumerable<PeerModel> mappingPeers;
+
+    IList<GroupTask> selectedTask { get; set; }
+    IEnumerable<GroupTask> tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        AuthenticationState auth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        ClaimsPrincipal user = auth.User;
+
+        if (user.Identities != null && user.Identity.IsAuthenticated)
+        {
+            isLogin = true;
+            
+            foreach (Claim claim in user.Claims)
+            {
+                if (claim.Type == ClaimTypes.Sid)
+                {
+                    userId = Int32.Parse(claim.Value);
+                }
+            }
+        }
+        else
+        {
+            isLogin = false;
+        }
+
+
+        // PeersGroups 전체 데이터 가져오기
+        peersGroups = await PeersGroupService.GetPeersGroupByAllAsync();
+
+        MakeGroupTask(peersGroups);
+    }
+
+    public class GroupTask
+    {
+        public PeersGroupModel group { get; set; }
+        public IList<PeerModel> groupDetails { get; set; }
+    }
+
+    private async void OnClickAddPeersGroupDialog()
+    {
+        if (!isLogin)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "오류",
+                Detail = $"로그인이 필요합니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        
+        await DialogService.OpenAsync("규칙", ds =>
+                @<RadzenStack Gap="1.5rem">
+                    <RadzenFormField Text="테이블명" Style="width: 100%;">
+                        <RadzenTextBox @bind-Value="@groupName" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="요약" Style="width: 100%;">
+                        <RadzenTextBox @bind-Value="@discription" />
+                    </RadzenFormField>
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Ok" Click="() => OnClickAddPeersGroup(ds)" Style="width: 80px;" />
+                        <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            , options: new DialogOptions { CloseDialogOnOverlayClick = true });
+    }
+    
+    private async void OnClickDeletePeersGroupDialog()
+    {
+        if (!isLogin)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "오류",
+                Detail = $"로그인이 필요합니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        
+        if (selectedGroup.FirstOrDefault() is null)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "오류",
+                Detail = $"선택된 테이블이 없습니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        
+        await DialogService.OpenAsync("삭제", ds =>
+                @<RadzenStack Gap="1.5rem">
+                    <RadzenFormField Text="테이블명" Style="width: 100%;">
+                        <RadzenTextBox Placeholder="삭제할 테이블 명을 확인합니다."@bind-Value="@deleteGroupName" />
+                    </RadzenFormField>
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Ok" Click="() => OnClickDeletePeersGroup(ds)" Style="width: 80px;" />
+                        <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            , options: new DialogOptions { CloseDialogOnOverlayClick = true });
+    }
+    
+    private async void OnClickAddPeersGroup(DialogService ds)
+    {
+        bool isDuplicate = await PeersGroupService.CheckDuplicatePeersGroup(groupName);
+        if (isDuplicate)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "등록 오류",
+                Detail = $"중복된 테이블이 존재합니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        // 데이터와 컬럼명이 비어있지 않고, 동일한 데이터가 Peers 테이블에 존재하지 않을 때.
+        if (!string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(discription))
+        {
+            await PeersGroupService.CreatePeersGroup(groupName, discription, userId);
+            peersGroups = await PeersGroupService.GetPeersGroupByAllAsync();
+            
+            MakeGroupTask(peersGroups);
+            
+            groupName = "";
+            discription = "";
+            ds.Close(false);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "등록 오류",
+                Detail = $"항목이 비어있습니다.",
+                Duration = 2000
+            });
+        }
+    }
+
+    private async void MakeGroupTask(IEnumerable<PeersGroupModel> peersGroups)
+    {
+        // 각 그룹별로 피어 데이터를 가져오고 GroupTask로 매핑
+        var tasksList = new List<GroupTask>();
+        foreach (var group in peersGroups)
+        {
+            var groupPeers = await PeerService.GetPeersGropMappingByPeersGroupId(group.PeersGroupId);
+            tasksList.Add(new GroupTask
+            {
+                group = group,
+                groupDetails = groupPeers.ToList()
+            });
+        }
+
+        tasks = tasksList;
+        
+        selectedGroup = new List<PeersGroupModel> { peersGroups.FirstOrDefault() };
+        selectedTask = new List<GroupTask> { tasks.FirstOrDefault() };
+        
+        StateHasChanged();
+    } 
+    
+    void OnMovePeersGroupDetailPage(int peersGroupId)
+    {
+        if (!isLogin)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "오류",
+                Detail = $"로그인이 필요합니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        
+        var url = $"/peer/group/detail?PeersGroupId={peersGroupId}";
+        NavigationManager.NavigateTo(url);
+    }
+    
+    private async void OnClickDeletePeersGroup(DialogService ds)
+    {
+        // 데이터와 컬럼명이 비어있지 않고, 동일한 데이터가 Peers 테이블에 존재하지 않을 때.
+        if (!string.IsNullOrEmpty(deleteGroupName))
+        {
+            PeersGroupModel selectedGroup = selectedTask.FirstOrDefault().group;
+            if (deleteGroupName.Equals(selectedGroup.GroupName))
+            {
+                await PeersGroupService.DeletePeersGroup(selectedGroup.PeersGroupId);
+                peersGroups = await PeersGroupService.GetPeersGroupByAllAsync();
+            
+                MakeGroupTask(peersGroups);
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "오류",
+                    Detail = $"입력한 테이블명이 선택한 테이블과 일치하지 않습니다.",
+                    Duration = 2000
+                });
+            }
+
+            deleteGroupName = "";
+            ds.Close(false);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "등록 오류",
+                Detail = $"항목이 비어있습니다.",
+                Duration = 2000
+            });
+        }
+    }
+}

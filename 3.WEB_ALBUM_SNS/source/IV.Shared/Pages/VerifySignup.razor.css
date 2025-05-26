@@ -1,0 +1,58 @@
+﻿/* Verify Signup Styles */
+.verify-container {
+    width: max-content;
+    min-width: 370px;
+    margin: auto; /* 부모 요소 안에서 수평으로 가운데 정렬 */
+    padding: 20px;
+    border-radius: 10px;
+    background-color: var(--light-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+form > div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-weight: bold;
+}

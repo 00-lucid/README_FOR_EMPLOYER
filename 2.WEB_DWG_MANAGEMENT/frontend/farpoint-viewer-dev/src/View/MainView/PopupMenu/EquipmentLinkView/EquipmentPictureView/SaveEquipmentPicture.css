@@ -1,0 +1,172 @@
+.SaveEquipmentPictureFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: visible;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    z-index: 50;
+}
+
+.SaveEquipmentPicture {
+    position: absolute;
+    left: calc((100% - 380px) / 2);
+    top: calc((100% - 210px) / 2);
+    width: 380px;
+    height: 210px;
+    background-color: var(--Dialogue-background);
+    border-radius: 6px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    padding-bottom: 10px;
+    pointer-events: all;
+    color: var(--Text-Normal);
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.SaveEquipmentPicture .Titlebar {
+    background-color: var(--Dialogue-Titlebar-background);
+    position: relative;
+    height: 30px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: 6px 0px 0px 0px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.3);
+}
+
+.SaveEquipmentPicture .Text {
+    top: 0px;
+    width: 100%;
+    text-align: center;
+}
+
+.SaveEquipmentPicture .Label01 {
+    position: absolute;
+    top: 57px;
+    left: 30px;
+    width: 100%;
+    color: var(--Text-Normal);
+}
+
+.SaveEquipmentPicture .Label02 {
+    position: absolute;
+    top: 109px;
+    left: 30px;
+    width: 100%;
+    color: var(--Text-Normal);
+}
+
+.SaveEquipmentPicture .CancelButton {
+    position: absolute;
+    top: 158px;
+    left: 10px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    color: var(--Text-Normal);
+}
+.SaveEquipmentPicture .CancelButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.SaveEquipmentPicture .CancelButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.SaveEquipmentPicture .SaveButton {
+    position: absolute;
+    top: 158px;
+    left: 196px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.SaveEquipmentPicture .DisabledSaveButton {
+    position: absolute;
+    top: 158px;
+    left: 196px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    /* background-color: #3b59c5; */
+    background-color: var(--Dialogue-Button-Disable);
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+
+.SaveEquipmentPicture .SaveButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.SaveEquipmentPicture .SaveButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.SaveEquipmentPicture .SelectedLabel {
+    color: var(--Text-Normal);
+}
+
+.SaveEquipmentPicture .NormalLabel {
+    color: var(--Text-Normal);
+}
+
+.SaveEquipmentPicture #SaveEquipmentPicture {
+    position: absolute;
+    top: 45px;
+    left: 77px;
+    width: 273px;
+    height: 40px;
+}
+.SaveEquipmentPicture #public {
+    position: absolute;
+    top: 98px;
+    left: 111px;
+    height: 40px;
+    width: 130px;
+}
+
+.SaveEquipmentPicture #private {
+    position: absolute;
+    top: 98px;
+    left: 228px;
+    height: 40px;
+    width: 130px;
+}
+
+.SaveEquipmentPicture .CheckBox svg {
+    position: absolute;
+    top: 7px;
+}
+
+.SaveEquipmentPicture .CheckBox span {
+    position: absolute;
+    top: 8px;
+    margin-left: 30px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.SaveEquipmentPicture .CheckBox > .Selected > span {
+    color: var(--Text-Normal);
+}
+.SaveEquipmentPicture .CheckBox > .Normal > span {
+    color: var(--Text-Normal);
+}
+.SaveEquipmentPicture .CheckBox:hover {
+    filter: drop-shadow(0px 0px 5px rgb(0 0 0 / 0.3));
+}
+.SaveEquipmentPicture .CheckBox:active {
+    filter: drop-shadow(0px 0px 2px rgb(0 0 0 / 0.3));
+}

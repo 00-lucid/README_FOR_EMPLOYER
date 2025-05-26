@@ -1,0 +1,75 @@
+.NotiorderView {
+    --NotiorderViewWidth: 500px;
+    position: absolute;
+    top: 0px;
+    width: var(--NotiorderViewWidth);
+    height: 100%;
+    background-color: var(--Background-Normal);
+}
+
+.NotiorderView .ListView {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    overflow-y: scroll;
+    border-collapse: collapse;
+}
+
+.NotiorderView .ListView::-webkit-scrollbar {
+    display: none;
+}
+
+.NotiorderView .ListView table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.NotiorderView .ListView tr {
+    height: 40px;
+    color: var(--Text-Normal);
+}
+
+.NotiorderView .ListView td {
+    padding: 10px 0 10px 0;
+    font-size: 13px;
+}
+
+.NotiorderView .ListView th {
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.NotiorderView .ListView tbody tr:nth-child(odd) {
+    background-color: var(--Table-Row-Highlight);
+}
+.NotiorderView .ListView tbody tr:hover {
+    background-color: var(--Table-Row-Hover);
+}
+.NotiorderView .ListView tbody tr:active {
+    background-color: var(--Table-Row-Active);
+}
+
+.NotiorderView .ListView td:first-child {
+    border-top-left-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+
+.NotiorderView .ListView td:last-child {
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+.NotiorderView .ListView .Header .Last {
+    width: 40px;
+}
+
+.NotiorderView .ListView .RowItem > td {
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.NotiorderView .ListView .RowItem > .Column3 {
+    text-align: left;
+}

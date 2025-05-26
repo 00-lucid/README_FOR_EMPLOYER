@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      host: 13.209.82.166
+      port: 27017
+      authentication-database: admin
+      username: koala
+      password: koala
+      database: quokka-dev
+  logging:
+    level:
+      org.springframework.data.mongodb.core.MongoTemplate: DEBUG

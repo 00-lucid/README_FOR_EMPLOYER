@@ -1,0 +1,43 @@
+.DarkTheme {
+    --Dialogue-background: #f4f6fc;
+    --Dialogue-Titlebar-background: #d5d5d5;
+    --Dialogue-Titlebar-background-Hover: #c5c5c5;
+    --Dialogue-Titlebar-background-Active: #cacaca;
+    /*  */
+    --Dialogue-Subtitlebar-background: #e5e5e5;
+    --Dialogue-Date-background: #d5d5d5;
+    --Dialogue-CheckBox-Stroke: #a3aeb9;
+    --Dialogue-CheckBox-Fill: #d5d5d5;
+}
+
+.LightTheme {
+    --Dialogue-background: #3c3f41;
+    --Dialogue-Titlebar-background: #26282a;
+    --Dialogue-Titlebar-background-Hover: #5e6467;
+    --Dialogue-Titlebar-background-Active: #757575;
+    --Dialogue-Button-Disable: #5e6467;
+    /*  */
+    --Dialogue-Subtitlebar-background: #4a4c4d;
+    --Dialogue-Date-background: #757575;
+    --Dialogue-CheckBox-Stroke: #8b8d90;
+    --Dialogue-CheckBox-Fill: #757575;
+}
+
+.DarkTheme {
+    --image-stroke-color: #464646;
+    --toolbar-background: #f4f6fc;
+    --icon-type2-fill-color: #dde3f3;
+    --icon-type2-stroke-color: #5c616a;
+    --SaveMarkup-Text-color: #2a2c2d;
+    --foreground-active: #4a70f7;
+    --Dialogue-Button-Disable: #e5e7ea;
+}
+
+.LightTheme {
+    --image-stroke-color: #fff;
+    --toolbar-background: #3c3f41;
+    --icon-type2-fill-color: #8b8d90;
+    --icon-type2-stroke-color: #25272d;
+    --SaveMarkup-Text-color: #fff;
+    --foreground-active: #4a70f7;
+}

@@ -1,0 +1,14 @@
+.FavoriteMenu {
+    position: absolute;
+    width: var(--FavoriteMenuWidth);
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.FavoriteMenu #favoriteMenuTreeView {
+    position: absolute;
+    top: 70px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}

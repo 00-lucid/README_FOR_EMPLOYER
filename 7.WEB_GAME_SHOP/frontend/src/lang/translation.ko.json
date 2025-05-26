@@ -1,0 +1,55 @@
+{
+  "login.name": "이름",
+  "login.email": "이메일",
+  "login.password": "비밀번호",
+  "login.password_confirmation": "비밀번호 확인",
+  "login.phone": "휴대폰번호",
+  "login.forget": "비밀번호를 잊어버렸어요",
+  "login.title": "로그인",
+  "login.singup": "가입하기",
+  "login.message": "아이디 또는 비밀번호를 잘못 입력하셨습니다.",
+  "login.resetpass": "재설정",
+  "login.resetpasstext": "잠시후에 비밀번호 재설정 이메일을 받을 수 있습니다.",
+  "login.zipcode": "우편번호",
+  "login.address1": "주소",
+  "login.address2": "상세주소",
+  "signup.title": "회원가입",
+  "date_formats": {
+    "month": "YYYY년 MM월",
+    "day": "YYYY년 MM월 DD일",
+    "time": "YYYY년 MM월 DD일 HH:mm"
+  },
+  "item": "상품",
+  "fqa": "자주묻는질문",
+  "contact": "문의",
+  "like": "좋아요",
+  "follow": "팔로우",
+  "enum": {
+    "faq": {
+      "usage": "서비스 이용",
+      "payment": "주문/결제",
+      "others": "기타 문의"
+    },
+    "contact": {
+      "guide": "사용법",
+      "payment": "결제",
+      "etc": "기타"
+    }
+  },
+  "sort": {
+    "item": {
+      "created_at desc": "최신순",
+      "price desc": "높은가격순",
+      "price asc": "낮은가격순"
+    }
+  },
+  "ui": {
+    "grid": "그리드",
+    "list": "리스트"
+  },
+  "checkdesc": {
+    "termCheck": "이용약관에 동의합니다 (필수)",
+    "privacyCheck": "개인정보 보호정책에 동의합니다 (필수)",
+    "marketingCheck": "마케팅 정보 수신에 동의합니다 (선택)"
+  }
+}

@@ -1,0 +1,15 @@
+﻿.number-input-container {
+    position: relative;
+    display: inline-block;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-addon {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+}

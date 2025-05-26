@@ -1,0 +1,170 @@
+﻿<div class="form-group" style="@GetMarginBottomStyle()">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">
+            @Label
+            @if (Required)
+            {
+                <span class="required-mark">*</span>
+            }
+        </label>
+    }
+    <div class="input-wrapper" style="@GetWidthStyle()">
+        <input
+            type="number"
+            id="@Id"
+            value="@Value"
+            placeholder="@PlaceHolder"
+            min="@Min"
+            max="@Max"
+            step="@Step"
+            required="@Required"
+            class="@GetInputClass()"
+            @onblur="OnBlur"
+            @oninput="HandleInput"
+        />
+
+        @if (!string.IsNullOrEmpty(Suffix))
+        {
+            <div class="input-suffix">@Suffix</div>
+        }
+
+        <div class="button-container">
+            @ChildContent
+        </div>
+    </div>
+
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty; // 레이블 텍스트
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty; // ID 속성
+
+    [Parameter]
+    public decimal Value { get; set; } // 바인딩 값
+
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; } // 값 변경 이벤트
+
+    [Parameter]
+    public string? PlaceHolder { get; set; } // Placeholder 텍스트
+
+    [Parameter]
+    public double? Min { get; set; } // 최소값
+
+    [Parameter]
+    public double? Max { get; set; } // 최대값
+
+    [Parameter]
+    public double Step { get; set; } = 1; // 증가/감소 단위
+
+    [Parameter]
+    public bool Required { get; set; } = false; // 필수 입력 여부
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public Func<decimal, string?>? Validation { get; set; } // 유효성 검사 함수
+
+    [Parameter]
+    public EventCallback<bool> OnValidationChange { get; set; } // 유효성 검사 결과를 알리는 이벤트 콜백
+
+    [Parameter]
+    public string Width { get; set; } = ""; // 입력 필드 너비 (예: "300px" 또는 "100%")
+
+    [Parameter]
+    public string MarginBottom { get; set; } = "20px"; // 하단 여백 설정 (기본값 20px)
+
+    [Parameter]
+    public string Suffix { get; set; } = ""; // 입력 필드 뒤에 표시될 텍스트 (예: "원", "kg" 등)
+
+    private bool _isValid = false; // 유효성 검사 결과 상태
+    public bool IsValid => _isValid; // 외부에서 현재 컴포넌트의 유효성 검사 결과 확인 가능
+
+    private string? ErrorMessage { get; set; }
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    private bool IsValidated { get; set; } = false;
+
+    // 포커스를 잃었을 때 유효성 검사 실행
+    private async Task OnBlur()
+    {
+        await ValidateInput();
+    }
+
+    private async Task ValidateInput()
+    {
+        IsValidated = true;
+        bool oldIsValid = _isValid;
+
+        // Required 체크 먼저 수행
+        if (Required && Value == 0)
+        {
+            ErrorMessage = $"{Label}은(는) 필수 입력 항목입니다.";
+            _isValid = false;
+        }
+        else if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+            _isValid = string.IsNullOrEmpty(ErrorMessage);
+        }
+        else
+        {
+            ErrorMessage = null;
+            _isValid = true;
+        }
+
+        // 유효성 상태가 변경되었을 때만 이벤트 발생
+        if (oldIsValid != _isValid)
+        {
+            await OnValidationChange.InvokeAsync(_isValid);
+        }
+    }
+
+    private string GetInputClass()
+    {
+        if (!IsValidated) // 아직 유효성 검사가 되지 않은 경우
+        {
+            return "form-control";
+        }
+
+        if (HasError) // 오류가 있는 경우
+        {
+            return "form-control error";
+        }
+
+        // 유효성 검사가 통과된 경우
+        return "form-control valid";
+    }
+
+    private string GetWidthStyle()
+    {
+        return !string.IsNullOrEmpty(Width) ? $"width: {Width};" : "";
+    }
+
+    private string GetMarginBottomStyle()
+    {
+        return !string.IsNullOrEmpty(MarginBottom) ? $"margin-bottom: {MarginBottom};" : "";
+    }
+
+    // HandleInput 메서드
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value?.ToString(), out decimal newValue))
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+
+            await ValidateInput();
+        }
+    }
+}

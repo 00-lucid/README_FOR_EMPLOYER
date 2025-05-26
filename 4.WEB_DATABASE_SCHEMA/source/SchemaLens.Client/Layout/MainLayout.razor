@@ -1,0 +1,41 @@
+﻿@using System.Security.Claims
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <TopMenu isLogin="@context.User.Identity.IsAuthenticated" authority="@context.User.FindFirst(ClaimTypes.Role).Value"/>
+    </Authorized>
+    <NotAuthorized>
+        <TopMenu isLogin="@context.User.Identity.IsAuthenticated" authority="VIEWER"/>
+        @if (IsMainPage)
+        {
+            <RadzenAlert Title="공지사항" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                본인 계정 아이디: 이메일 at 앞부분, 비밀번호: 0000
+            </RadzenAlert>
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@* <div id="notice-container">
+    <div class="notice-box">
+        ! 본인 계정 이름은 비상연락망의 email 앞부분이고 비밀번호는 전화번호의 뒷 4자리입니다. 로그인에 참고해주세요.
+    </div>
+</div> *@
+
+<div class="content">
+    <RadzenComponents @rendermode="InteractiveServer" />
+    @Body
+</div>  
+
+@* <div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div> *@
+
+
+@code {
+    private bool IsMainPage => NavigationManager.Uri.EndsWith("/main", StringComparison.OrdinalIgnoreCase);
+}

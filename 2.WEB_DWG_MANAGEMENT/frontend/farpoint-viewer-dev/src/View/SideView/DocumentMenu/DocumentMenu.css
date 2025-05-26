@@ -1,0 +1,13 @@
+.DocumentMenu {
+    position: absolute;
+    width: var(--DocumentMenuWidth);
+    height: 100%;
+    /* background-color: var(--Background-Normal); */
+}
+#documentMenuTreeView {
+    position: absolute;
+    top: 120px;
+    left: 15px;
+    right: 2px;
+    bottom: 15px;
+}

@@ -1,0 +1,25 @@
+<div style="@InlineStyle">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? BackgroundColor { get; set; } = "transparent"; // 기본값 설정
+
+    [Parameter]
+    public bool IsAbsolute { get; set; } = false;
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } // 자식 컨텐츠 렌더링
+
+    private string InlineStyle => string.Join(" ", new string?[]
+        {
+            IsAbsolute ? "position: absolute; top: 0;" : null,
+            "width: 100%;",
+            "height: 100vh;",
+            "display: flex;",
+            "justify-content: center;",
+            "align-items: center;",
+            $"background-color: {BackgroundColor};"
+        }.Where(style => !string.IsNullOrEmpty(style)));
+}

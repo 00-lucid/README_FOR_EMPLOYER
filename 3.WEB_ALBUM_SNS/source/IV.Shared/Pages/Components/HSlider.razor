@@ -1,0 +1,21 @@
+<label class="switch">
+    <input type="checkbox" @bind="Value" />
+    <span class="slider"></span>
+</label>
+@if (!string.IsNullOrEmpty(Label))
+{
+    <label>@Label</label>
+}
+
+@code {
+    // 슬라이드 상태 바인딩 (true/false)
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    // 레이블 텍스트 (사용자 지정 가능)
+    [Parameter]
+    public string? Label { get; set; }
+}

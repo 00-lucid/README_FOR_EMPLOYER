@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>TEST SERVER</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="v-app" >
+        <h1 id="title">{{title}}</h1>
+
+        <p>
+            <ul id="ul-chat">
+                <li v-for="msg of messages" class="li-chat">{{msg}}</li>
+            </ul>
+        </p>
+        <from id="interface">
+            <input v-model="text" type="text" id="write"/>
+            <button type="submit" @click.prevent="sendMessage()" id="btn">보내기</button>
+        </from>
+        <a id="exit" href="http://localhost:8080">나가기</a>
+    </div>
+    <script> 
+        var app = new Vue({
+            el: '#v-app',
+            data: {
+                title: '안녕하세요 ***님',
+                text: '',
+                messages: ['모든 채팅문의는 실시간으로 진행됩니다', '문의가 종료되면 나가기를 눌러 주세요'],
+                socket: null,
+            },
+            methods: {
+                sendMessage() {
+                    console.log(`send: ${this.text}`)
+                    this.socket.emit('messageToServer', this.text);
+                    this.text = ""
+                },
+                receiveMessage(msg) {
+                    console.log(`recv: ${msg}`)
+                    this.messages.push(msg);
+                },
+            },
+            created() {
+                this.socket = io('https://localhost:3000');
+                this.socket.on('messageToClient', (msg) => {
+                    this.receiveMessage(msg);
+                })
+            }
+        })
+    </script>
+</body>
+</html>

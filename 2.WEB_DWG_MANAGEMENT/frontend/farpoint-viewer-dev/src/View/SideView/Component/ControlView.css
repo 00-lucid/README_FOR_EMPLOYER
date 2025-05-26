@@ -1,0 +1,61 @@
+.MydocMenu .Button {
+    position: relative;
+    margin-right: 5px;
+    width: 70px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: inline-flex;
+    align-items: center;
+}
+.MydocMenu .Button:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.MydocMenu .Button:active {
+    background-color: var(--Background-Highlight-Active);
+}
+.MydocMenu .Button .TextLabel {
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+    color: white;
+}
+
+.MydocMenu {
+    --Component-Stroke: #464646;
+    --Component-Disable: #a4a4a4;
+}
+
+.MydocMenu .DisableButton {
+    position: relative;
+    margin-right: 5px;
+    width: 70px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--Component-Disable);
+    display: inline-flex;
+    align-items: center;
+}
+.MydocMenu .DisableButton .TextLabel {
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+    color: var(--Component-Stroke);
+}
+
+.MydocMenu .ControlView .SeparateLine {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-left: 5px;
+    top: 10px;
+    width: 1px;
+    height: 25px;
+    background-color: var(--Separate-Line);
+}
+
+.MydocMenu .ControlView #mydocUploadButton {
+    position: absolute;
+    display: none;
+}

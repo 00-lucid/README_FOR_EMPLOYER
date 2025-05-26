@@ -1,0 +1,20 @@
+﻿.hgrid {
+    /* 데스크톱 사이즈 (기본) */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /*justify-items: center; !* 원하는 정렬 방식으로 조정 가능 *!*/
+}
+
+/* 태블릿 사이즈 이하 (768px 이하) -> 2열 */
+@media (max-width: 768px) {
+    .hgrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 모바일 사이즈 이하 (480px 이하) -> 1열 */
+@media (max-width: 480px) {
+    .hgrid {
+        grid-template-columns: 1fr;
+    }
+}

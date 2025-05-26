@@ -1,0 +1,28 @@
+﻿@using IV.Shared.Layout
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Layout.MainLayout).Assembly">
+        <Found Context="routeData">
+            @* 기존 레이아웃 typeof(Layout.MainLayout) *@
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                <NotAuthorized>
+                    @* 컨텍스트 주입 *@
+                    @context.User.Identity?.IsAuthenticated
+
+                    @if (context.User?.Identity?.IsAuthenticated == false)
+                    {
+                        @* 사용자 미인증 상태라면 로그인 페이지로 이동 *@
+                        NavigationManager.NavigateTo("/login", true);
+                    }
+                    else
+                    {
+                        <p>접근 권한이 없습니다.</p>
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1"/>
+        </Found>
+    </Router>
+</CascadingAuthenticationState>

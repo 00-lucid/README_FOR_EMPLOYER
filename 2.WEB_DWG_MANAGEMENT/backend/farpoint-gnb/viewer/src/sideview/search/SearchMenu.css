@@ -1,0 +1,83 @@
+.SearchMenu {
+    position: absolute;
+    width: var(--SearchMenuWidth);
+    height: 100%;
+    transition: all 0.3s;
+}
+.SearchMenu .Background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* background-color: var(--Background-Normal); */
+}
+
+.SearchMenu .space {
+    height: 60px;
+}
+
+.SearchMenu .ControlsView .CommonComponent {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 25px;
+    margin-right: 25px;
+    height: 40px;
+}
+
+.SearchMenu .ResetButton {
+    position: relative;
+    margin-left: 25px;
+    margin-top: 15px;
+    width: calc(100% - 40px);
+    height: 24px;
+    color: var(--Text-Normal);
+    fill: var(--Text-Normal);
+}
+
+.SearchMenu .ResetButton:hover {
+    filter: drop-shadow(0px 0px 5px rgb(0 0 0 / 0.3));
+}
+.SearchMenu .ResetButton:active {
+    filter: drop-shadow(0px 0px 2px rgb(0 0 0 / 0.3));
+}
+
+.SearchMenu .ResetButton > svg {
+    position: absolute;
+    top: 1px;
+    height: 22px;
+    width: 22px;
+}
+
+.SearchMenu .ResetButton > div {
+    font-weight: 100;
+    position: absolute;
+    top: 5px;
+    left: 27px;
+    height: 13px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.SearchMenu .SearchButton {
+    position: relative;
+    margin-left: 25px;
+    margin-top: 24px;
+    width: calc(100% - 25px - 25px);
+    height: 60px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+}
+.SearchMenu .SearchButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.SearchMenu .SearchButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+.SearchMenu .SearchButton > div {
+    width: 100%;
+    height: 20px;
+    font-size: 20px;
+    text-align: center;
+    color: white;
+}

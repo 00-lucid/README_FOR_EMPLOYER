@@ -1,0 +1,59 @@
+.OkPopupFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: visible;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}
+
+.OkPopup {
+    position: absolute;
+    left: calc((100% - 380px) / 2);
+    top: calc((100% - 210px) / 2);
+    width: 380px;
+    height: 110px;
+    background-color: var(--Dialogue-background);
+    border-radius: 6px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    padding-bottom: 10px;
+    pointer-events: all;
+    color: var(--Text-Normal);
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.OkPopup .Label {
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    width: 100%;
+    color: var(--Text-Normal);
+    font-size: 14px;
+}
+
+.OkPopup .Text {
+    top: 0px;
+    width: 100%;
+    text-align: center;
+}
+
+.OkPopup .OkButton {
+    position: absolute;
+    top: 60px;
+    left: calc((380px - 174px) / 2);
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+.OkPopup .OkButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.OkPopup .OkButton:active {
+    background-color: var(--Background-Highlight-Active);
+}

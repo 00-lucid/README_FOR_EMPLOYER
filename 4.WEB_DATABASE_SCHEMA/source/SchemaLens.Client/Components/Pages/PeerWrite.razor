@@ -1,0 +1,103 @@
+﻿@page "/peer/write"
+@using System.Security.Claims
+@using SchemaLens.Client.Enums
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@inject IPeerService PeerService
+@inject DialogService DialogService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div id="peer-write-container">
+    <div id="peer-write-sidebar"></div>
+    <div id="peer-write-detail-container">
+        @if (onlinePeers is not null && offlinePeers is not null)
+        {
+            <PeerItemSection isExamine="false" isOnline="true" OnPeerUpdate="@HandlePeerUpdate" OnPeerDelete="@HandlePeerDelete" peers="@onlinePeers"/>
+            <PeerItemSection isExamine="false" isOnline="false" OnPeerUpdate="@HandlePeerUpdate" OnPeerDelete="@HandlePeerDelete" peers="@offlinePeers"/>
+        }
+        <RadzenButton Click="OnClickAddPeerDialog" Variant="Variant.Flat" Style="position: fixed; border-radius: 50%; bottom: 4rem; right:  4rem; width: 4rem; height: 4rem;" Icon="add" ButtonStyle="ButtonStyle.Primary"/>
+    </div>
+    <div id="peer-write-additional-container"></div>
+</div>
+
+
+@code {
+    bool isAddPeer = false;
+    DialogPosition position;
+    IEnumerable<PeerModel> peers;
+    IList<PeerModel> onlinePeers;
+    IList<PeerModel> offlinePeers;
+    int userId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        AuthenticationState auth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        foreach(Claim claim in auth.User.Claims)
+        {
+            if (claim.Type == ClaimTypes.Sid)
+            {
+                userId = Int32.Parse(claim.Value);
+                peers = await PeerService.GetPeersByRegisteredAsync(Int32.Parse(claim.Value));
+                SetPeers(peers);
+                
+            }
+        }
+        
+    }
+
+    // Not used
+    private async Task HandlePeerUpdate((int PeerId, Enums.PeerType PeerType) updateInfo)
+    {
+        int peerId = updateInfo.PeerId;
+        PeerType peerType = updateInfo.PeerType;
+
+        // 필요한 로직 수행
+
+        StateHasChanged();
+    }
+
+    private async Task HandlePeerDelete(int peerId)
+    {
+        // 필요한 로직 수행
+        await PeerService.DeletePeerById(peerId);
+        peers = await PeerService.GetPeersByRegisteredAsync(userId);
+        SetPeers(peers);
+    }
+
+    private async Task HandlePeerSync(int userId)
+    {
+        peers = await PeerService.GetPeersByRegisteredAsync(userId);
+        SetPeers(peers);
+    }
+    
+    private async void OnClickAddPeerDialog()
+    {
+        await DialogService.OpenAsync("규칙", ds =>
+                @<PeerAddDialog ds="@ds" userId="@userId" OnPeerSync="@HandlePeerSync"/>
+    , options: new DialogOptions { CloseDialogOnOverlayClick = true });
+    }
+
+    private void SetPeers(IEnumerable<PeerModel> peers)
+    {
+        List<PeerModel> tempOnlinePeers = new List<PeerModel>();
+        List<PeerModel> tempOfflinePeers = new List<PeerModel>();
+        
+        foreach (PeerModel peer in peers)
+        {
+            if (peer.State.Equals("Pending"))
+            {
+                tempOnlinePeers.Add(peer);
+            }
+            else
+            {
+                tempOfflinePeers.Add(peer);
+            }
+        }
+
+        onlinePeers = tempOnlinePeers;
+        offlinePeers = tempOfflinePeers;
+        StateHasChanged();
+    }
+}

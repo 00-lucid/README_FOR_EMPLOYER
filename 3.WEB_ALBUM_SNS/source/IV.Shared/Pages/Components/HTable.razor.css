@@ -1,0 +1,85 @@
+﻿.htable-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.htable {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: #333;
+}
+
+.htable-header {
+    background-color: #f7f9fc;
+    color: #1a1a1a;
+    text-align: left;
+    font-weight: 600;
+}
+
+.htable-header th {
+    padding: 16px 24px;
+    font-size: 14px;
+    border-bottom: 2px solid #e0e6ed;
+}
+
+.htable-body td {
+    padding: 14px 24px;
+    font-size: 14px;
+    border-top: 1px solid #e0e6ed;
+}
+
+.htable-body tr:hover {
+    background-color: #f2f6fc;
+    transition: background-color 0.2s ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+    .htable-container {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .htable-table, .htable-header, .htable-body, .htable-header th, .htable-body td {
+        display: block;
+        width: 100%;
+    }
+
+    .htable-header {
+        position: absolute;
+        clip: rect(0 0 0 0);
+        margin: -1px;
+        padding: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        border: 0;
+    }
+
+    .htable-body tr {
+        margin-bottom: 15px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+
+    .htable-body td {
+        padding: 10px;
+        border: none;
+        font-size: 13px;
+        text-align: right;
+        position: relative;
+    }
+
+    .htable-body td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        color: #666;
+        font-weight: bold;
+        text-align: left;
+    }
+}

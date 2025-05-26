@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+
+<div class="@($"h-bottom-sheet-overlay{(IsOpen ? " open" : "")}")" @onclick="HandleOverlayClick">
+    <div class="h-bottom-sheet" @onclick:stopPropagation>
+        <!-- 닫기 버튼(가로 일자 형태) -->
+        <button class="h-bottom-sheet-close" @onclick="CloseSheet">
+            @* &#8212; *@
+        </button>
+        
+        <!-- 원하는 내용(HTML/Razor 등) -->
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// BottomSheet 열림/닫힘을 제어하는 플래그
+    /// </summary>
+    [Parameter] public bool IsOpen { get; set; }
+
+    /// <summary>
+    /// outside 클릭 등을 통해 Sheet를 닫으면 상위로 알림
+    /// </summary>
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>
+    /// 원하는 내용을 삽입할 수 있는 RenderFragment
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // 오버레이 클릭 시 닫기
+    private async Task HandleOverlayClick()
+    {
+        await CloseSheet();
+    }
+
+    // 닫기 동작 자체를 메소드로 분리
+    private async Task CloseSheet()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

@@ -1,0 +1,35 @@
+﻿@namespace MESALL.Shared.Pages.Components
+
+<div class="loading-container">
+    <div class="loading-indicator">
+        <div class="loading-dot dot-1"></div>
+        <div class="loading-dot dot-2"></div>
+        <div class="loading-dot dot-3"></div>
+        <div class="loading-dot dot-4"></div>
+    </div>
+    @if (!string.IsNullOrEmpty(LoadingText))
+    {
+        @* <div class="loading-text">@LoadingText</div> *@
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// 로딩 중 표시할 텍스트 (선택 사항)
+    /// </summary>
+    [Parameter]
+    public string? LoadingText { get; set; }
+
+    /// <summary>
+    /// 로딩 인디케이터 크기 (기본값: 중간)
+    /// </summary>
+    [Parameter]
+    public LoadingSize Size { get; set; } = LoadingSize.Medium;
+
+    public enum LoadingSize
+    {
+        Small,
+        Medium,
+        Large
+    }
+}

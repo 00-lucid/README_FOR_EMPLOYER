@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Watch(Mock)",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "REACT_APP_SERVICE_URL": "mock"
+                }
+            },
+            "command": "npm start"
+        },
+        {
+            "label": "Watch(Impl)",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "REACT_APP_SERVICE_URL": "http://localhost:4000"
+                }
+            },
+            "command": "npm start",
+            "problemMatcher": []
+        },
+        {
+            "label": "Watch(Impl) with docker",
+            "type": "shell",
+            "command": "npm dockerStart",
+            "problemMatcher": []
+        }
+    ]
+}

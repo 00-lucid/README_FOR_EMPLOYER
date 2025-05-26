@@ -1,0 +1,81 @@
+.PldProcessMenu {
+    position: absolute;
+    width: var(--PldProcessMenuWidth);
+    height: 100%;
+    /* background-color: var(--Background-Normal); */
+}
+
+.PldProcessMenu .topline {
+    height: 1px;
+    margin-top: 110px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: #d5dadd;
+}
+
+#pld-preview {
+    min-height: 7rem;
+    display: flex;
+    flex-direction: column;
+    color: #6e8df8;
+    padding: 1rem 2rem 1rem 2rem;
+    font-size: 0.8rem;
+    justify-content: space-around;
+}
+
+#pld-preview .info {
+    display: flex;
+}
+
+#pld-preview .info .name {
+    width: 40%;
+}
+
+#pld-preview .info .content {
+    width: 50%;
+}
+
+.PldProcessMenu .bottomline {
+    height: 1px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: #d5dadd;
+}
+
+.PldProcessMenu #buttons {
+    position: absolute;
+    z-index: 40;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+.PldProcessMenu .button {
+    width: 6rem;
+    height: 3rem;
+    background-color: black;
+    color: white;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    border: none;
+}
+
+.PldProcessMenu .button.blue {
+    background-color: #4a70f7;
+}
+
+.PldProcessTree {
+    margin-top: 5%;
+    height: 60%;
+}
+
+.PldProcessMenu .button.blue.disable {
+    pointer-events: none;
+    background-color: #a4a4a4;
+}
+
+#processMenuTreeView {
+    top: 70px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}

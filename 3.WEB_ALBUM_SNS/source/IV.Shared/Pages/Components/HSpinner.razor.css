@@ -1,0 +1,47 @@
+﻿.h-spinner-container {
+    position: fixed; /* 화면 크기에 구애받지 않고 중앙에 뜨도록 설정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8); /* 배경 반투명 */
+    z-index: 9999; /* 모든 요소 위에 표시 */
+    flex-direction: column;
+}
+
+.h-spinner {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.h-spinner-inner {
+    width: 100%;
+    height: 100%;
+    border: 6px solid var(--primary-color, #0064FF); /* 기본 색상: primary-color */
+    border-top-color: transparent; /* 상단의 색상을 투명하게 처리 */
+    border-radius: 50%;
+    animation: h-spinner-rotate 1s linear infinite; /* 무한 회전 애니메이션 */
+}
+
+/* 스피너 애니메이션 */
+@keyframes h-spinner-rotate {
+    0% {
+        transform: rotate(0deg); /* 회전 초기 상태 */
+    }
+    100% {
+        transform: rotate(360deg); /* 360도 회전 */
+    }
+}
+
+.h-spinner-progress-text {
+    margin-top: 8px;         /* 스피너와 텍스트 간격 설정 */
+    font-size: 14px;         /* 텍스트 크기 */
+    color: var(--disabled-color);             /* 텍스트 색상 */
+    text-align: center;      /* 중앙 정렬 */
+}

@@ -1,0 +1,873 @@
+﻿@page "/service"
+@using System.Text.Json
+@using System.Net.Http.Json
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.Interfaces
+@using MESALL.Shared.Pages.Components
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>서비스 관리</h1>
+            <span class="service-count">총 @(_filteredServices?.Count ?? 0)개의 서비스</span>
+        </div>
+    </header>
+
+    <HRow JustifyContent="space-between" AlignItems="center">
+        <div class="filters-section">
+            <div class="filter-tag @(_activeFilter == null ? "active" : "")" @onclick='() => ApplyFilter(null)'>
+                전체
+            </div>
+            <div class="filter-tag @(_activeFilter == ServiceType.TimeBase ? "active" : "")" @onclick='() => ApplyFilter(ServiceType.TimeBase)'>
+                시간 기준
+            </div>
+            <div class="filter-tag @(_activeFilter == ServiceType.CountBase ? "active" : "")" @onclick='() => ApplyFilter(ServiceType.CountBase)'>
+                횟수 기준
+            </div>
+            <div class="filter-tag @(_activeFilter == ServiceType.GradeBase ? "active" : "")" @onclick='() => ApplyFilter(ServiceType.GradeBase)'>
+                등급 기준
+            </div>
+            <div class="filter-tag @(_activeFilter == ServiceType.Other ? "active" : "")" @onclick='() => ApplyFilter(ServiceType.Other)'>
+                기타
+            </div>
+        </div>
+
+        <HRow AutoWidth="true" Gap="1rem" AlignItems="center">
+            <HTextInput
+                Width="300px"
+                PlaceHolder="서비스명, 코드 검색"
+                Value="@_searchTerm"
+                ValueChanged="@((value) => { _searchTerm = value; ApplyFiltersAndSort(); })"
+                MarginBottom="0"
+            >
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="clear-search" @onclick="ClearSearch">×</button>
+                }
+            </HTextInput>
+
+            <HButton OnClick="OpenAddServiceDialog">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
+                    <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                서비스 등록
+            </HButton>
+        </HRow>
+    </HRow>
+
+    <div class="view-toggle">
+        <button class="view-toggle-btn @(_viewMode == ViewMode.List ? "active" : "")" @onclick="() => _viewMode = ViewMode.List">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 4H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M2 8H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M2 12H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+        </button>
+        <button class="view-toggle-btn @(_viewMode == ViewMode.Card ? "active" : "")" @onclick="() => _viewMode = ViewMode.Card">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5" />
+                <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5" />
+                <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5" />
+                <rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+        </button>
+    </div>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="서비스 정보를 불러오는 중입니다..." />
+    }
+    else if (_filteredServices == null || _filteredServices.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M37 25.5V37C37 38.1046 36.1046 39 35 39H13C11.8954 39 11 38.1046 11 37V11C11 9.89543 11.8954 9 13 9H25" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                    <path d="M22 25H20C19.4477 25 19 25.4477 19 26V32C19 32.5523 19.4477 33 20 33H28C28.5523 33 29 32.5523 29 32V26C29 25.4477 28.5523 25 28 25H26" stroke="#BDBDBD" stroke-width="2" />
+                    <path d="M24 15V25" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="34" cy="14" r="5" stroke="#BDBDBD" stroke-width="2" />
+                    <path d="M32 14L33.5 15.5L36.5 12.5" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h3>서비스가 없습니다</h3>
+            @if (!string.IsNullOrEmpty(_searchTerm) || _activeFilter != null)
+            {
+                <p>검색어 또는 필터에 해당하는 서비스가 없습니다.</p>
+                <button class="secondary-btn" @onclick="ClearFilters">
+                    필터 초기화
+                </button>
+            }
+            else
+            {
+                <p>첫 번째 서비스를 등록해 보세요!</p>
+                <button class="primary-btn" @onclick="OpenAddServiceDialog">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
+                        <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    서비스 등록
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        @if (_viewMode == ViewMode.List)
+        {
+            <div class="list-view">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="image-cell">아이콘</th>
+                        <th @onclick='() => SortServices("name")' class="sortable-header">
+                            서비스명 
+                            @GetSortIcon("name")
+                        </th>
+                        <th @onclick='() => SortServices("type")' class="sortable-header">
+                            유형 
+                            @GetSortIcon("type")
+                        </th>
+                        <th @onclick='() => SortServices("unit")' class="sortable-header">
+                            단위 
+                            @GetSortIcon("unit")
+                        </th>
+                        <th @onclick='() => SortServices("price")' class="sortable-header">
+                            기본 가격 
+                            @GetSortIcon("price")
+                        </th>
+                        <th>할인율</th>
+                        <th>옵션</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var service in _filteredServices)
+                    {
+                        <tr>
+                            <td class="image-cell">
+                                @if (!string.IsNullOrEmpty(service.IconUrl))
+                                {
+                                    <img src="@service.IconUrl" alt="@service.ServiceName" />
+                                }
+                                else
+                                {
+                                    <div class="no-image">
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                            <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                            <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                            <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                }
+                            </td>
+                            <td>@service.ServiceName</td>
+                            <td>
+                                <HBadge Type="@GetServiceTypeClass(service.ServiceType).Replace("type-", "")">
+                                    @GetServiceTypeDisplayName(service.ServiceType)
+                                </HBadge>
+                            </td>
+                            <td>@service.Unit</td>
+                            <td>@service.BasePrice.ToString("N0")원</td>
+                            <td>@service.DiscountRate.ToString("P0")</td>
+                            <td>
+                                @if (service.Options != null && service.Options.Any())
+                                {
+                                    <HBadge Type="info" CustomClass="options-count">@service.Options.Count 개 옵션</HBadge>
+                                }
+                                else
+                                {
+                                    <span class="no-options">없음</span>
+                                }
+                            </td>
+                            <td class="actions-cell">
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditServiceDialog(service)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.333 2.33301C11.5083 2.15775 11.7454 2.05957 11.9997 2.05957C12.254 2.05957 12.491 2.15775 12.6663 2.33301C12.8416 2.50827 12.9398 2.74534 12.9398 2.99967C12.9398 3.25401 12.8416 3.49108 12.6663 3.66634L4.33301 11.9997L2.66634 12.333L2.99967 10.6663L11.333 2.33301Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-btn" @onclick="() => ConfirmDeleteService(service)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 4H3.33333H14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.33301 3.99967V2.66634C5.33301 2.31272 5.47348 1.97358 5.72353 1.72353C5.97358 1.47348 6.31272 1.33301 6.66634 1.33301H9.33301C9.68663 1.33301 10.0258 1.47348 10.2758 1.72353C10.5259 1.97358 10.6663 2.31272 10.6663 2.66634V3.99967" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.6673 4V13.3333C12.6673 13.687 12.5268 14.0261 12.2768 14.2761C12.0267 14.5262 11.6876 14.6667 11.334 14.6667H4.66732C4.3137 14.6667 3.97456 14.5262 3.72451 14.2761C3.47446 14.0261 3.33398 13.687 3.33398 13.3333V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="card-view">
+                @foreach (var service in _filteredServices)
+                {
+                    <div class="service-card">
+                        <div class="service-card-header">
+                            <HBadge Type="@GetServiceTypeClass(service.ServiceType).Replace("type-", "")">
+                                @GetServiceTypeDisplayName(service.ServiceType)
+                            </HBadge>
+                            <div class="card-actions">
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditServiceDialog(service)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.333 2.33301C11.5083 2.15775 11.7454 2.05957 11.9997 2.05957C12.254 2.05957 12.491 2.15775 12.6663 2.33301C12.8416 2.50827 12.9398 2.74534 12.9398 2.99967C12.9398 3.25401 12.8416 3.49108 12.6663 3.66634L4.33301 11.9997L2.66634 12.333L2.99967 10.6663L11.333 2.33301Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-btn" @onclick="() => ConfirmDeleteService(service)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 4H3.33333H14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.33301 3.99967V2.66634C5.33301 2.31272 5.47348 1.97358 5.72353 1.72353C5.97358 1.47348 6.31272 1.33301 6.66634 1.33301H9.33301C9.68663 1.33301 10.0258 1.47348 10.2758 1.72353C10.5259 1.97358 10.6663 2.31272 10.6663 2.66634V3.99967" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.6673 4V13.3333C12.6673 13.687 12.5268 14.0261 12.2768 14.2761C12.0267 14.5262 11.6876 14.6667 11.334 14.6667H4.66732C4.3137 14.6667 3.97456 14.5262 3.72451 14.2761C3.47446 14.0261 3.33398 13.687 3.33398 13.3333V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="service-card-icon">
+                            @if (!string.IsNullOrEmpty(service.IconUrl))
+                            {
+                                <img src="@service.IconUrl" alt="@service.ServiceName" />
+                            }
+                            else
+                            {
+                                <div class="no-image">
+                                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="64" height="64" rx="8" fill="#F5F7FA" />
+                                        <path d="M44 32C44 38.6274 38.6274 44 32 44C25.3726 44 20 38.6274 20 32C20 25.3726 25.3726 20 32 20C38.6274 20 44 25.3726 44 32Z" stroke="#BDBDBD" stroke-width="2" />
+                                        <path d="M32 26V38" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M26 32H38" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                            }
+                        </div>
+                        <div class="service-card-content">
+                            <h3 class="service-name">@service.ServiceName</h3>
+                            <div class="service-details">
+                                <div class="service-detail">
+                                    <span class="detail-label">서비스 코드:</span>
+                                    <span class="detail-value">@service.ServiceCode</span>
+                                </div>
+                                <div class="service-detail">
+                                    <span class="detail-label">단위:</span>
+                                    <span class="detail-value">@service.Unit</span>
+                                </div>
+                                <div class="service-detail">
+                                    <span class="detail-label">기본 가격:</span>
+                                    <span class="detail-value price">@service.BasePrice.ToString("N0")원</span>
+                                </div>
+                                <div class="service-detail">
+                                    <span class="detail-label">할인율:</span>
+                                    <span class="detail-value">@service.DiscountRate.ToString("P0")</span>
+                                </div>
+                            </div>
+                            
+                            @if (service.Options != null && service.Options.Any())
+                            {
+                                <div class="service-options">
+                                    <h4>서비스 옵션</h4>
+                                    <div class="options-list">
+                                        @foreach (var option in service.Options.Take(3))
+                                        {
+                                            <div class="option-item">
+                                                <span class="option-name">@option.Name</span>
+                                                <span class="option-price">+@option.PriceAdjustment.ToString("N0")원</span>
+                                            </div>
+                                        }
+                                        @if (service.Options.Count > 3)
+                                        {
+                                            <div class="more-options">+@(service.Options.Count - 3)개 더 보기</div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<HDialog @bind-IsOpen="_showServiceDialog" Title=@(_editingService.ServiceId == 0 ? "서비스 등록" : "서비스 수정")>
+    <ChildContent>
+        <HRow>
+            <HTextInput 
+                Id="serviceName"
+                Label="서비스명"
+                Value="@_editingService.ServiceName"
+                ValueChanged="@((value) => _editingService.ServiceName = value)"
+                PlaceHolder="서비스명을 입력하세요"
+                Required="true"
+            />
+            <HTextInput 
+                Id="serviceCode"
+                Label="서비스 코드"
+                Value="@_editingService.ServiceCode"
+                ValueChanged="@((value) => _editingService.ServiceCode = value)"
+                PlaceHolder="서비스 코드를 입력하세요"
+                Required="true"
+            />
+        </HRow>
+        
+        <HRow>
+            @* <HSelect  *@
+            @*     Id="serviceType" *@
+            @*     Label="서비스 유형" *@
+            @*     Value="@_editingService.ServiceType.ToString()" *@
+            @*     ValueChanged="@((value) => _editingService.ServiceType = Enum.Parse<ServiceType>(value))" *@
+            @*     Required="true" *@
+            @* > *@
+            @*     <HSelectOption Value="@ServiceType.TimeBase.ToString()">시간 기준</HSelectOption> *@
+            @*     <HSelectOption Value="@ServiceType.CountBase.ToString()">횟수 기준</HSelectOption> *@
+            @*     <HSelectOption Value="@ServiceType.GradeBase.ToString()">등급 기준</HSelectOption> *@
+            @*     <HSelectOption Value="@ServiceType.Other.ToString()">기타</HSelectOption> *@
+            @* </HSelect> *@
+            
+            <HTextInput 
+                Id="unit"
+                Label="단위"
+                Value="@_editingService.Unit"
+                ValueChanged="@((value) => _editingService.Unit = value)"
+                PlaceHolder="예: 시간, 회, 등급"
+                Required="true"
+            />
+        </HRow>
+        
+        <HRow>
+            <HNumberInput 
+                Id="basePrice"
+                Label="기본 가격"
+                Value="@_editingService.BasePrice"
+                ValueChanged="@((value) => _editingService.BasePrice = value)"
+                Min="0"
+                Suffix="원"
+                Required="true"
+            />
+            
+            <HNumberInput 
+                Id="discountRate"
+                Label="할인율"
+                Value="@(_editingService.DiscountRate * 100)"
+                ValueChanged="@((value) => _editingService.DiscountRate = value / 100)"
+                Min="0"
+                Max="100"
+                Suffix="%"
+            />
+        </HRow>
+        
+        <div class="service-options-editor">
+            <div class="options-header">
+                <h4>서비스 옵션</h4>
+                <button type="button" class="add-option-btn" @onclick="AddServiceOption">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    옵션 추가
+                </button>
+            </div>
+            
+            @if (_editingService.Options == null || _editingService.Options.Count == 0)
+            {
+                <div class="no-options-message">
+                    <p>등록된 옵션이 없습니다. 서비스 가격 조정을 위한 옵션을 추가해보세요.</p>
+                </div>
+            }
+            else
+            {
+                <div class="options-list-editor">
+                    @for (int i = 0; i < _editingService.Options.Count; i++)
+                    {
+                        var index = i;
+                        <div class="option-item-editor">
+                            <HRow>
+                                <HTextInput 
+                                    Label="옵션명"
+                                    Value="@_editingService.Options[index].Name"
+                                    ValueChanged="@((value) => _editingService.Options[index].Name = value)"
+                                    PlaceHolder="옵션명을 입력하세요"
+                                    Required="true"
+                                />
+                                <HNumberInput 
+                                    Label="가격 조정"
+                                    Value="@_editingService.Options[index].PriceAdjustment"
+                                    ValueChanged="@((value) => _editingService.Options[index].PriceAdjustment = value)"
+                                    Suffix="원"
+                                />
+                                <button type="button" class="remove-option-btn" @onclick="() => RemoveServiceOption(index)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                </button>
+                            </HRow>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        
+        <HTextArea 
+            Id="description"
+            Label="서비스 설명"
+            Value="@_editingService.Description"
+            ValueChanged="@((value) => _editingService.Description = value)"
+            PlaceHolder="서비스에 대한 상세 설명을 입력하세요"
+            Rows="3"
+        />
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="@(() => _showServiceDialog = false)">취소</HButton>
+        <HButton OnClick="SaveService">저장</HButton>
+    </FooterContent>
+</HDialog>
+
+<HDialog @bind-IsOpen="_showDeleteDialog" Title="서비스 삭제">
+    <ChildContent>
+        <div class="confirm-dialog-content">
+            <div class="confirm-icon warning">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <path d="M16 21.5V21.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <path d="M16 29C23.1797 29 29 23.1797 29 16C29 8.8203 23.1797 3 16 3C8.8203 3 3 8.8203 3 16C3 23.1797 8.8203 29 16 29Z" stroke="currentColor" stroke-width="2" />
+                </svg>
+            </div>
+            <p>정말로 <strong>@(_serviceToDelete?.ServiceName)</strong> 서비스를 삭제하시겠습니까?</p>
+            <p class="warning-text">삭제된 서비스는 복구할 수 없으며, 관련된 모든 데이터가 함께 삭제됩니다.</p>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="@(() => _showDeleteDialog = false)">취소</HButton>
+        <HButton OnClick="DeleteService">삭제</HButton>
+    </FooterContent>
+</HDialog>
+
+@code {
+    private List<ServiceModel> _services;
+    private List<ServiceModel> _filteredServices;
+    private ServiceType? _activeFilter;
+    private string _searchTerm = "";
+    private bool _isLoading = true;
+    private ViewMode _viewMode = ViewMode.Card;
+    private string _sortField = "name";
+    private bool _sortAscending = true;
+    
+    private bool _showServiceDialog = false;
+    private bool _showDeleteDialog = false;
+    private ServiceModel _editingService = new();
+    private ServiceModel _serviceToDelete;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadServices();
+    }
+    
+    private async Task LoadServices()
+    {
+        // 실제 구현에서는 API를 통해 데이터를 가져오겠지만, 
+        // 여기서는 더미 데이터를 사용합니다
+        _isLoading = true;
+        
+        await Task.Delay(500); // 로딩 시뮬레이션
+        
+        _services = GenerateDummyServices();
+        ApplyFiltersAndSort();
+        
+        _isLoading = false;
+    }
+    
+    private List<ServiceModel> GenerateDummyServices()
+    {
+        return new List<ServiceModel>
+        {
+            new ServiceModel
+            {
+                ServiceId = 1,
+                ServiceName = "기본 컨설팅",
+                ServiceCode = "CONS-001",
+                ServiceType = ServiceType.TimeBase,
+                Unit = "시간",
+                BasePrice = 150000,
+                DiscountRate = 0.05m,
+                Description = "기본적인 컨설팅 서비스입니다.",
+                IconUrl = "",
+                CreatedAt = DateTime.Now.AddDays(-30),
+                Options = new List<ServiceOptionModel>
+                {
+                    new ServiceOptionModel { Id = 1, Name = "주니어 컨설턴트", PriceAdjustment = -30000 },
+                    new ServiceOptionModel { Id = 2, Name = "시니어 컨설턴트", PriceAdjustment = 50000 },
+                    new ServiceOptionModel { Id = 3, Name = "전문 컨설턴트", PriceAdjustment = 100000 }
+                }
+            },
+            new ServiceModel
+            {
+                ServiceId = 2,
+                ServiceName = "웹 디자인",
+                ServiceCode = "DSGN-001",
+                ServiceType = ServiceType.GradeBase,
+                Unit = "등급",
+                BasePrice = 1000000,
+                DiscountRate = 0.1m,
+                Description = "전문적인 웹 디자인 서비스입니다.",
+                IconUrl = "",
+                CreatedAt = DateTime.Now.AddDays(-25),
+                Options = new List<ServiceOptionModel>
+                {
+                    new ServiceOptionModel { Id = 4, Name = "기본형", PriceAdjustment = -200000 },
+                    new ServiceOptionModel { Id = 5, Name = "프리미엄형", PriceAdjustment = 500000 },
+                    new ServiceOptionModel { Id = 6, Name = "맞춤형", PriceAdjustment = 1000000 }
+                }
+            },
+            new ServiceModel
+            {
+                ServiceId = 3,
+                ServiceName = "소프트웨어 유지보수",
+                ServiceCode = "MAIN-001",
+                ServiceType = ServiceType.CountBase,
+                Unit = "회",
+                BasePrice = 200000,
+                DiscountRate = 0,
+                Description = "소프트웨어 유지보수 서비스입니다.",
+                IconUrl = "",
+                CreatedAt = DateTime.Now.AddDays(-15),
+                Options = new List<ServiceOptionModel>
+                {
+                    new ServiceOptionModel { Id = 7, Name = "원격 지원", PriceAdjustment = -50000 },
+                    new ServiceOptionModel { Id = 8, Name = "현장 방문", PriceAdjustment = 100000 }
+                }
+            },
+            new ServiceModel
+            {
+                ServiceId = 4,
+                ServiceName = "애플리케이션 개발",
+                ServiceCode = "DEV-001",
+                ServiceType = ServiceType.TimeBase,
+                Unit = "일",
+                BasePrice = 800000,
+                DiscountRate = 0.15m,
+                Description = "맞춤형 애플리케이션 개발 서비스입니다.",
+                IconUrl = "",
+                CreatedAt = DateTime.Now.AddDays(-10),
+                Options = new List<ServiceOptionModel>
+                {
+                    new ServiceOptionModel { Id = 9, Name = "주니어 개발자", PriceAdjustment = -200000 },
+                    new ServiceOptionModel { Id = 10, Name = "시니어 개발자", PriceAdjustment = 0 },
+                    new ServiceOptionModel { Id = 11, Name = "아키텍트", PriceAdjustment = 400000 },
+                    new ServiceOptionModel { Id = 12, Name = "긴급 개발", PriceAdjustment = 500000 }
+                }
+            },
+            new ServiceModel
+            {
+                ServiceId = 5,
+                ServiceName = "데이터 분석",
+                ServiceCode = "DATA-001",
+                ServiceType = ServiceType.Other,
+                Unit = "프로젝트",
+                BasePrice = 3000000,
+                DiscountRate = 0.05m,
+                Description = "비즈니스 인텔리전스를 위한 데이터 분석 서비스입니다.",
+                IconUrl = "",
+                CreatedAt = DateTime.Now.AddDays(-5),
+                Options = new List<ServiceOptionModel>
+                {
+                    new ServiceOptionModel { Id = 13, Name = "기본 분석", PriceAdjustment = -1000000 },
+                    new ServiceOptionModel { Id = 14, Name = "심층 분석", PriceAdjustment = 0 },
+                    new ServiceOptionModel { Id = 15, Name = "실시간 모니터링 추가", PriceAdjustment = 1500000 }
+                }
+            }
+        };
+    }
+    
+    private void ApplyFilter(ServiceType? filterType)
+    {
+        _activeFilter = filterType;
+        ApplyFiltersAndSort();
+    }
+    
+    private void ClearSearch()
+    {
+        _searchTerm = "";
+        ApplyFiltersAndSort();
+    }
+    
+    private void ClearFilters()
+    {
+        _activeFilter = null;
+        _searchTerm = "";
+        ApplyFiltersAndSort();
+    }
+    
+    private void ApplyFiltersAndSort()
+    {
+        if (_services == null) return;
+        
+        // 필터 적용
+        var filtered = _services.Where(s => 
+            (_activeFilter == null || s.ServiceType == _activeFilter) &&
+            (string.IsNullOrEmpty(_searchTerm) || 
+             s.ServiceName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+             s.ServiceCode.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+        ).ToList();
+        
+        // 정렬 적용
+        filtered = SortServicesList(filtered);
+        
+        _filteredServices = filtered;
+    }
+    
+    private List<ServiceModel> SortServicesList(List<ServiceModel> services)
+    {
+        return _sortField switch
+        {
+            "name" => _sortAscending 
+                ? services.OrderBy(s => s.ServiceName).ToList() 
+                : services.OrderByDescending(s => s.ServiceName).ToList(),
+            
+            "type" => _sortAscending 
+                ? services.OrderBy(s => s.ServiceType).ToList() 
+                : services.OrderByDescending(s => s.ServiceType).ToList(),
+            
+            "unit" => _sortAscending 
+                ? services.OrderBy(s => s.Unit).ToList() 
+                : services.OrderByDescending(s => s.Unit).ToList(),
+            
+            "price" => _sortAscending 
+                ? services.OrderBy(s => s.BasePrice).ToList() 
+                : services.OrderByDescending(s => s.BasePrice).ToList(),
+            
+            "date" => _sortAscending 
+                ? services.OrderBy(s => s.CreatedAt).ToList() 
+                : services.OrderByDescending(s => s.CreatedAt).ToList(),
+            
+            _ => services
+        };
+    }
+    
+    private void SortServices(string field)
+    {
+        if (_sortField == field)
+        {
+            _sortAscending = !_sortAscending;
+        }
+        else
+        {
+            _sortField = field;
+            _sortAscending = true;
+        }
+        
+        ApplyFiltersAndSort();
+    }
+    
+    private MarkupString GetSortIcon(string field)
+    {
+        if (_sortField != field) return new MarkupString("");
+    
+        return _sortAscending
+            ? new MarkupString("<svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M6 2.5V9.5' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'/><path d='M3 5.5L6 2.5L9 5.5' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+            : new MarkupString("<svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M6 9.5V2.5' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'/><path d='M9 6.5L6 9.5L3 6.5' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    }
+    
+    private string GetServiceTypeClass(ServiceType type)
+    {
+        return type switch
+        {
+            ServiceType.TimeBase => "type-time",
+            ServiceType.CountBase => "type-count",
+            ServiceType.GradeBase => "type-grade",
+            ServiceType.Other => "type-other",
+            _ => ""
+        };
+    }
+    
+    private string GetServiceTypeDisplayName(ServiceType type)
+    {
+        return type switch
+        {
+            ServiceType.TimeBase => "시간 기준",
+            ServiceType.CountBase => "횟수 기준",
+            ServiceType.GradeBase => "등급 기준",
+            ServiceType.Other => "기타",
+            _ => "미정의"
+        };
+    }
+    
+    private void OpenAddServiceDialog()
+    {
+        _editingService = new ServiceModel
+        {
+            ServiceId = 0,
+            ServiceType = ServiceType.TimeBase,
+            DiscountRate = 0,
+            Options = new List<ServiceOptionModel>(),
+            CreatedAt = DateTime.Now
+        };
+        
+        _showServiceDialog = true;
+    }
+    
+    private void OpenEditServiceDialog(ServiceModel service)
+    {
+        // 편집 시 원본 객체를 직접 수정하지 않도록 복사본 생성
+        _editingService = new ServiceModel
+        {
+            ServiceId = service.ServiceId,
+            ServiceName = service.ServiceName,
+            ServiceCode = service.ServiceCode,
+            ServiceType = service.ServiceType,
+            Unit = service.Unit,
+            BasePrice = service.BasePrice,
+            DiscountRate = service.DiscountRate,
+            Description = service.Description,
+            IconUrl = service.IconUrl,
+            CreatedAt = service.CreatedAt,
+            Options = service.Options?.Select(o => new ServiceOptionModel
+            {
+                Id = o.Id,
+                Name = o.Name,
+                PriceAdjustment = o.PriceAdjustment
+            }).ToList() ?? new List<ServiceOptionModel>()
+        };
+        
+        _showServiceDialog = true;
+    }
+    
+    private void AddServiceOption()
+    {
+        if (_editingService.Options == null)
+        {
+            _editingService.Options = new List<ServiceOptionModel>();
+        }
+        
+        _editingService.Options.Add(new ServiceOptionModel
+        {
+            Id = 0, // 새 옵션은 ID 0으로 설정
+            Name = "",
+            PriceAdjustment = 0
+        });
+    }
+    
+    private void RemoveServiceOption(int index)
+    {
+        if (_editingService.Options != null && index >= 0 && index < _editingService.Options.Count)
+        {
+            _editingService.Options.RemoveAt(index);
+        }
+    }
+    
+    private async Task SaveService()
+    {
+        // 필수 필드 유효성 검사
+        if (string.IsNullOrWhiteSpace(_editingService.ServiceName) ||
+            string.IsNullOrWhiteSpace(_editingService.ServiceCode) ||
+            string.IsNullOrWhiteSpace(_editingService.Unit) ||
+            _editingService.BasePrice <= 0)
+        {
+            // 실제 구현에서는 에러 메시지 표시
+            return;
+        }
+        
+        // 옵션 유효성 검사
+        if (_editingService.Options != null)
+        {
+            foreach (var option in _editingService.Options)
+            {
+                if (string.IsNullOrWhiteSpace(option.Name))
+                {
+                    // 실제 구현에서는 에러 메시지 표시
+                    return;
+                }
+            }
+        }
+        
+        // 새 서비스 등록
+        if (_editingService.ServiceId == 0)
+        {
+            // 실제 구현에서는 API를 통해 데이터를 저장
+            var maxId = _services.Any() ? _services.Max(s => s.ServiceId) : 0;
+            _editingService.ServiceId = maxId + 1;
+            _editingService.CreatedAt = DateTime.Now;
+            
+            _services.Add(_editingService);
+        }
+        // 기존 서비스 수정
+        else
+        {
+            // 실제 구현에서는 API를 통해 데이터를 업데이트
+            var index = _services.FindIndex(s => s.ServiceId == _editingService.ServiceId);
+            if (index >= 0)
+            {
+                _services[index] = _editingService;
+            }
+        }
+        
+        _showServiceDialog = false;
+        ApplyFiltersAndSort();
+    }
+    
+    private void ConfirmDeleteService(ServiceModel service)
+    {
+        _serviceToDelete = service;
+        _showDeleteDialog = true;
+    }
+    
+    private async Task DeleteService()
+    {
+        if (_serviceToDelete != null)
+        {
+            // 실제 구현에서는 API를 통해 데이터를 삭제
+            _services.RemoveAll(s => s.ServiceId == _serviceToDelete.ServiceId);
+            
+            _showDeleteDialog = false;
+            _serviceToDelete = null;
+            
+            ApplyFiltersAndSort();
+        }
+    }
+    
+    // 서비스 타입 열거형
+    public enum ServiceType
+    {
+        TimeBase,    // 시간 기준 (시급, 일급, 등)
+        CountBase,   // 횟수 기준 (건당)
+        GradeBase,   // 등급 기준 (기본/프리미엄/VIP 등)
+        Other        // 기타
+    }
+    
+    // 뷰 모드 열거형
+    private enum ViewMode
+    {
+        List,
+        Card
+    }
+    
+    // 서비스 모델 클래스
+    public class ServiceModel
+    {
+        public int ServiceId { get; set; }
+        public string ServiceName { get; set; }
+        public string ServiceCode { get; set; }
+        public ServiceType ServiceType { get; set; }
+        public string Unit { get; set; }
+        public decimal BasePrice { get; set; }
+        public decimal DiscountRate { get; set; }
+        public string Description { get; set; }
+        public string IconUrl { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public List<ServiceOptionModel> Options { get; set; }
+    }
+    
+    // 서비스 옵션 모델 클래스
+    public class ServiceOptionModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal PriceAdjustment { get; set; }
+    }
+}

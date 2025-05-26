@@ -1,0 +1,36 @@
+.MainView {
+    position: absolute;
+    left: var(--SideMenuWidth);
+    right: 0px;
+    height: 100%;
+}
+
+.MainView .BackgroundLogo {
+    position: absolute;
+    left: calc((100% - 170px) / 2);
+    top: calc((100% - 141px) / 2);
+    width: 170px;
+    height: 141px;
+}
+
+.MainView .Background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.MainView .RightViewFrame {
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    height: calc(100% - 130px);
+    pointer-events: none;
+}
+
+.MainView .CenterPopup {
+    position: absolute;
+    left: calc((100% - 800px) / 2);
+    top: calc((100% - 400px) / 2);
+    width: 800px;
+    /* height: 400px; */
+}

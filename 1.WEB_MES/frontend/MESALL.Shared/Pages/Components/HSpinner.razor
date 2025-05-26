@@ -1,0 +1,29 @@
+﻿<div class="h-spinner-container" @attributes="AdditionalAttributes" hidden="@(!IsLoading)">
+    <div class="h-spinner">
+        <div class="h-spinner-inner"></div>
+    </div>
+    @if (!string.IsNullOrEmpty(ProgressText))
+    {
+        <div class="h-spinner-progress-text">@ProgressText</div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// Determines whether the spinner should be visible.
+    /// </summary>
+    [Parameter]
+    public bool IsLoading { get; set; } = true;
+
+    /// <summary>
+    /// 스피너 하단에 표시할 진행 상황(예: "파일 업로드 중 1/7") 등의 문자열
+    /// </summary>
+    [Parameter]
+    public string ProgressText { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Additional attributes for the container div.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>();
+}

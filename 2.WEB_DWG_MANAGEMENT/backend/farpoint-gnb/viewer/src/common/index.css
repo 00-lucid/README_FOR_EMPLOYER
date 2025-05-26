@@ -1,0 +1,14 @@
+.CenterText {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.VerticalCenter {
+    display: flex;
+    align-items: center;
+}
+
+.HiddenScrollbar::-webkit-scrollbar {
+    display: none;
+}

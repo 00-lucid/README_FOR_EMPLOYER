@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\SchemaLens.Client.props" />
+</Project>

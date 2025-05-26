@@ -1,0 +1,28 @@
+<span class="@CssClass" style="@CombinedStyle">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter]
+    public string? CssClass { get; set; }  // 사용자 정의 CSS 클래스
+
+    [Parameter]
+    public string? Color { get; set; }    // 텍스트 색상
+
+    [Parameter]
+    public string? FontSize { get; set; } // 폰트 크기
+
+    [Parameter]
+    public bool Bold { get; set; } = false; // 텍스트 굵기 여부
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } // 라벨 텍스트
+
+    // 사용되는 스타일 조합
+    private string CombinedStyle => string.Join(" ", new string?[]
+    {
+        string.IsNullOrEmpty(Color) ? null : $"color: {Color}",
+        string.IsNullOrEmpty(FontSize) ? null : $"font-size: {FontSize}",
+        Bold ? "font-weight: bold" : null
+    }.Where(style => !string.IsNullOrEmpty(style)));
+}

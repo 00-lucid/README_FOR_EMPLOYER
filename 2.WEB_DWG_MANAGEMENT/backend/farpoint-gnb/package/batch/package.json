@@ -1,0 +1,19 @@
+{
+  "name": "batch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "batch_vsfx.js",
+  "scripts": {
+    "start": "node batch_vsfx.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  },
+  "dependencies": {
+    "oracledb": "^5.5.0"
+  }
+}

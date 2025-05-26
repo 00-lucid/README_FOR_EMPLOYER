@@ -1,0 +1,14 @@
+﻿<span class="badge @($"badge-{Type?.ToLower() ?? "default"}") @CustomClass">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter]
+    public string Type { get; set; } = "default";
+    
+    [Parameter]
+    public string CustomClass { get; set; } = "";
+    
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

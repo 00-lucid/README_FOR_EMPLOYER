@@ -1,0 +1,6 @@
+.equipment-picture-view-container {
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}

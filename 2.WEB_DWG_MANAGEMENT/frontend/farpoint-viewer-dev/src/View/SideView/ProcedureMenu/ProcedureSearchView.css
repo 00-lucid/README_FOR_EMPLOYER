@@ -1,0 +1,18 @@
+.DocumentSearchView .ListView .Header .First {
+    width: 20px;
+}
+.DocumentSearchView .ListView .Header .Second {
+    width: 100px;
+}
+.DocumentSearchView .ListView .Header .Third {
+    width: 100px;
+}
+.DocumentSearchView .ListView .RowItem .First {
+    padding-left: 10px;
+}
+.DocumentSearchView .ListView .RowItem .Second {
+    text-align: center;
+}
+.DocumentSearchView .ListView .RowItem .Third {
+    text-align: center;
+}

@@ -1,0 +1,26 @@
+.SearchTextField > input {
+    position: absolute;
+    width: 96%;
+    height: 100%;
+    border-radius: 8px;
+    border: solid 1px var(--Component-Border);
+    background-color: var(--Component-Background);
+    font-size: 14px;
+    color: var(--Component-Stroke);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.SearchTextField > input:hover {
+    background-color: var(--Component-Background-Hover);
+}
+.SearchTextField > input:active {
+    background-color: var(--Component-Background-Active);
+}
+.SearchTextField > input:focus {
+    border: solid 2px var(--Component-Active);
+    outline: none;
+}
+.SearchTextField > input::placeholder {
+    color: var(--Component-Disable);
+}

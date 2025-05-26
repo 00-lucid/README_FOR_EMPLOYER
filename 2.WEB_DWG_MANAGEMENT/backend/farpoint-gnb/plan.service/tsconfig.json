@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        // Strict Checks
+        "alwaysStrict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        // Project Options
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "ES2020",
+        // for reflaction
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "baseUrl": "src",
+        "paths": {
+            "common/*": ["common/*"]
+        }
+    },
+    "include": ["src/**/*.ts"]
+}

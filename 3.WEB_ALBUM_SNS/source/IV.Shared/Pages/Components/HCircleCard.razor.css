@@ -1,0 +1,81 @@
+/* HCircleCard.razor.css */
+
+/* 원형 카드 */
+.h-circle-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: var(--light-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+/* 호버 시 카드 효과 */
+.h-circle-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 카드 제목과 부제목이 들어갈 영역 */
+.h-circle-card-text {
+    text-align: center;
+    margin-top: 1rem; /* 원형과 텍스트 사이 간격 조절 */
+}
+
+/* 카드 제목 */
+.h-circle-card-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* 카드 부제목 */
+.h-circle-card-subtitle {
+    font-size: 0.5rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.h-circle-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 수평 가운데 정렬 */
+    justify-content: center; /* 수직 가운데 정렬 (필요 시) */
+    text-align: center;
+}
+
+/* 모바일 (예: 767px 이하) */
+@media (max-width: 767px) {
+    .h-circle-card {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* 태블릿 (예: 768px 이상 ~ 1024px 이하) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .h-circle-card {
+        width: 85px;
+        height: 85px;
+    }
+}
+
+/* 데스크톱 (예: 1025px 이상) */
+/* 이미 .h-circle-card의 기본값을 데스크톱으로 간주해도 됩니다만, 필요시 명시해줄 수도 있음 */
+@media (min-width: 1025px) {
+    .h-circle-card {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+.overlapped-card {
+    margin-top: -80px; /* 위로 겹쳐올 위치 조정 */
+    z-index: 1;        /* 배경보다 앞쪽에 표시 */
+}

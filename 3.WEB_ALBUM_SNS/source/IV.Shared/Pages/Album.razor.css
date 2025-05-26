@@ -1,0 +1,16 @@
+.blurred-private-img {
+    filter: blur(6px);
+    position: relative; /* 부모 요소에 position 설정 */
+}
+
+/* 잠금 아이콘 오버레이 예시 */
+.private-lock-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    z-index: 100;
+    font-size: 2rem;
+    color: #fff;
+    pointer-events: none; /* 마우스 이벤트 무시 */
+}

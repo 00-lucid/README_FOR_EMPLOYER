@@ -1,0 +1,326 @@
+.PMDCListView {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 820px;
+    background-color: var(--toolbar-background);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 2px 10px 4px rgba(0, 0, 0, 0.17);
+    border-radius: 6px;
+    overflow: hidden;
+    pointer-events: all;
+}
+
+.PMDCListView .PMDCListContainer {
+    width: 100%;
+}
+/* #OrderListFlagTreeView {
+    position: relative;
+    height: 400px;
+    padding-bottom: 10px;
+    margin: 10px;
+} */
+
+.PMDCListView .Titlebar {
+    background-color: var(--Dialogue-Titlebar-background);
+    position: relative;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    width: 100%;
+}
+.PMDCListView .Titlebar .Text {
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+    color: var(--image-stroke-color);
+}
+
+.PMDCListView .ListView {
+    position: relative;
+    /* top: 40px; */
+    left: 20px;
+    font-size: 12px;
+    width: calc(100% - 40px);
+    max-height: 450px;
+    overflow-y: scroll;
+    border-collapse: collapse;
+    color: var(--image-stroke-color);
+    text-align: center;
+}
+
+/* .PMDCListView .ListView div {
+    display: flex;
+} */
+
+.PMDCListView .ListView::-webkit-scrollbar {
+    display: none;
+}
+
+.PMDCListView .ListView .Header tr {
+    border-bottom: 0px;
+    width: 100%;
+    height: 40px;
+}
+
+.PMDCListView .ListView .Header th {
+    opacity: 0.5;
+}
+
+.PMDCListView .ListView .RowItem svg {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.RowItem {
+    border-radius: 6px;
+}
+
+.HovableItem {
+    border-radius: 6px;
+}
+
+.HovableItem:hover{
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+
+.RowItem .Item {
+    margin-left: 10px;
+    margin-right: 10px;
+    /* max-width: 200px; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* display: -webkit-box; */
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.PMDCListView .ListView .Total {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+}
+.PMDCListView  .ListView .Header span {
+    margin-left: 0px;
+}
+
+.PMDCListView  .ListView tr {
+    border-bottom: 1px solid var(--Dialogue-Date-background);
+    height: 50px;
+}
+
+.PMDCListView .ListView table {
+    border-collapse: collapse;
+    max-width: 800px;
+    width: 100%;
+    background-color: var(--Dialogue-Subtitlebar-background);
+}
+
+.PMDCListView .ListView .Display {
+    max-width: 800px;
+    width: 100%;
+}
+
+.PMDCListView .ListView .Setting {
+    display: flex;
+    max-width: 800px;
+    width: 100%;
+}
+
+.PMDCListView .ListView .Setting .PMDCMaster {
+    max-width: 300px;
+    width: 100%;
+    height: 320px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.PMDCListView .ListView .Setting .PMDCMaster::-webkit-scrollbar {
+    display: none;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch {
+    display: block; 
+    width: 480px;
+    height: 235px;
+    margin-left: 20px
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchBar {
+    display: flex;
+    flex-direction: column;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchBar > div {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchBar .SearchText {
+    width: 210px;
+    height: 30px;
+    padding: 0 5px 0;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+.PMDCListView .ListView .Setting .PMDCSearch .SearchBar > div:nth-child(2) .SearchText {
+    width: 385px;
+    height: 30px;
+    padding: 0 5px 0; 
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchBar .SearchButton {
+    position: relative;
+    width: 50px;
+    height: 33px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchResult {
+    max-width: 460px;
+    width: 100%;
+    height: 235px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchResult::-webkit-scrollbar {
+    display: none;
+}
+
+.PMDCListView .ListView .Setting .PMDCSearch .SearchResult table {
+    border-collapse: collapse;
+    max-width: 460px;
+    width: 100%;
+}
+
+.PMDCListView table th:nth-child(1) {
+    -webkit-border-radius: 4px 0px 0px 4px;
+    -moz-border-radius: 4px 0px 0px 4px;
+    border-radius: 4px 0px 0px 4px;
+}
+
+.PMDCListView table th:nth-last-child(1) {
+    -webkit-border-radius: 0px 4px 4px 0px;
+    -moz-border-radius: 0px 4px 4px 0px;
+    border-radius: 0px 4px 4px 0px;
+}
+
+.PMDCListView .ListView thead {
+    top: 0px;
+    width: 100%;
+    height: 40px;
+    background-color: var(--Dialogue-Date-background);
+    border-radius: 4px;
+    position: sticky
+    /* border: solid 1px rgba(0, 0, 0, 0.7); */
+}
+
+.PMDCListView .ListView .Header .Title {
+    width: 255px;
+}
+.PMDCListView .ListView .Header .Writer {
+    width: 80px;
+}
+.PMDCListView .ListView .Header .Date {
+    width: 125px;
+}
+
+.PMDCListView .ListView .Footer{
+    width: 100%;
+    height: 62px;
+    display: flex;
+    justify-content: center;
+    bottom:-1px;
+    position: sticky;
+    background-color: var(--toolbar-background);
+}
+
+.Footer .Button {
+    /* position: absolute;
+    top: 280px;
+    left: 10px; */
+    width: 150px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    color: var(--image-stroke-color);
+    margin-left: 10px
+}
+.PMDCListView .CancelLoadButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.PMDCListView .CancelLoadButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.PMDCListView .Subtitlebar {
+    background-color: var(--Dialogue-Subtitlebar-background);
+    position: relative;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 14px;
+    color: var(--image-stroke-color);
+    border-top: solid 1px rgba(0, 0, 0, 0.7);
+    border-bottom: solid 1px rgba(0, 0, 0, 0.7);
+}
+.PMDCListView .Subtitlebar .Text {
+    font-size: 14px;
+    text-align: center;
+    color: var(--image-stroke-color);
+    margin: 0px 10px 0px 10px;
+}
+
+.PMDCListView .Subtitlebar .FavoriteIcon {
+    position: absolute;
+    right: 5px;
+    width: 28px;
+    height: 28px;
+}
+
+.PMDCListView .Subtitlebar .FavoriteIcon:hover {
+    background-color: var(--Menu-Toolbar-Item-Hover);
+}
+.PMDCListView .Subtitlebar .FavoriteIcon:active {
+    background-color: var(--Menu-Toolbar-Item-Active);
+}
+
+.ListBtn {
+    padding: 10px; 
+    background-color: var(--image-stroke-color);
+    color: var(--Background-Normal-Hover);
+    border-radius: 3px
+}
+
+.PMDCListView .Button:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.PMDCListView .Button:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.ListView .Footer{
+    width: 100%;
+    height: 62px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom:-1px;
+    position: sticky;
+    background-color: var(--toolbar-background);
+}

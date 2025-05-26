@@ -1,0 +1,27 @@
+.recover-container {
+    width: max-content;
+    min-width: 370px;
+    margin: auto; /* 부모 요소 안에서 수평으로 가운데 정렬 */
+    padding: 20px;
+    /*border: 1px solid var(--secondary-color);*/
+    border-radius: 10px;
+    /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
+    background-color: var(--light-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--primary-color); /* 버튼 배경색 */
+    color: var(--light-color); /* 텍스트 색상 */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--secondary-color); /* 호버 시 Secondary 색상 */
+}

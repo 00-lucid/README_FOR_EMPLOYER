@@ -1,0 +1,15 @@
+﻿@inherits HAlertBase
+
+<div class="alert-container">
+    @foreach (var alert in Alerts)
+    {
+        <div @key="@alert.Id">
+            <HAlert Title="@alert.Title"
+                    Subtitle="@alert.Subtitle"
+                    Type="@alert.Type"
+                    Duration="@alert.Duration"
+                    OnAlertFinished="() => DismissAlertById(alert.Id)" />
+        </div>
+    }
+
+</div>

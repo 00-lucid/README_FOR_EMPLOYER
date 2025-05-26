@@ -1,0 +1,592 @@
+        private void Get_IntelligentList(string shandle, string position)
+        {
+            string sSql = string.Empty;
+            string tagno = string.Empty;
+            string libno = string.Empty;
+
+sSql = "SELECT A.TAGNO, A.TAG_TYPE, A.GUBUN, A.INTELLIGENT, A.CONNECTION, A.FUNCTION, A.LIBNO, A.FOLID, (SELECT (CASE WHEN HOGI_GUBUN = '0' THEN '공용' ELSE HOGI_GUBUN || '호기' END) FROM IDS_FOLDER WHERE FOLID = A.FOLID) AS HOGINM ";
+sSql += " FROM IDS_TAG A WHERE A.TAGNO IN ( ";
+sSql += "SELECT TAGNO FROM IDS_TAG_DETAIL WHERE TAGHANDLE = '" + shandle + "' AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "'";
+sSql += " GROUP BY TAGNO) AND A.DOCNO = '" + m_DOCNO + "' AND A.DOCVR = '" + m_DOCVR + "'";
+sSql += " ORDER BY A.INTELLIGENT, HOGINM ";
+
+            DataTable dt = iDsws.getDataSet(sSql).Tables[0];
+
+            if (dt.Rows.Count == 0)
+            {
+                m_Current_DocInfo.m_Select_Intelligent = string.Empty;
+                m_Intelligent = null;
+                m_Connection = null;
+                m_OPC_hogi = null;
+                m_Function = null;
+                m_Current_Function = string.Empty;
+                Create_MouseRight_Button();                     //오른쪽 마우스 기능 삭제
+                m_Pipe_Tag = false;
+                m_Mouse_Right_OPC_Gubun = string.Empty;
+                return;
+            }
+
+            if (dt.Rows[0]["TAG_TYPE"].ToString() == "001")
+            {
+                //일반 태그
+                if (dt.Rows[0]["GUBUN"].ToString() == "N")
+                {
+                    m_Current_DocInfo.m_Select_Intelligent = string.Empty;
+                    m_Intelligent = null;
+                    m_Connection = null;
+                    m_OPC_hogi = null;
+                    m_Function = null;
+                    m_Current_Function = string.Empty;
+                    Create_MouseRight_Button();                     //오른쪽 마우스 기능 삭제
+                    m_Pipe_Tag = false;
+                    m_Mouse_Right_OPC_Gubun = string.Empty;
+                    return;
+                }
+
+                m_Intelligent = new string[dt.Rows.Count];
+                m_Function = new string[dt.Rows.Count];
+                m_Connection = new string[dt.Rows.Count];
+                m_OPC_hogi = new string[dt.Rows.Count];
+                m_OPC_hogiNM = new string[dt.Rows.Count];
+                m_Pipe_Tag = false;
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    tagno = dt.Rows[i]["TAGNO"].ToString();
+                    m_Intelligent[i] = dt.Rows[i]["INTELLIGENT"].ToString();
+                    m_Connection[i] = dt.Rows[i]["CONNECTION"].ToString();
+                    m_OPC_hogi[i] = dt.Rows[i]["FOLID"].ToString();
+                    m_OPC_hogiNM[i] = dt.Rows[i]["HOGINM"].ToString();
+                    m_Function[i] = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Current_Function = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Mouse_Right_OPC_Gubun = dt.Rows[i]["TAG_TYPE"].ToString();
+                }
+
+                if (m_Function == null)
+                {
+                    //지능화 매핑 안된거
+                    return;
+                }
+
+                if (m_Intelligent == null && m_Connection == null)
+                {
+                    return;
+                }
+
+                sSql = "SELECT TAGHANDLE FROM IDS_TAG_DETAIL WHERE TAGNO = '" + tagno
+                        + "' AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "' ";
+                dt = iDsws.getDataSet(sSql).Tables[0];
+
+                string[] handles = new string[dt.Rows.Count];
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    handles[i] = dt.Rows[i]["TAGHANDLE"].ToString();
+                }
+
+                m_Current_DocInfo.cadControl.Block_Selected(handles, m_CUSER);
+            }
+            else if (dt.Rows[0]["TAG_TYPE"].ToString() == "002")
+            {
+                //OPC태그
+
+                string sTmpTagNoQuey = string.Empty;
+                if (dt.Rows.Count > 1)
+                {
+                    sTmpTagNoQuey = "IN (";
+                    for (int i_cnt = 0; i_cnt < dt.Rows.Count; i_cnt++)
+                    {
+                        sTmpTagNoQuey = sTmpTagNoQuey + "'" + dt.Rows[i_cnt]["TAGNO"].ToString() + "',";
+                    }
+                    sTmpTagNoQuey = sTmpTagNoQuey.Substring(0, sTmpTagNoQuey.Length - 1);
+                    sTmpTagNoQuey = sTmpTagNoQuey + ")";
+                }
+                else
+                {
+                    sTmpTagNoQuey = "= '" + dt.Rows[0]["TAGNO"].ToString() + "'";
+                }
+
+                //string[] handles = new string[dt2.Rows.Count];
+
+                if (dt.Rows.Count == 0)
+                {
+                    m_Current_DocInfo.m_Select_Intelligent = string.Empty;
+                    m_Intelligent = null;
+                    m_Connection = null;
+                    m_OPC_hogi = null;
+                    m_OPC_hogiNM = null;
+                    m_Function = null;
+                    m_Current_Function = string.Empty;
+                    Create_MouseRight_Button();                     //오른쪽 마우스 기능 삭제
+                    m_Pipe_Tag = false;
+                    m_Mouse_Right_OPC_Gubun = string.Empty;
+                    return;
+                }
+
+                m_Intelligent = new string[dt.Rows.Count];
+                m_Function = new string[dt.Rows.Count];
+                m_Connection = new string[dt.Rows.Count];
+                m_OPC_hogi = new string[dt.Rows.Count];
+                m_OPC_hogiNM = new string[dt.Rows.Count];
+                m_Pipe_Tag = false;
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    m_Current_DocInfo.m_Select_Intelligent = dt.Rows[i]["INTELLIGENT"].ToString();
+                    m_Intelligent[i] = dt.Rows[i]["INTELLIGENT"].ToString();
+                    m_Connection[i] = dt.Rows[i]["CONNECTION"].ToString();
+                    m_OPC_hogi[i] = dt.Rows[i]["FOLID"].ToString();
+                    m_OPC_hogiNM[i] = dt.Rows[i]["HOGINM"].ToString();
+                    m_Function[i] = dt.Rows[i]["FUNCTION"].ToString();
+                    libno = dt.Rows[i]["LIBNO"].ToString();
+                    //handles[i] = dt2.Rows[i]["TAGHANDLE"].ToString();
+                    m_Mouse_Right_OPC_Gubun = dt.Rows[i]["TAG_TYPE"].ToString();
+                }
+
+                //2016-09-28
+                sSql = "SELECT TAGHANDLE FROM IDS_TAG_DETAIL WHERE TAGNO " + sTmpTagNoQuey
+                       + " AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "' ";
+                DataTable dt_handle = iDsws.getDataSet(sSql).Tables[0];
+
+                string[] handles = new string[dt_handle.Rows.Count];
+                for (int i = 0; i < dt_handle.Rows.Count; i++)
+                {
+                    handles[i] = dt_handle.Rows[i]["TAGHANDLE"].ToString();
+                }
+
+                m_Current_DocInfo.cadControl.Block_Selected(handles, m_CUSER);
+
+                if (m_Connection == null)
+                    return;
+
+                if (position == "VIEW")
+                {
+                    //선택된 지능화가 현재 마우스 버튼의 내용과 같은지 비교
+                    if (m_Function_Temp != m_Intelligent)
+                    {
+                        m_Function_Temp = m_Intelligent;
+
+                        if (dt.Rows.Count == 1)
+                        {
+                            AutoClosingMessageBox.Show("이동", "알림", 100);
+                            move_OPC(m_Intelligent[0], 0);         //바로 OPC 이동
+                        }
+                        else
+                            Create_MouseRight_Button_OPC();         //오른쪽 마우스 버튼 만들기
+                    }
+
+                    //OPC 여러개인 경우
+                    if (m_Intelligent != null && dt.Rows.Count > 1)
+                    {
+                        cmOPC.ShowPopup(new Point(Cursor.Position.X, Cursor.Position.Y));
+                    }
+                }
+            }
+            else if (dt.Rows[0]["TAG_TYPE"].ToString() == "003")
+            {
+                //배관 태그
+                if (dt.Rows[0]["GUBUN"].ToString() == "N")
+                {
+                    m_Current_DocInfo.m_Select_Intelligent = string.Empty;
+                    m_Intelligent = null;
+                    m_Connection = null;
+                    m_OPC_hogi = null;
+                    m_OPC_hogiNM = null;
+                    m_Function = null;
+                    m_Current_Function = string.Empty;
+                    Create_MouseRight_Button();                     //오른쪽 마우스 기능 삭제
+                    m_Pipe_Tag = false;
+                    m_Mouse_Right_OPC_Gubun = string.Empty;
+                    return;
+                }
+
+                m_Intelligent = new string[dt.Rows.Count];
+                m_Function = new string[dt.Rows.Count];
+                m_Connection = new string[dt.Rows.Count];
+                m_OPC_hogi = new string[dt.Rows.Count];
+                m_OPC_hogiNM = new string[dt.Rows.Count];
+                m_Pipe_Tag = true;
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    tagno = dt.Rows[i]["TAGNO"].ToString();
+                    m_Intelligent[i] = dt.Rows[i]["INTELLIGENT"].ToString();
+                    m_Connection[i] = dt.Rows[i]["CONNECTION"].ToString();
+                    m_OPC_hogi[i] = dt.Rows[i]["FOLID"].ToString();
+                    m_OPC_hogiNM[i] = dt.Rows[i]["HOGINM"].ToString();
+                    m_Function[i] = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Current_Function = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Mouse_Right_OPC_Gubun = dt.Rows[i]["TAG_TYPE"].ToString();
+                }
+
+                if (m_Function == null)
+                {
+                    //지능화 매핑 안된거
+                    return;
+                }
+
+                if (m_Intelligent == null && m_Connection == null)
+                {
+                    return;
+                }
+
+                sSql = "SELECT TAGHANDLE FROM IDS_TAG_DETAIL WHERE TAGNO = '" + tagno
+                        + "' AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "' ";
+                dt = iDsws.getDataSet(sSql).Tables[0];
+
+                string[] handles = new string[dt.Rows.Count];
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    handles[i] = dt.Rows[i]["TAGHANDLE"].ToString();
+                }
+
+                m_Current_DocInfo.cadControl.Block_Selected(handles, m_CUSER);
+            }
+            else if (dt.Rows[0]["TAG_TYPE"].ToString() == "004")
+            {
+                //일반 태그
+                if (dt.Rows[0]["GUBUN"].ToString() == "N")
+                {
+                    m_Current_DocInfo.m_Select_Intelligent = string.Empty;
+                    m_Intelligent = null;
+                    m_Connection = null;
+                    m_OPC_hogi = null;
+                    m_OPC_hogiNM = null;
+                    m_Function = null;
+                    m_Current_Function = string.Empty;
+                    Create_MouseRight_Button();                     //오른쪽 마우스 기능 삭제
+                    m_Pipe_Tag = false;
+                    m_Mouse_Right_OPC_Gubun = string.Empty;
+                    return;
+                }
+
+                m_Intelligent = new string[dt.Rows.Count];
+                m_Function = new string[dt.Rows.Count];
+                m_Connection = new string[dt.Rows.Count];
+                m_OPC_hogi = new string[dt.Rows.Count];
+                m_OPC_hogiNM = new string[dt.Rows.Count];
+                m_Pipe_Tag = false;
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    tagno = dt.Rows[i]["TAGNO"].ToString();
+                    m_Intelligent[i] = dt.Rows[i]["INTELLIGENT"].ToString();
+                    m_Connection[i] = dt.Rows[i]["CONNECTION"].ToString();
+                    m_OPC_hogi[i] = dt.Rows[i]["FOLID"].ToString();
+                    m_OPC_hogiNM[i] = dt.Rows[i]["HOGINM"].ToString();
+                    m_Function[i] = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Current_Function = dt.Rows[i]["FUNCTION"].ToString();
+                    m_Mouse_Right_OPC_Gubun = dt.Rows[i]["TAG_TYPE"].ToString();
+                }
+
+                if (m_Function == null)
+                {
+                    //지능화 매핑 안된거
+                    return;
+                }
+
+                if (m_Intelligent == null && m_Connection == null)
+                {
+                    return;
+                }
+
+                sSql = "SELECT TAGHANDLE FROM IDS_TAG_DETAIL WHERE TAGNO = '" + tagno
+                        + "' AND DOCNO = '" + m_DOCNO + "' AND DOCVR = '" + m_DOCVR + "' ";
+                dt = iDsws.getDataSet(sSql).Tables[0];
+
+                string[] handles = new string[dt.Rows.Count];
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    handles[i] = dt.Rows[i]["TAGHANDLE"].ToString();
+                }
+
+                m_Current_DocInfo.cadControl.Block_Selected(handles, m_CUSER);
+
+                if (m_Intelligent == null)
+                    return;
+
+                if (position == "VIEW")
+                {
+                    //선택된 지능화가 현재 마우스 버튼의 내용과 같은지 비교
+                    if (m_Function_Temp != m_Intelligent)
+                    {
+                        m_Function_Temp = m_Intelligent;
+                    }
+
+                    if (m_Intelligent != null)
+                    {
+                        try
+                        {
+                            m_Sap = new IDSSap.SAPConn();
+                            if (m_Sap.SAP_Connect() == false)
+                            {
+                                MessageBox.Show(m_Sap.m_Result_Message, "SAP");
+                                m_Sap = null;
+                                return;
+                            }
+
+                            //LDM 도면 호출
+                            string url = m_Sap.pSAP(m_Intelligent[0].Substring(0, 3), m_Intelligent[0].Substring(6), m_Intelligent[0].Substring(3, 3));
+
+                            m_Sap = null;
+
+                            if (url == "" || url == null)
+                            {
+                                MessageBox.Show("도면이 없습니다.", "경고", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            else
+                            {
+                                string sFileName = string.Empty;
+                                try
+                                {
+                                    sFileName = url.Substring(url.IndexOf("&compId=") + 8, url.IndexOf("&accessMode=") - url.IndexOf("&compId=") - 8);
+                                    sFileName = sFileName.Substring(sFileName.LastIndexOf(".") + 1);
+                                }
+                                catch { sFileName = "tif"; }
+
+                                Create_EP(url);
+                            }
+                        }
+                        catch
+                        {
+                            MessageBox.Show("도면이 없습니다.", "경고", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+
+
+        void Create_MouseRight_Button()
+        {
+            //버튼삭제
+            Remove_BarSubItem(IV_004_01_01);        //설비마스터 리본
+
+            Remove_BarSubItem(IV_004_01_02);        //BOM 리본
+
+            //Remove_BarSubItem(IV_004_02_01_01);        //통지 리본(M1)
+            //Remove_BarSubItem(IV_004_02_01_02);        //통지 리본(M2)
+            //Remove_BarSubItem(IV_004_02_01_03);        //통지 리본(기타유형)
+            Remove_BarSubItem(IV_004_02_01);        //통지 리본
+
+            Remove_BarSubItem(IV_004_03_01);        //오더 리본
+
+            Remove_BarSubItem(IV_004_02_02_03);        //통지이력조회 리본
+
+            Remove_BarSubItem(IV_004_03_02_03);        //오더이력조회 리본
+
+            //Remove_BarSubItem(IV_005_01_01_01);        //관련문서생성(기능위치) 리본
+
+            //Remove_BarSubItem(IV_005_01_01_02);        //관련문서생성(설비번호) 리본
+
+            //Remove_BarSubItem(IV_005_01_02);        //관련문서등록 리본
+
+            Remove_BarSubItem(IV_005_01_03);        //관련문서조회 리본
+            Remove_BarSubItem(IV_005_01_03_00);        //관련문서조회 리본
+
+            Remove_BarSubItem(IV_005_03_01);        //측정문서입력 리본
+
+            Remove_BarSubItem(IV_005_03_02);        //측정문서조회 리본
+
+            Remove_BarSubItem(IV_005_02_01);        //지능화 설비 자료 등록 리본
+
+            Remove_BarSubItem(IV_005_02_02);        //지능화 설비 자료 조회 리본
+
+            Remove_BarSubItem(IV_005_02_03);        //지능화 설비 자료 수정 리본
+            Remove_BarSubItem(IV_005_02_04);        //지능화 설비 자료 삭제 리본
+
+            Remove_BarSubItem(IV_004_07_01);        //배관마스터 리본
+            Remove_BarSubItem(IV_004_07_02);        //ISO 도면 조회 리본
+
+            //iNPCMS
+            if (m_PLANTCODE == "2710")  //신한울12
+            {
+                Remove_BarSubItem(IV_004_08_01);
+            }
+
+            if (m_Function == null)
+                return;
+
+            if (m_Function.Length == 1)
+            {
+                //기능위치가 하나인 경우
+                //string sSql = "SELECT DISTINCT (EQUIPMENT),INTELLIGENT,FUNCTION_DETAIL,OBJECT FROM IDS_MASTER WHERE INTELLIGENT IS NOT NULL AND FUNCTION = '" + m_Function[0] + "' ";
+                string sSql = "SELECT DISTINCT (EQUIPMENT),INTELLIGENT,FUNCTION_DETAIL,OBJECT FROM IDS_MASTER WHERE INTELLIGENT IS NOT NULL AND FUNCTION = '" + m_Function[0] + "' AND PLANTCODE = '" + m_PLANTCODE + "' ";
+                DataTable dt = iDsws.getDataSet(sSql).Tables[0];
+
+                //ISO ==> 나중에 PLANTCODE를 테이블에 만들어야 됨. 태그만으로는 사업소별로 중복 됨
+                sSql = "SELECT DISTINCT (EQUIPMENT), DRAW, OBJ, PART FROM IDS_ISO_DRAW WHERE FUNCTION = '" + m_Function[0] + "' ";
+                DataTable iso = iDsws.getDataSet(sSql).Tables[0];
+
+                //마스터
+                Create_BarSubItem(IV_004_01_01, "100_" + m_Function[0] + "_Ribon", dt, "");
+                //BOM
+                Create_BarSubItem(IV_004_01_02, "200_" + m_Function[0] + "_Ribon", dt, "");
+                //통지
+                //Create_BarSubItem(IV_004_02_01_01, "301_" + m_Function[0] + "_Ribon", dt, "");
+                //Create_BarSubItem(IV_004_02_01_02, "302_" + m_Function[0] + "_Ribon", dt, "");
+                //Create_BarSubItem(IV_004_02_01_03, "303_" + m_Function[0] + "_Ribon", dt, "");
+                Create_BarSubItem(IV_004_02_01, "303_" + m_Function[0] + "_Ribon", dt, "");
+                //오더
+                Create_BarSubItem(IV_004_03_01, "400_" + m_Function[0] + "_Ribon", dt, "");
+                //통지이력조회
+                Create_BarSubItem(IV_004_02_02_03, "500_" + m_Function[0] + "_Ribon", dt, "");
+                //오더이력조회
+                Create_BarSubItem(IV_004_03_02_03, "600_" + m_Function[0] + "_Ribon", dt, "");
+                //관련문서생성(기능위치)
+                //Create_BarSubItem(IV_005_01_01_01, "700_" + m_Function[0] + "_Ribon", null, m_Function[0]);
+                //관련문서생성(설비번호)
+                //Create_BarSubItem(IV_005_01_01_02, "800_" + m_Function[0] + "_Ribon", dt, "");
+                //관련문서등록
+                //Create_BarSubItem(IV_005_01_02, "900_" + m_Function[0] + "_Ribon", dt, "");
+                //관련문서조회
+                Create_BarSubItem(IV_005_01_03, "1000_" + m_Function[0] + "_Ribon", dt, "");
+                Create_BarSubItem(IV_005_01_03_00, "1000_" + m_Function[0] + "_Ribon", dt, "");
+                //측정문서입력(기능위치)
+                Create_BarSubItem(IV_005_03_01, "1100_" + m_Function[0] + "_Ribon", dt, "");
+                //측정문서조회(기능위치)
+                Create_BarSubItem(IV_005_03_02, "1200_" + m_Function[0] + "_Ribon", dt, "");
+                //지능화 설비 자료 등록
+                Create_BarSubItem(IV_005_02_01, "1500_" + m_Function[0] + "_Ribon", null, m_Function[0]);
+                //지능화 설비 자료 조회
+                Create_BarSubItem(IV_005_02_02, "1600_" + m_Function[0] + "_Ribon", null, m_Function[0]);
+                //지능화 설비 자료 수정
+                Create_BarSubItem(IV_005_02_03, "1700_" + m_Function[0] + "_Ribon", null, m_Function[0]);
+                //지능화 설비 자료 삭제
+                Create_BarSubItem(IV_005_02_04, "1800_" + m_Function[0] + "_Ribon", null, m_Function[0]);
+                //배관마스터
+                Create_BarSubItem(IV_004_07_01, "1900_" + m_Function[0] + "_Ribon", dt, "");
+                //ISO 도면 조회
+                Create_BarSubItem(IV_004_07_02, "2000_" + m_Function[0] + "_Ribon", iso, "");
+                //iNPCMS
+                if (m_PLANTCODE == "2710")  //신한울12
+                {
+                    //설비인지 배관인지 구분
+                    if (m_Function[0].Substring(8, 3) == "-L-")   //배관설비
+                    {
+                        //iNPCMS
+                        //sSql = "SELECT FUNCTION || TAGHANDLE AS SPOOL, TAGTYPE FROM IDS_TAG_DETAIL WHERE FUNCTION = '" + m_Function[0] + "' ORDER BY SPOOL";
+                        sSql = "select * from (";
+                        sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PSBSP01@INPCMSLINK ";
+                        sSql += " where proj_cd = 'SHN12' ";
+                        sSql += " and line_no like '%" + m_Function[0].Substring(5) + "' ";
+                        sSql += " and unit_no_cd = '" + m_Function[0].Substring(3, 1) + "' ";
+                        sSql += " union all ";
+                        sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PLBSP01@INPCMSLINK ";
+                        sSql += " where proj_cd = 'SHN12' ";
+                        sSql += " and line_no like '%" + m_Function[0].Substring(5) + "' ";
+                        sSql += " and unit_no_cd = '" + m_Function[0].Substring(3, 1) + "' ";
+                        sSql += " union all ";
+                        sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PFLBS01@INPCMSLINK ";
+                        sSql += " where proj_cd = 'SHN12' ";
+                        sSql += " and line_no like '%" + m_Function[0].Substring(5) + "' ";
+                        sSql += " and unit_no_cd = '" + m_Function[0].Substring(3, 1) + "' ";
+                        sSql += ") AA ";
+                        sSql += "order by AA.SPOOLNO";
+                        DataTable inpcmsDT = iDsws.getDataSet(sSql).Tables[0];
+
+                        IV_004_08_01.Visibility = BarItemVisibility.Always;
+                        Create_BarSubItem(IV_004_08_01, "2100_" + m_Function[0] + "_Ribon", inpcmsDT, "");
+                    }
+                    else    //일반설비
+                    {
+                        IV_004_08_01.Visibility = BarItemVisibility.Always;
+                        Create_BarSubItem(IV_004_08_01, "2100_" + m_Function[0] + "_Ribon", dt, "");
+                    }
+                }
+                else
+                    IV_004_08_01.Visibility = BarItemVisibility.Never;
+
+            }
+            else
+            {
+                //기능위치가 여래개인 경우
+                for (int i = 0; i < m_Function.Length; i++)
+                {
+                    string sSql = "SELECT DISTINCT (EQUIPMENT),INTELLIGENT,FUNCTION_DETAIL,OBJECT FROM IDS_MASTER WHERE  INTELLIGENT is not null AND FUNCTION = '" + m_Function[i] + "' AND PLANTCODE = '" + m_PLANTCODE + "' ";
+                    DataTable dt = iDsws.getDataSet(sSql).Tables[0];
+
+                    //ISO ==> 나중에 PLANTCODE를 테이블에 만들어야 됨. 태그만으로는 사업소별로 중복 됨
+                    sSql = "SELECT DISTINCT (EQUIPMENT), DRAW, OBJ, PART FROM IDS_ISO_DRAW WHERE FUNCTION = '" + m_Function[i] + "' ";
+                    DataTable iso = iDsws.getDataSet(sSql).Tables[0];
+
+                    //마스터
+                    Create_BarSubItem(IV_004_01_01, "100_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //BOM
+                    Create_BarSubItem(IV_004_01_02, "200_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //통지
+                    //Create_BarSubItem(IV_004_02_01_01, "301_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //Create_BarSubItem(IV_004_02_01_02, "302_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //Create_BarSubItem(IV_004_02_01_03, "303_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    Create_BarSubItem(IV_004_02_01, "303_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //오더
+                    Create_BarSubItem(IV_004_03_01, "400_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //통지이력조회
+                    Create_BarSubItem(IV_004_02_02_03, "500_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //오더이력조회
+                    Create_BarSubItem(IV_004_03_02_03, "600_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //관련문서생성(기능위치)
+                    //Create_BarSubItem(IV_005_01_01_01, "700_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //관련문서생성(설비번호)
+                    //Create_BarSubItem(IV_005_01_01_02, "800_" + m_Function[i] + "_Ribon", null, m_Function[i]);
+                    //관련문서등록
+                    //Create_BarSubItem(IV_005_01_02, "900_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //관련문서조회
+                    Create_BarSubItem(IV_005_01_03, "1000_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    Create_BarSubItem(IV_005_01_03_00, "1000_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //측정문서입력(기능위치)
+                    Create_BarSubItem(IV_005_03_01, "1100_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //측정문서조회(기능위치)
+                    Create_BarSubItem(IV_005_03_02, "1200_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //지능화 설비 자료 등록
+                    Create_BarSubItem(IV_005_02_01, "1500_" + m_Function[i] + "_Ribon", null, m_Function[i]);
+                    //지능화 설비 자료 조회
+                    Create_BarSubItem(IV_005_02_02, "1600_" + m_Function[i] + "_Ribon", null, m_Function[i]);
+                    //지능화 설비 자료 수정
+                    Create_BarSubItem(IV_005_02_03, "1700_" + m_Function[i] + "_Ribon", null, m_Function[i]);
+                    //지능화 설비 자료 삭제
+                    Create_BarSubItem(IV_005_02_04, "1800_" + m_Function[i] + "_Ribon", null, m_Function[i]);
+                    //배관마스터
+                    Create_BarSubItem(IV_004_07_01, "1900_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                    //ISO 도면 조회
+                    Create_BarSubItem(IV_004_07_02, "2000_" + m_Function[i] + "_Ribon", iso, m_Function[i]);
+                    //iNPCMS
+                    if (m_PLANTCODE == "2710")  //신한울12
+                    {
+                        //설비인지 배관인지 구분
+                        if (m_Function[i].Substring(8, 3) == "-L-")   //배관설비
+                        {
+                            //iNPCMS
+                            //sSql = "SELECT FUNCTION || TAGHANDLE AS SPOOL, TAGTYPE FROM IDS_TAG_DETAIL WHERE FUNCTION = '" + m_Function[i] + "'  ORDER BY SPOOL";
+                            sSql = "select * from (";
+                            sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PSBSP01@INPCMSLINK ";
+                            sSql += " where proj_cd = 'SHN12' ";
+                            sSql += " and line_no like '%" + m_Function[i].Substring(5) + "' ";
+                            sSql += " and unit_no_cd = '" + m_Function[i].Substring(3, 1) + "' ";
+                            sSql += " union all ";
+                            sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PLBSP01@INPCMSLINK ";
+                            sSql += " where proj_cd = 'SHN12' ";
+                            sSql += " and line_no like '%" + m_Function[i].Substring(5) + "' ";
+                            sSql += " and unit_no_cd = '" + m_Function[i].Substring(3, 1) + "' ";
+                            sSql += " union all ";
+                            sSql += " select tag_no AS SPOOLNO, 'SCH:' || schedule || ', SIZE:' || pip_size || ', PDT NO:' || pdt_no AS DESCR, iso_dwg_no, iso_dwg_sht_no, line_no from inpcms.PFLBS01@INPCMSLINK ";
+                            sSql += " where proj_cd = 'SHN12' ";
+                            sSql += " and line_no like '%" + m_Function[i].Substring(5) + "' ";
+                            sSql += " and unit_no_cd = '" + m_Function[i].Substring(3, 1) + "' ";
+                            sSql += ") AA ";
+                            sSql += "order by AA.SPOOLNO";
+                            DataTable inpcmsDT = iDsws.getDataSet(sSql).Tables[0];
+
+                            IV_004_08_01.Visibility = BarItemVisibility.Always;
+                            Create_BarSubItem(IV_004_08_01, "2100_" + m_Function[i] + "_Ribon", inpcmsDT, m_Function[i]);
+                        }
+                        else    //일반설비
+                        {
+                            IV_004_08_01.Visibility = BarItemVisibility.Always;
+                            Create_BarSubItem(IV_004_08_01, "2100_" + m_Function[i] + "_Ribon", dt, m_Function[i]);
+                        }
+                    }
+                    else
+                        IV_004_08_01.Visibility = BarItemVisibility.Never;
+                }
+            }
+
+        }

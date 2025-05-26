@@ -1,0 +1,884 @@
+﻿@page "/order"
+@using System.Text.Json
+@using System.Net.Http.Json
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.Interfaces
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>수주 관리</h1>
+            <span class="order-count">총 @(_filteredOrders?.Count ?? 0)개의 수주</span>
+        </div>
+    </header>
+
+    <HRow JustifyContent="space-between" AlignItems="center">
+        <div class="filters-section">
+            <div class="filter-tag @(_activeStatusFilter == null ? "active" : "")" @onclick='() => ApplyStatusFilter(null)'>
+                전체
+            </div>
+            <div class="filter-tag @(_activeStatusFilter == OrderStatus.Requested ? "active" : "")" @onclick='() => ApplyStatusFilter(OrderStatus.Requested)'>
+                접수
+            </div>
+            <div class="filter-tag @(_activeStatusFilter == OrderStatus.Confirmed ? "active" : "")" @onclick='() => ApplyStatusFilter(OrderStatus.Confirmed)'>
+                확정
+            </div>
+            <div class="filter-tag @(_activeStatusFilter == OrderStatus.InProgress ? "active" : "")" @onclick='() => ApplyStatusFilter(OrderStatus.InProgress)'>
+                진행중
+            </div>
+            <div class="filter-tag @(_activeStatusFilter == OrderStatus.Completed ? "active" : "")" @onclick='() => ApplyStatusFilter(OrderStatus.Completed)'>
+                완료
+            </div>
+            <div class="filter-tag @(_activeStatusFilter == OrderStatus.Cancelled ? "active" : "")" @onclick='() => ApplyStatusFilter(OrderStatus.Cancelled)'>
+                취소
+            </div>
+        </div>
+
+        <HRow AutoWidth="true" Gap="1rem" AlignItems="center">
+            <HTextInput
+                Width="300px"
+                PlaceHolder="고객명, 제품명, 주문번호 검색"
+                Value="@_searchTerm"
+                ValueChanged="@((value) => { _searchTerm = value; ApplyFiltersAndSort(); })"
+                MarginBottom="0"
+            >
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="clear-search" @onclick="ClearSearch">×</button>
+                }
+            </HTextInput>
+
+            <HButton OnClick="OpenCreateOrderDialog">
+                <svg class="button-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 1V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                수주 등록
+            </HButton>
+        </HRow>
+    </HRow>
+
+    <div class="view-options">
+        <div class="date-filter">
+            <span class="date-filter-label">기간:</span>
+            <input type="date" class="date-input" value="@_startDate.ToString("yyyy-MM-dd")" @onchange="(e) => UpdateDateRange(e.Value, true)" />
+            <span>~</span>
+            <input type="date" class="date-input" value="@_endDate.ToString("yyyy-MM-dd")" @onchange="(e) => UpdateDateRange(e.Value, false)" />
+        </div>
+        
+        <div class="view-toggle">
+            <button class="view-toggle-btn @(_viewMode == ViewMode.List ? "active" : "")" @onclick="() => _viewMode = ViewMode.List">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 4H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M2 9H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M2 14H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <button class="view-toggle-btn @(_viewMode == ViewMode.Card ? "active" : "")" @onclick="() => _viewMode = ViewMode.Card">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="수주 정보를 불러오는 중입니다..." />
+    }
+    else if (_filteredOrders == null || _filteredOrders.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="80" height="80" rx="40" fill="#F5F7FA"/>
+                    <path d="M27 30H53C54.1046 30 55 30.8954 55 32V54C55 55.1046 54.1046 56 53 56H27C25.8954 56 25 55.1046 25 54V32C25 30.8954 25.8954 30 27 30Z" stroke="#BDBDBD" stroke-width="2"/>
+                    <path d="M30 24V30" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M50 24V30" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M25 38H55" stroke="#BDBDBD" stroke-width="2"/>
+                    <path d="M34 44H46" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M34 50H42" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h3>수주 내역이 없습니다</h3>
+            @if (!string.IsNullOrEmpty(_searchTerm) || _activeStatusFilter != null)
+            {
+                <p>검색어 또는 필터에 해당하는 수주 내역이 없습니다.</p>
+                <button class="secondary-btn" @onclick="ClearFilters">
+                    필터 초기화
+                </button>
+            }
+            else
+            {
+                <p>첫 번째 수주를 등록해 보세요!</p>
+                <button class="primary-btn" @onclick="OpenCreateOrderDialog">
+                    <svg class="button-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 1V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    수주 등록
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        @if (_viewMode == ViewMode.List)
+        {
+            <div class="list-view">
+                <table>
+                    <thead>
+                    <tr>
+                        <th @onclick='() => SortOrders("orderNumber")' class="sortable-header">
+                            주문번호 @GetSortIcon("orderNumber")
+                        </th>
+                        <th @onclick='() => SortOrders("customerName")' class="sortable-header">
+                            고객명 @GetSortIcon("customerName")
+                        </th>
+                        <th @onclick='() => SortOrders("productName")' class="sortable-header">
+                            제품명 @GetSortIcon("productName")
+                        </th>
+                        <th @onclick='() => SortOrders("quantity")' class="sortable-header">
+                            수량 @GetSortIcon("quantity")
+                        </th>
+                        <th @onclick='() => SortOrders("orderDate")' class="sortable-header">
+                            주문일 @GetSortIcon("orderDate")
+                        </th>
+                        <th @onclick='() => SortOrders("dueDate")' class="sortable-header">
+                            납기일 @GetSortIcon("dueDate")
+                        </th>
+                        <th @onclick='() => SortOrders("status")' class="sortable-header">
+                            상태 @GetSortIcon("status")
+                        </th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var order in _filteredOrders)
+                    {
+                        <tr>
+                            <td><a href="/order/@order.OrderId" class="order-link">@order.OrderNumber</a></td>
+                            <td>@order.CustomerName</td>
+                            <td>@order.ProductName</td>
+                            <td>@order.Quantity.ToString("N0") @order.Unit</td>
+                            <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td>@order.DueDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <span class="order-status @GetOrderStatusClass(order.Status)">
+                                    @GetOrderStatusDisplayName(order.Status)
+                                </span>
+                            </td>
+                            <td class="actions-cell">
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditOrderDialog(order)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.5 2.5L13.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4.5 12.5L11.5 5.5L10.5 4.5L3.5 11.5V12.5H4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-btn" @onclick="() => ConfirmDeleteOrder(order)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 4H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.5 4V3C5.5 2.44772 5.94772 2 6.5 2H9.5C10.0523 2 10.5 2.44772 10.5 3V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.5 4V13C12.5 13.5523 12.0523 14 11.5 14H4.5C3.94772 14 3.5 13.5523 3.5 13V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="card-view">
+                @foreach (var order in _filteredOrders)
+                {
+                    <div class="order-card">
+                        <div class="order-card-header">
+                            <span class="order-status-badge @GetOrderStatusClass(order.Status)">
+                                @GetOrderStatusDisplayName(order.Status)
+                            </span>
+                            <div class="card-actions">
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditOrderDialog(order)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.5 2.5L13.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4.5 12.5L11.5 5.5L10.5 4.5L3.5 11.5V12.5H4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn delete-btn" @onclick="() => ConfirmDeleteOrder(order)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 4H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5.5 4V3C5.5 2.44772 5.94772 2 6.5 2H9.5C10.0523 2 10.5 2.44772 10.5 3V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.5 4V13C12.5 13.5523 12.0523 14 11.5 14H4.5C3.94772 14 3.5 13.5523 3.5 13V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="order-card-content">
+                            <h3 class="order-number">
+                                <a href="/order/@order.OrderId" class="order-link">@order.OrderNumber</a>
+                            </h3>
+                            <div class="customer-info">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M13 14C13 11.7909 10.7614 10 8 10C5.23858 10 3 11.7909 3 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>@order.CustomerName</span>
+                            </div>
+                            <div class="order-details">
+                                <div class="order-detail">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 4.5V8H10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="detail-label">주문일:</span>
+                                    <span class="detail-value">@order.OrderDate.ToString("yyyy-MM-dd")</span>
+                                </div>
+                                <div class="order-detail">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 4.5H13.5C13.7761 4.5 14 4.72386 14 5V12.5C14 12.7761 13.7761 13 13.5 13H2.5C2.22386 13 2 12.7761 2 12.5V5C2 4.72386 2.22386 4.5 2.5 4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4.5 3V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M11.5 3V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 7.5H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="detail-label">납기일:</span>
+                                    <span class="detail-value @(order.DueDate < DateTime.Today ? "overdue" : "")">@order.DueDate.ToString("yyyy-MM-dd")</span>
+                                </div>
+                                <div class="order-detail">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M11 5H5V11H11V5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="detail-label">제품:</span>
+                                    <span class="detail-value">@order.ProductName</span>
+                                </div>
+                                <div class="order-detail">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M13 3H3C2.44772 3 2 3.44772 2 4V12C2 12.5523 2.44772 13 3 13H13C13.5523 13 14 12.5523 14 12V4C14 3.44772 13.5523 3 13 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 7V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="8" cy="6" r="0.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="detail-label">수량:</span>
+                                    <span class="detail-value quantity">@order.Quantity.ToString("N0") @order.Unit</span>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(order.Note))
+                            {
+                                <div class="order-note">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+                                    </svg>
+                                    <p>@order.Note</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+    <HDialog @bind-IsOpen="_showOrderDialog" Title=@(_editingOrder.OrderId == 0 ? "수주 등록" : "수주 수정")>
+    <ChildContent>
+        <div class="form-row">
+            <HTextInput
+                Id="customerName"
+                Label="고객명"
+                Value="@_editingOrder.CustomerName"
+                ValueChanged="@((value) => _editingOrder.CustomerName = value)"
+                PlaceHolder="고객명을 입력하세요"
+                Required="true"
+            />
+            
+            <HTextInput
+                Id="productName"
+                Label="제품명"
+                Value="@_editingOrder.ProductName"
+                ValueChanged="@((value) => _editingOrder.ProductName = value)"
+                PlaceHolder="제품명을 입력하세요"
+                Required="true"
+            />
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quantity">
+                    수량 <span class="required">*</span>
+                </label>
+                <div class="quantity-input-wrapper">
+                    <input 
+                        type="number" 
+                        id="quantity" 
+                        value="@_editingOrder.Quantity" 
+                        @onchange="@((e) => _editingOrder.Quantity = Convert.ToInt32(e.Value))" 
+                        min="1" 
+                        required 
+                    />
+                </div>
+            </div>
+            
+            <HTextInput
+                Id="unit"
+                Label="단위"
+                Value="@_editingOrder.Unit"
+                ValueChanged="@((value) => _editingOrder.Unit = value)"
+                PlaceHolder="EA, KG 등"
+                Required="true"
+            />
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="orderDate">
+                    주문일 <span class="required">*</span>
+                </label>
+                <input 
+                    type="date" 
+                    id="orderDate" 
+                    value="@_editingOrder.OrderDate.ToString("yyyy-MM-dd")" 
+                    @onchange="@((e) => _editingOrder.OrderDate = DateTime.Parse(e.Value.ToString()))" 
+                    required 
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="dueDate">
+                    납기일 <span class="required">*</span>
+                </label>
+                <input 
+                    type="date" 
+                    id="dueDate" 
+                    value="@_editingOrder.DueDate.ToString("yyyy-MM-dd")" 
+                    @onchange="@((e) => _editingOrder.DueDate = DateTime.Parse(e.Value.ToString()))" 
+                    required 
+                />
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="status">
+                    상태 <span class="required">*</span>
+                </label>
+                <select 
+                    id="status" 
+                    @bind="_editingOrder.Status" 
+                    required
+                >
+                    <option value="@OrderStatus.Requested">접수</option>
+                    <option value="@OrderStatus.Confirmed">확정</option>
+                    <option value="@OrderStatus.InProgress">진행중</option>
+                    <option value="@OrderStatus.Completed">완료</option>
+                    <option value="@OrderStatus.Cancelled">취소</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="note">메모</label>
+            <textarea 
+                id="note" 
+                @bind="_editingOrder.Note" 
+                placeholder="특이사항이나 요청사항을 입력하세요" 
+                rows="3"
+            ></textarea>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton Color="secondary" OnClick="CloseOrderDialog">취소</HButton>
+        <HButton Color="primary" OnClick="SaveOrder">저장</HButton>
+    </FooterContent>
+</HDialog>
+
+<HDialog @bind-IsOpen="_showDeleteDialog" Title="수주 삭제">
+    <ChildContent>
+        <p>정말로 이 수주를 삭제하시겠습니까?</p>
+        <p class="warning-text">이 작업은 되돌릴 수 없습니다.</p>
+        <div class="delete-info">
+            <p><strong>주문번호:</strong> @(_orderToDelete?.OrderNumber)</p>
+            <p><strong>고객명:</strong> @(_orderToDelete?.CustomerName)</p>
+            <p><strong>제품명:</strong> @(_orderToDelete?.ProductName)</p>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton Color="secondary" OnClick="() => _showDeleteDialog = false">취소</HButton>
+        <HButton Color="danger" OnClick="DeleteOrder">삭제</HButton>
+    </FooterContent>
+</HDialog>
+
+@code {
+    private List<Order>? _orders;
+    private List<Order>? _filteredOrders;
+    private bool _isLoading = true;
+    private string _searchTerm = "";
+    private OrderStatus? _activeStatusFilter = null;
+    private ViewMode _viewMode = ViewMode.Card;
+    private DateTime _startDate = DateTime.Today.AddMonths(-1);
+    private DateTime _endDate = DateTime.Today.AddMonths(1);
+    
+    // 정렬 상태
+    private string? _sortField;
+    private bool _sortAscending = true;
+    
+    // 수주 추가/편집 다이얼로그
+    private bool _showOrderDialog = false;
+    private Order _editingOrder = new();
+    
+    // 삭제 다이얼로그
+    private bool _showDeleteDialog = false;
+    private Order? _orderToDelete;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+    
+    private async Task LoadOrders()
+    {
+        _isLoading = true;
+        try
+        {
+            // 실제 API 연동
+            // _orders = await OrderService.GetOrdersAsync();
+            
+            // 더미 데이터 생성
+            _orders = new List<Order>
+            {
+                new Order
+                {
+                    OrderId = 1,
+                    OrderNumber = "ORD-2024-0001",
+                    CustomerName = "삼성전자",
+                    ProductName = "반도체 부품 A",
+                    Quantity = 5000,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-15),
+                    DueDate = DateTime.Today.AddDays(30),
+                    Status = OrderStatus.Confirmed,
+                    Note = "긴급 주문건으로 우선 처리 필요"
+                },
+                new Order
+                {
+                    OrderId = 2,
+                    OrderNumber = "ORD-2024-0002",
+                    CustomerName = "LG디스플레이",
+                    ProductName = "디스플레이 패널",
+                    Quantity = 2000,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-10),
+                    DueDate = DateTime.Today.AddDays(20),
+                    Status = OrderStatus.InProgress,
+                    Note = "특수 사양으로 제작 필요"
+                },
+                new Order
+                {
+                    OrderId = 3,
+                    OrderNumber = "ORD-2024-0003",
+                    CustomerName = "현대자동차",
+                    ProductName = "자동차 부품 B-100",
+                    Quantity = 10000,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-30),
+                    DueDate = DateTime.Today.AddDays(-5),
+                    Status = OrderStatus.Completed,
+                    Note = "품질 검사 완료"
+                },
+                new Order
+                {
+                    OrderId = 4,
+                    OrderNumber = "ORD-2024-0004",
+                    CustomerName = "SK하이닉스",
+                    ProductName = "메모리 모듈",
+                    Quantity = 8000,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-5),
+                    DueDate = DateTime.Today.AddDays(15),
+                    Status = OrderStatus.Requested,
+                    Note = null
+                },
+                new Order
+                {
+                    OrderId = 5,
+                    OrderNumber = "ORD-2024-0005",
+                    CustomerName = "한국철강",
+                    ProductName = "특수강 A-540",
+                    Quantity = 500,
+                    Unit = "TON",
+                    OrderDate = DateTime.Today.AddDays(-20),
+                    DueDate = DateTime.Today.AddDays(-2),
+                    Status = OrderStatus.Cancelled,
+                    Note = "고객 요청으로 취소됨"
+                },
+                new Order
+                {
+                    OrderId = 6,
+                    OrderNumber = "ORD-2024-0006",
+                    CustomerName = "삼성전자",
+                    ProductName = "반도체 부품 B",
+                    Quantity = 3000,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-3),
+                    DueDate = DateTime.Today.AddDays(25),
+                    Status = OrderStatus.Confirmed,
+                    Note = null
+                },
+                new Order
+                {
+                    OrderId = 7,
+                    OrderNumber = "ORD-2024-0007",
+                    CustomerName = "포스코",
+                    ProductName = "철강 부품 C-200",
+                    Quantity = 1500,
+                    Unit = "KG",
+                    OrderDate = DateTime.Today.AddDays(-8),
+                    DueDate = DateTime.Today.AddDays(10),
+                    Status = OrderStatus.InProgress,
+                    Note = "견본 제작 중"
+                },
+                new Order
+                {
+                    OrderId = 8,
+                    OrderNumber = "ORD-2024-0008",
+                    CustomerName = "두산중공업",
+                    ProductName = "중장비 부품 X-100",
+                    Quantity = 200,
+                    Unit = "SET",
+                    OrderDate = DateTime.Today.AddDays(-25),
+                    DueDate = DateTime.Today.AddDays(5),
+                    Status = OrderStatus.InProgress,
+                    Note = "생산 80% 완료"
+                },
+                new Order
+                {
+                    OrderId = 9,
+                    OrderNumber = "ORD-2024-0009",
+                    CustomerName = "LG화학",
+                    ProductName = "화학 소재 H-50",
+                    Quantity = 4000,
+                    Unit = "L",
+                    OrderDate = DateTime.Today.AddDays(-12),
+                    DueDate = DateTime.Today.AddDays(18),
+                    Status = OrderStatus.Requested,
+                    Note = "샘플 테스트 필요"
+                },
+                new Order
+                {
+                    OrderId = 10,
+                    OrderNumber = "ORD-2024-0010",
+                    CustomerName = "현대모비스",
+                    ProductName = "자동차 전장부품",
+                    Quantity = 7500,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-18),
+                    DueDate = DateTime.Today.AddDays(12),
+                    Status = OrderStatus.InProgress,
+                    Note = "품질 테스트 진행 중"
+                },
+                new Order
+                {
+                    OrderId = 11,
+                    OrderNumber = "ORD-2024-0011",
+                    CustomerName = "KT",
+                    ProductName = "통신장비 모듈",
+                    Quantity = 1000,
+                    Unit = "SET",
+                    OrderDate = DateTime.Today.AddDays(-2),
+                    DueDate = DateTime.Today.AddDays(28),
+                    Status = OrderStatus.Requested,
+                    Note = null
+                },
+                new Order
+                {
+                    OrderId = 12,
+                    OrderNumber = "ORD-2024-0012",
+                    CustomerName = "네이버",
+                    ProductName = "서버랙 부품",
+                    Quantity = 300,
+                    Unit = "EA",
+                    OrderDate = DateTime.Today.AddDays(-7),
+                    DueDate = DateTime.Today.AddDays(23),
+                    Status = OrderStatus.Confirmed,
+                    Note = "특별 사양으로 제작"
+                }
+            };
+            
+            ApplyFiltersAndSort();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading orders: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    private void ApplyStatusFilter(OrderStatus? status)
+    {
+        _activeStatusFilter = status;
+        ApplyFiltersAndSort();
+    }
+    
+    private void ClearSearch()
+    {
+        _searchTerm = "";
+        ApplyFiltersAndSort();
+    }
+    
+    private void ClearFilters()
+    {
+        _searchTerm = "";
+        _activeStatusFilter = null;
+        _startDate = DateTime.Today.AddMonths(-1);
+        _endDate = DateTime.Today.AddMonths(1);
+        ApplyFiltersAndSort();
+    }
+    
+    private void UpdateDateRange(object? value, bool isStartDate)
+    {
+        if (value != null && DateTime.TryParse(value.ToString(), out var date))
+        {
+            if (isStartDate)
+                _startDate = date;
+            else
+                _endDate = date;
+                
+            ApplyFiltersAndSort();
+        }
+    }
+    
+    private void ApplyFiltersAndSort()
+    {
+        if (_orders == null) 
+            return;
+            
+        // 필터링
+        _filteredOrders = _orders
+            .Where(o => (_activeStatusFilter == null || o.Status == _activeStatusFilter) &&
+                        (string.IsNullOrEmpty(_searchTerm) || 
+                         o.CustomerName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                         o.ProductName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                         o.OrderNumber.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+                        (o.OrderDate >= _startDate && o.OrderDate <= _endDate))
+            .ToList();
+            
+        // 정렬
+        if (!string.IsNullOrEmpty(_sortField))
+        {
+            SortOrders(_sortField, false);
+        }
+        else
+        {
+            // 기본 정렬: 주문일 기준 내림차순
+            _filteredOrders = _filteredOrders.OrderByDescending(o => o.OrderDate).ToList();
+        }
+    }
+    
+    private void SortOrders(string field, bool toggleDirection = true)
+    {
+        if (_sortField == field && toggleDirection)
+        {
+            _sortAscending = !_sortAscending;
+        }
+        else
+        {
+            _sortField = field;
+            _sortAscending = true;
+        }
+        
+        if (_filteredOrders == null) 
+            return;
+            
+        _filteredOrders = field switch
+        {
+            "orderNumber" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.OrderNumber).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.OrderNumber).ToList(),
+                
+            "customerName" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.CustomerName).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.CustomerName).ToList(),
+                
+            "productName" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.ProductName).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.ProductName).ToList(),
+                
+            "quantity" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.Quantity).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.Quantity).ToList(),
+                
+            "orderDate" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.OrderDate).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.OrderDate).ToList(),
+                
+            "dueDate" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.DueDate).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.DueDate).ToList(),
+                
+            "status" => _sortAscending 
+                ? _filteredOrders.OrderBy(o => o.Status).ToList() 
+                : _filteredOrders.OrderByDescending(o => o.Status).ToList(),
+                
+            _ => _filteredOrders
+        };
+    }
+    
+    private string GetSortIcon(string field)
+    {
+        if (_sortField != field)
+            return "";
+            
+        return _sortAscending ? "↑" : "↓";
+    }
+    
+    private string GetOrderStatusClass(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Requested => "status-requested",
+            OrderStatus.Confirmed => "status-confirmed",
+            OrderStatus.InProgress => "status-inprogress",
+            OrderStatus.Completed => "status-completed",
+            OrderStatus.Cancelled => "status-cancelled",
+            _ => ""
+        };
+    }
+    
+    private string GetOrderStatusDisplayName(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Requested => "접수",
+            OrderStatus.Confirmed => "확정",
+            OrderStatus.InProgress => "진행중",
+            OrderStatus.Completed => "완료",
+            OrderStatus.Cancelled => "취소",
+            _ => status.ToString()
+        };
+    }
+    
+    private void OpenCreateOrderDialog()
+    {
+        _editingOrder = new Order
+        {
+            OrderDate = DateTime.Today,
+            DueDate = DateTime.Today.AddDays(7),
+            Status = OrderStatus.Requested,
+            Unit = "EA"
+        };
+        _showOrderDialog = true;
+    }
+    
+    private void OpenEditOrderDialog(Order order)
+    {
+        _editingOrder = new Order
+        {
+            OrderId = order.OrderId,
+            OrderNumber = order.OrderNumber,
+            CustomerName = order.CustomerName,
+            ProductName = order.ProductName,
+            Quantity = order.Quantity,
+            Unit = order.Unit,
+            OrderDate = order.OrderDate,
+            DueDate = order.DueDate,
+            Status = order.Status,
+            Note = order.Note
+        };
+        _showOrderDialog = true;
+    }
+    
+    private void CloseOrderDialog()
+    {
+        _showOrderDialog = false;
+        _editingOrder = new Order();
+    }
+    
+    private async Task SaveOrder()
+    {
+        try
+        {
+            if (_editingOrder.OrderId == 0)
+            {
+                // 새 수주 생성
+                // await OrderService.CreateOrderAsync(_editingOrder);
+            }
+            else
+            {
+                // 기존 수주 수정
+                // await OrderService.UpdateOrderAsync(_editingOrder);
+            }
+            
+            await LoadOrders();
+            CloseOrderDialog();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving order: {ex.Message}");
+        }
+    }
+    
+    private void ConfirmDeleteOrder(Order order)
+    {
+        _orderToDelete = order;
+        _showDeleteDialog = true;
+    }
+    
+    private async Task DeleteOrder()
+    {
+        if (_orderToDelete == null) 
+            return;
+            
+        try
+        {
+            // await OrderService.DeleteOrderAsync(_orderToDelete.OrderId);
+            await LoadOrders();
+            _showDeleteDialog = false;
+            _orderToDelete = null;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting order: {ex.Message}");
+        }
+    }
+    
+    private enum ViewMode
+    {
+        List,
+        Card
+    }
+    
+    public class Order
+    {
+        public int OrderId { get; set; }
+        public string OrderNumber { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string ProductName { get; set; } = "";
+        public int Quantity { get; set; } = 1;
+        public string Unit { get; set; } = "";
+        public DateTime OrderDate { get; set; } = DateTime.Today;
+        public DateTime DueDate { get; set; } = DateTime.Today.AddDays(7);
+        public OrderStatus Status { get; set; } = OrderStatus.Requested;
+        public string? Note { get; set; }
+    }
+    
+    public enum OrderStatus
+    {
+        Requested,  // 접수
+        Confirmed,  // 확정
+        InProgress, // 진행중
+        Completed,  // 완료
+        Cancelled   // 취소
+    }
+}

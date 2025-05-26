@@ -1,0 +1,86 @@
+.NotiorderMenu {
+    position: absolute;
+    width: var(--NotiorderMenuWidth);
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.NotiorderMenu .topline {
+    position: relative;
+    height: 1px;
+    margin: 15px;
+    background-color: #d5dadd;
+}
+
+.NotiorderMenu .TreeBack {
+    position: absolute;
+    margin: 10px;
+    /* background-color: cadetblue; */
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
+.NotiorderMenu #notiorderMenuTreeView {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
+.NotiorderMenu .SearchButton {
+    position: relative;
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 24px;
+    height: 60px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+}
+.NotiorderMenu .SearchButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.NotiorderMenu .SearchButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+.NotiorderMenu .SearchButton > div {
+    width: 100%;
+    height: 20px;
+    font-size: 20px;
+    text-align: center;
+    color: white;
+}
+
+.NotiorderMenu .DisabledSearchButton {
+    ----Background-Highlight-Disable: #6a90f7;
+    background-color: var(----Background-Highlight-Disable);
+}
+.NotiorderMenu .DisabledSearchButton:hover {
+    background-color: var(----Background-Highlight-Disable);
+}
+.NotiorderMenu .DisabledSearchButton:active {
+    background-color: var(----Background-Highlight-Disable);
+}
+
+.NotiorderMenu .DateLabel {
+    color: var(--Text-Normal);
+    position: relative;
+    display: inline-block;
+    margin-left: 25px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.NotiorderMenu .DatePick {
+    position: relative;
+    margin: 5px 10px;
+}
+
+.NotiorderMenu .TreeBack {
+    --order-showall-icon: #c70039;
+    --noti-showall-icon: #f39c12;
+}

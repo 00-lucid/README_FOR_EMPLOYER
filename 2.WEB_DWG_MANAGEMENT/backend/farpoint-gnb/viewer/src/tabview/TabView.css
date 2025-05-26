@@ -1,0 +1,73 @@
+.TabView {
+    position: absolute;
+    top: 10px;
+    width: 40px;
+    height: 100%;
+    left: 80px;
+    z-index: 0;
+    
+}
+.TabItem {
+    width: 40px;
+    height: 120px;
+    margin-bottom: 5px;
+    background-color: #e5eaf0;
+    z-index: 0;
+    border-radius: 0px 6px 6px 0px;
+}
+
+.TabItem .TabIcon {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 7px;
+}
+
+.TabItem .TabLine {
+    width: 30px;
+    height: 1px;
+    margin: 5px;
+}    
+
+.TabItemOn .TabLine {
+    background-color: #FFF;
+}
+
+.TabItemOff .TabLine {
+    background-color: #bbb;
+}
+
+.TabItem .TabLabel {
+    font-size: 13px;
+    color: #000;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.TabView .TabItemOn {
+    background-color: var(--Background-Highlight);
+}
+.TabView .TabItemOn:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.TabView .TabItemOn:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.TabView .TabItemOff:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.TabView .TabItemOff:active {
+    background-color: var(--Background-Normal-Active);
+}
+
+.TabItemOn .TabLabel {
+    color: var(--Stroke-Highlight);
+}
+.TabItemOff .TabLabel {
+    color: var(--Stroke-Normal);
+}

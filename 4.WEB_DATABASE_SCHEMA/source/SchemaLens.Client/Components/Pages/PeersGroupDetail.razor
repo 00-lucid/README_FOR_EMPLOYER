@@ -1,0 +1,302 @@
+﻿@page "/peer/group/detail"
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@rendermode InteractiveServer
+@inject IPeersGroupService PeersGroupService
+@inject IPeerService PeerService
+@inject IPeersGroupMappingService PeersGroupMappingService
+
+@* 간단하게 피어를 등록/삭제만 가능하게끔
+그리고 등록 삭제된 피어들이 가시성 좋게 보이게끔 *@
+
+<div id="peer-group-detail-container">
+    <div id="peer-group-detail-sidebar"></div>
+    <div id="peer-group-detail-info-container">
+        <div id="breadcrumb-width-option-container">
+            @* BreadCrumbUI *@
+            <RadzenBreadCrumb>
+                <RadzenBreadCrumbItem Path="/" Text="Home" />
+            </RadzenBreadCrumb>
+            <div id="option-container">
+                @* OptionButtonUI *@
+                <RadzenButton Icon="bookmark" ButtonStyle="ButtonStyle.Primary" />
+                @* 그룹 저장 *@
+                <RadzenButton Disabled="@(!isModified)" Icon="save" Click="SaveChanges"></RadzenButton>
+            </div>
+        </div>
+
+        <div id="object-title-container">
+            <span>@(peersGroupModel?.GroupName)</span>
+            @* <RadzenIcon Style="margin-left: 1rem; font-variation-settings: 'FILL' 1; cursor: default;"
+                        Icon="check_circle"
+                        IconColor="@Colors.Primary"
+                        MouseEnter="@(args => ShowTooltip("검증됨", args, new TooltipOptions(){ Position = TooltipPosition.Top, Duration = 500 }))">
+            </RadzenIcon> *@
+                @* else if (peers.First().State.Equals("Pending"))
+            {
+            <RadzenIcon Style="margin-left: 1rem; font-variation-settings: 'FILL' 1; cursor: default;"
+            Icon="alarm"
+            IconColor="@Colors.Primary"
+            MouseEnter="@(args => ShowTooltip("검토중", args, new TooltipOptions(){ Position = TooltipPosition.Top, Duration = 2000 }))">
+            </RadzenIcon>
+            } *@
+        </div>
+
+        <ul id="object-subtitle-container">
+            <li>
+                <RadzenText>
+                    등록일 @peersGroupModel?.CreatedAt
+                </RadzenText>
+            </li>
+            <li>
+                <RadzenText>
+                    등록자 @peersGroupModel?.Username
+                </RadzenText>
+            </li>
+        </ul>
+
+        @* Dropzone UI *@
+        @if (tasks is not null)
+        {
+            <RadzenDropZoneContainer TItem="PeerTask" Data="tasks"
+                                     ItemSelector="@ItemSelector"
+                                     ItemRender="@OnItemRender"
+                                     CanDrop="@CanDrop"
+                                     Drop="@OnDrop"
+                                     Style="padding-top: 32px;"
+            >
+                <ChildContent>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <RadzenDropZone Value="Status.Pending" class="rz-display-flex rz-flex-column rz-background-color-warning-lighter rz-border-warning-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                            <RadzenText Text="대기" TextStyle="TextStyle.Subtitle2" />
+                        </RadzenDropZone>
+
+                        <RadzenDropZone Value="Status.Assign" class="rz-display-flex rz-flex-column rz-background-color-info-lighter rz-border-info-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                            <RadzenText Text="등록" TextStyle="TextStyle.Subtitle2" />
+                        </RadzenDropZone>
+
+                        <RadzenDropZone Value="Status.Deleted" class="rz-display-flex rz-flex-column rz-background-color-danger-lighter rz-border-danger-light rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                            <RadzenText Text="삭제" TextStyle="TextStyle.Subtitle2" />
+                        </RadzenDropZone>
+                    </RadzenStack>
+                </ChildContent>
+                <Template >
+                    <span style="display: flex; justify-content: space-between; align-content: center; font-size: 0.85rem;">
+                        @* @if (context.PeerModel.Seq is not null)
+                        {
+                            <span Style="color: var(--rz-base-lighter);">@context.PeerModel.Seq</span>
+                        } *@
+                        <RadzenText>@context.Name (@context.PeerModel.SearchTerm)</RadzenText>
+                        <RadzenText>@context.PeerModel.DataType</RadzenText>
+                    </span>
+                </Template>
+            </RadzenDropZoneContainer>
+        }
+    </div>
+    <div id="peer-group-detail-additional-container"></div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int PeersGroupId { get; set; }
+
+    private bool isModified = false;
+
+    PeersGroupModel peersGroupModel;
+    IEnumerable<PeerModel> mappingPeers;
+    IEnumerable<PeerModel> peers;
+
+    IList<PeerTask> tasks;
+
+    // Filter items by zone value
+    Func<PeerTask, RadzenDropZone<PeerTask>, bool> ItemSelector = (item, zone) => item.Status == (Status)zone.Value && item.Status != Status.Deleted;
+
+    Func<RadzenDropZoneItemEventArgs<PeerTask>, bool> CanDrop = request =>
+    {
+        // Allow item drop only in the same zone, in "Deleted" zone or in the next/previous zone.
+        return request.FromZone == request.ToZone || (Status)request.ToZone.Value == Status.Deleted ||
+            Math.Abs((int)request.Item.Status - (int)request.ToZone.Value) == 1;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // 현재 그룹 데이터 패치
+        IEnumerable<PeersGroupModel> peersGroups = await PeersGroupService.GetPeersGroupByPeersGroupId(PeersGroupId);
+        peersGroupModel = peersGroups.First();
+
+        // 현재 그룹에 등록된 예약어 패치
+        mappingPeers = await PeerService.GetPeersGropMappingByPeersGroupId(PeersGroupId);
+        // 현재 그룹에서 사용할 수 있는 예약어 패치
+        peers = await PeerService.GetPeersByAllOfIsApproved();
+        // mapping 된 피어들은 전체 피어 리스트에서 삭제
+        peers = peers.Where(peer => !mappingPeers.Any(mp => mp.PeerId == peer.PeerId)).ToList();
+
+        List<PeerTask> tempTasks = new List<PeerTask>();
+
+        foreach (PeerModel peerModel in peers)
+        {
+            tempTasks.Add(
+                new PeerTask()
+                {
+                    Id = peerModel.PeerId,
+                    Name = peerModel.RelatedTerm,
+                    PeerModel = peerModel,
+                    Status = Status.Pending,
+                }
+            );
+        }
+
+        foreach (PeerModel peerModel in mappingPeers)
+        {
+            tempTasks.Add(
+                new PeerTask()
+                    {
+                        Id = peerModel.PeerId,
+                        Name = peerModel.RelatedTerm,
+                        PeerModel = peerModel,
+                        Status = Status.Assign
+                    }
+            );
+        }
+
+        tasks = tempTasks;
+
+        SortPendingTasks();
+    }
+
+    void OnItemRender(RadzenDropZoneItemRenderEventArgs<PeerTask> args)
+    {
+        // Customize item appearance
+        if (args.Item.Name == "Task2")
+        {
+            args.Attributes["draggable"] = "false";
+            args.Attributes["style"] = "cursor:not-allowed";
+            args.Attributes["class"] = "rz-card rz-variant-flat .rz-background-color-white rz-color-on-primary";
+        }
+        else
+        {
+            args.Attributes["class"] = "rz-card rz-variant-filled .rz-background-color-white rz-color-on-primary";
+        }
+
+        // Do not render item if deleted
+        // args.Visible = args.Item.Status != Status.Deleted;
+    }
+
+    void OnDrop(RadzenDropZoneItemEventArgs<PeerTask> args)
+    {
+        // PeerTask가 DrapZone을 이동했을 때 실행.
+        if (args.FromZone != args.ToZone)
+        {
+            // 피어가 "Deleted" 상태로 이동한 경우
+            if (((Status)args.ToZone.Value) == Status.Deleted)
+            {
+                // 다시 "Pending" 상태로 복귀
+                args.Item.Status = Status.Pending;
+
+                // 상태 복귀 후 DropZone 업데이트
+                tasks.Remove(args.Item);
+                tasks.Add(args.Item); // 리스트 맨 뒤로 이동
+            }
+            else
+            {
+                // 일반적인 상태 이동
+                args.Item.Status = (Status)args.ToZone.Value;
+            }
+
+            isModified = true;
+        }
+
+        if (args.ToItem != null && args.ToItem != args.Item)
+        {
+            if (!((Status)args.FromZone.Value == Status.Pending))
+            {
+                // reorder items in same zone or place the item at specific index in new zone
+                tasks.Remove(args.Item);
+                tasks.Insert(tasks.IndexOf(args.ToItem), args.Item);
+            }
+        }
+
+        // 항상 대기 상태 정렬
+        SortPendingTasks();
+    }
+
+
+    public class PeerTask
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public PeerModel PeerModel { get; set; }
+        public Status Status { get; set; } = Status.Pending;
+    }
+
+    public enum Status
+    {
+        Pending,
+        Assign,
+        Deleted
+    }
+
+    async Task SaveChanges()
+    {
+        // 추가된 Peer 찾기
+        var addedPeers = tasks
+            .Where(t => t.Status == Status.Assign && !mappingPeers.Any(mp => mp.PeerId == t.Id))
+            .Select(t => t.PeerModel);
+
+        // 삭제된 Peer 찾기
+        var removedPeers = mappingPeers
+            .Where(mp => !tasks.Any(t => t.Id == mp.PeerId && t.Status == Status.Assign));
+
+        // 데이터베이스 업데이트 로직
+        foreach (var peer in addedPeers)
+        {
+            await PeersGroupMappingService.CreatePeersGroupMappingAsync(PeersGroupId, peer.PeerId);
+        }
+
+        foreach (var peer in removedPeers)
+        {
+            await PeersGroupMappingService.DeletePeersGroupMappingAsync(PeersGroupId, peer.PeerId);
+        }
+
+        // 변경 상태 초기화
+        isModified = false;
+
+        // 새로고침
+        StateHasChanged();
+    }
+
+    void SortPendingTasks()
+    {
+        // 대기 상태(Pending)인 피어만 필터링 후 알파벳 순 정렬
+        var pendingTasks = tasks
+            .Where(task => task.Status == Status.Pending)
+            .OrderBy(task => task.Name)
+            .ToList();
+
+        // 정렬된 대기 리스트를 유지하면서 전체 리스트 갱신
+        var otherTasks = tasks
+            .Where(task => task.Status != Status.Pending)
+            .ToList();
+
+        tasks = pendingTasks.Concat(otherTasks).ToList();
+    }
+
+    void SortAssignTasks()
+    {
+        // 등록 상태(Assign)인 피어만 필터링 후 Seq 순으로 정렬
+        var assignTasks = tasks
+            .Where(task => task.Status == Status.Assign)
+            .OrderBy(task => task.PeerModel.Seq)
+            .ToList();
+
+        // 다른 상태의 피어를 기존 순서 유지하며 리스트 갱신
+        var otherTasks = tasks
+            .Where(task => task.Status != Status.Assign)
+            .ToList();
+
+        // 정렬된 리스트를 다시 결합
+        tasks = assignTasks.Concat(otherTasks).ToList();
+    }
+}

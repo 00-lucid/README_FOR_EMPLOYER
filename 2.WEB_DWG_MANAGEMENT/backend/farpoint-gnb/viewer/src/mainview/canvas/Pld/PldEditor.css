@@ -1,0 +1,28 @@
+.editMove {
+    fill: rgba(0, 0, 0, 0);
+    stroke: black;
+    stroke-width: 0.7px;
+    stroke-dasharray: 1;
+    pointer-events: all;
+}
+.editMove:hover {
+    cursor: grab;
+}
+.editMove:active {
+    cursor: grabbing;
+}
+
+.editScale {
+    fill: white;
+    stroke: black;
+    stroke-width: 0.56px;
+    pointer-events: all;
+}
+
+.top-left {
+    cursor: nwse-resize;
+}
+
+.bottom-right {
+    cursor: nesw-resize;
+}

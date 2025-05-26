@@ -1,0 +1,924 @@
+﻿/* 페이지 컨테이너 */
+.page-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* 페이지 헤더 영역 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.sales-count {
+    color: var(--disabled-color);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+/* 대시보드 섹션 */
+.dashboard-section {
+    margin-bottom: 2rem;
+}
+
+.sales-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-card {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-content {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.total-sales .card-icon {
+    background-color: rgba(64, 133, 251, 0.1);
+    color: var(--primary-color);
+}
+
+.net-sales .card-icon {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+}
+
+.tax-amount .card-icon {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
+
+.customer-count .card-icon {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--info-color);
+}
+
+.card-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--disabled-color);
+}
+
+.card-info .amount {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--gray-300, #e2e8f0);
+    font-size: 0.875rem;
+}
+
+.trend, .percent {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
+}
+
+.trend.positive {
+    color: var(--success-color);
+}
+
+.trend.negative {
+    color: var(--error-color);
+}
+
+.period {
+    color: var(--disabled-color);
+}
+
+/* 차트 섹션 */
+.chart-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1100px) {
+    .chart-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-container {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.chart-header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.chart-controls {
+    display: flex;
+    align-items: center;
+}
+
+.period-selector {
+    display: flex;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.period-selector button {
+    background: #fff;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--disabled-color);
+    transition: all 0.2s;
+}
+
+.period-selector button:hover {
+    color: var(--primary-color);
+}
+
+.period-selector button.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.chart-type-selector {
+    display: flex;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.chart-type-selector button {
+    background: #fff;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    color: var(--disabled-color);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-type-selector button:hover {
+    color: var(--primary-color);
+}
+
+.chart-type-selector button.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.chart-body {
+    padding: 0.5rem 0;
+}
+
+.chart-visualization {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chart-bar-item {
+    display: flex;
+    align-items: center;
+}
+
+.chart-label {
+    width: 120px;
+    font-size: 0.875rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 1rem;
+}
+
+.chart-bar-container {
+    flex-grow: 1;
+    height: 2rem;
+    background-color: var(--light-color);
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.chart-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color) 0%, rgba(64, 133, 251, 0.8) 100%);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: width 0.5s ease-out;
+    min-width: 3rem;
+}
+
+.chart-value {
+    white-space: nowrap;
+}
+
+/* 파이 차트 */
+.pie-chart-visualization {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.pie-chart {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--light-color);
+    flex-shrink: 0;
+}
+
+.pie-segments {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform: rotate(-90deg);
+}
+
+.pie-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(
+            from var(--start-angle),
+            currentColor var(--end-angle),
+            transparent var(--end-angle)
+    );
+}
+
+.pie-segment:nth-child(1) { color: var(--color-0, #4085FB); }
+.pie-segment:nth-child(2) { color: var(--color-1, #FA7921); }
+.pie-segment:nth-child(3) { color: var(--color-2, #2ECC71); }
+.pie-segment:nth-child(4) { color: var(--color-3, #9B59B6); }
+.pie-segment:nth-child(5) { color: var(--color-4, #E74C3C); }
+.pie-segment:nth-child(6) { color: var(--color-5, #F1C40F); }
+.pie-segment:nth-child(7) { color: var(--color-6, #1ABC9C); }
+.pie-segment:nth-child(8) { color: var(--color-7, #34495E); }
+.pie-segment:nth-child(9) { color: var(--color-8, #D35400); }
+.pie-segment:nth-child(10) { color: var(--color-9, #7F8C8D); }
+
+.pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-item:nth-child(1) .legend-color { background-color: var(--color-0, #4085FB); }
+.legend-item:nth-child(2) .legend-color { background-color: var(--color-1, #FA7921); }
+.legend-item:nth-child(3) .legend-color { background-color: var(--color-2, #2ECC71); }
+.legend-item:nth-child(4) .legend-color { background-color: var(--color-3, #9B59B6); }
+.legend-item:nth-child(5) .legend-color { background-color: var(--color-4, #E74C3C); }
+.legend-item:nth-child(6) .legend-color { background-color: var(--color-5, #F1C40F); }
+.legend-item:nth-child(7) .legend-color { background-color: var(--color-6, #1ABC9C); }
+.legend-item:nth-child(8) .legend-color { background-color: var(--color-7, #34495E); }
+.legend-item:nth-child(9) .legend-color { background-color: var(--color-8, #D35400); }
+.legend-item:nth-child(10) .legend-color { background-color: var(--color-9, #7F8C8D); }
+
+.legend-label {
+    flex-grow: 1;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.legend-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* 필터 및 검색 */
+.filters-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    align-items: center;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    background-color: #fff;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.filter-tag:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.filter-tag.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    border-color: var(--primary-color);
+}
+
+.more-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fff;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.date-input {
+    border: none;
+    padding: 0.25rem;
+    font-size: 0.9rem;
+    width: 120px;
+    color: var(--text-color);
+}
+
+.date-input:focus {
+    outline: none;
+}
+
+.clear-search {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--disabled-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.clear-search:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+}
+
+/* 뷰 토글 버튼 */
+.view-toggle {
+    display: flex;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    background: #fff;
+    border: none;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    color: var(--disabled-color);
+    transition: all 0.2s;
+}
+
+.view-toggle-btn:hover {
+    color: var(--primary-color);
+}
+
+.view-toggle-btn.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+/* 리스트 뷰 */
+.list-view {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    overflow-x: auto;
+}
+
+.list-view table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.list-view th {
+    background-color: var(--light-color);
+    color: var(--text-color);
+    font-weight: 500;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--gray-300, #e2e8f0);
+}
+
+.list-view td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray-300, #e2e8f0);
+    vertical-align: middle;
+}
+
+.list-view tr:last-child td {
+    border-bottom: none;
+}
+
+.list-view tr:hover {
+    background-color: var(--light-color);
+}
+
+.total-amount {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-header:hover {
+    color: var(--primary-color);
+}
+
+.actions-cell {
+    width: 80px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+tfoot {
+    background-color: #f8fafc;
+    font-weight: 500;
+}
+
+.summary-label {
+    text-align: right;
+    color: var(--text-color);
+}
+
+.summary-value {
+    font-weight: 600;
+}
+
+/* 카드 뷰 */
+.card-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+}
+
+.sale-card {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.sale-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sale-card-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--gray-300, #e2e8f0);
+}
+
+.sale-date {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.sale-card-content {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.correspondent-info, .item-info, .quantity-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.correspondent-info svg, .item-info svg, .quantity-info svg {
+    color: var(--disabled-color);
+    flex-shrink: 0;
+}
+
+.sale-amounts {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.amount-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.amount-label {
+    color: var(--disabled-color);
+}
+
+.amount-item.total {
+    margin-top: 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--gray-300, #e2e8f0);
+    font-weight: 600;
+}
+
+.amount-item.total .amount-value {
+    color: var(--primary-color);
+}
+
+/* 버튼 스타일 */
+.icon-btn {
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--disabled-color);
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background-color: var(--light-color);
+}
+
+.detail-btn:hover {
+    color: var(--info-color);
+}
+
+.invoice-btn:hover {
+    color: var(--primary-color);
+}
+
+.edit-btn:hover {
+    color: var(--primary-color);
+}
+
+.delete-btn:hover {
+    color: var(--error-color);
+}
+
+.secondary-btn {
+    background-color: var(--light-color);
+    color: var(--text-color);
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+    background-color: var(--gray-300, #e2e8f0);
+}
+
+.button-icon {
+    margin-right: 0.5rem;
+}
+
+/* 빈 상태 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.empty-state-icon {
+    margin-bottom: 1.5rem;
+    color: var(--disabled-color);
+}
+
+.empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.empty-state p {
+    margin: 0 0 1.5rem 0;
+    color: var(--disabled-color);
+}
+
+/* 다이얼로그 내용 */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    border-radius: 0.375rem;
+    font-size: 0.9rem;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.1);
+}
+
+.invoice-preview {
+    background-color: var(--light-color);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.invoice-preview-header {
+    margin-bottom: 1rem;
+}
+
+.invoice-preview-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.invoice-preview-header p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+/* 매출 상세 정보 */
+.sale-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-section h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--gray-300, #e2e8f0);
+}
+
+.detail-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.detail-item {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-item.full-width {
+    width: 100%;
+    flex-basis: 100%;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: var(--disabled-color);
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.detail-value.note {
+    font-weight: normal;
+    white-space: pre-line;
+}
+
+.detail-value.total-amount {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 거래처 필터 다이얼로그 */
+.correspondents-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.correspondent-filter-item {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--gray-300, #e2e8f0);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.correspondent-filter-item:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: rgba(64, 133, 251, 0.05);
+}
+
+.correspondent-filter-item.active {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    border-color: var(--primary-color);
+}
+
+/* CSS 변수 (색상 정의) */
+:root {
+    --color-0: #4085FB;
+    --color-1: #FA7921;
+    --color-2: #2ECC71;
+    --color-3: #9B59B6;
+    --color-4: #E74C3C;
+    --color-5: #F1C40F;
+    --color-6: #1ABC9C;
+    --color-7: #34495E;
+    --color-8: #D35400;
+    --color-9: #7F8C8D;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .sales-summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-section {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        overflow-x: auto;
+    }
+
+    .card-view {
+        grid-template-columns: 1fr;
+    }
+
+    .pie-chart-visualization {
+        flex-direction: column;
+    }
+}

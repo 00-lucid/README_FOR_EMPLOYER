@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaLens", "SchemaLens\SchemaLens.csproj", "{E5C15CFC-4C78-470E-B114-583DB23115DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaLens.Client", "SchemaLens.Client\SchemaLens.Client.csproj", "{2C6D3043-444B-4297-B641-813C90CA8DCF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5C15CFC-4C78-470E-B114-583DB23115DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5C15CFC-4C78-470E-B114-583DB23115DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5C15CFC-4C78-470E-B114-583DB23115DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5C15CFC-4C78-470E-B114-583DB23115DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C6D3043-444B-4297-B641-813C90CA8DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C6D3043-444B-4297-B641-813C90CA8DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C6D3043-444B-4297-B641-813C90CA8DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C6D3043-444B-4297-B641-813C90CA8DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

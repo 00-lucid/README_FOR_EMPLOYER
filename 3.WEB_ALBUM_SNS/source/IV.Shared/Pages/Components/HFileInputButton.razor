@@ -1,0 +1,57 @@
+﻿@* 업로드 버튼 *@
+<div class="@GetButtonClass()">
+    <label for="@Id">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             height="24px"
+             viewBox="0 -960 960 960"
+             width="24px"
+             fill="@GetIconColor()">
+            @* 조건에 따라 아이콘 변경 *@
+            @if (IsFloating)
+            {
+                <path d="M440-200h80v-167l64 64 56-57-160-160-160 160 57 56 63-63v167ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
+            }
+            else
+            {
+                @* + 아이콘 *@
+                <path d="M480-240q-17 0-28.5-11.5T440-280v-160h-160q-17 0-28.5-11.5T240-480q0-17 11.5-28.5T280-520h160v-160q0-17 11.5-28.5T480-720q17 0 28.5 11.5T520-680v160h160q17 0 28.5 11.5T720-480q0 17-11.5 28.5T680-440H520v160q0 17-11.5 28.5T480-240Z"/>
+            }
+        </svg>
+        @if (IsFloating)
+        {
+            <span class="upload-text">Media Upload</span>
+        }
+    </label>
+</div>
+
+
+@* 숨겨진 실제 파일 선택 Input *@
+<InputFile id="@Id"
+           OnChange="OnFileChanged"
+           multiple="@Multiple"
+           style="display:none" />
+
+@code {
+    [Parameter]
+    public bool IsFloating { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<InputFileChangeEventArgs> OnFileChanged { get; set; }
+
+    [Parameter] public string Id { get; set; } = "";
+    
+    /// <summary>
+    /// 다중 파일 업로드 여부를 설정하는 파라미터 (기본값 true)
+    /// </summary>
+    [Parameter] public bool Multiple { get; set; } = true;
+    
+    private string GetButtonClass()
+    {
+        return IsFloating ? "floating-upload-button" : "circle-upload-button";
+    }
+
+    private string GetIconColor()
+    {
+        return IsFloating ? "#ffff" : "#0064FF";
+    }
+}

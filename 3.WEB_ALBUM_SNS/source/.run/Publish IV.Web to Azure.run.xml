@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish IV.Web to Azure" type="AzureWebAppDeploy">
+    <option name="appServicePlanName" value="asp-app-250211211219" />
+    <option name="appServicePlanResourceGroupName" value="IV" />
+    <option name="openBrowser" value="true" />
+    <option name="operatingSystem" value="Windows" />
+    <option name="pricingSize" value="F1" />
+    <option name="pricingTier" value="Free" />
+    <option name="publishableProjectPath" value="$PROJECT_DIR$/IV.Web/IV.Web.csproj" />
+    <option name="region" value="koreacentral" />
+    <option name="resourceGroupName" value="IV" />
+    <option name="subscriptionId" value="12657c39-3c3c-4ecd-b159-25d192a2fc49" />
+    <option name="webAppName" value="iv-webapp" />
+    <method v="2" />
+  </configuration>
+</component>

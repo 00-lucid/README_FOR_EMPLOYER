@@ -1,0 +1,185 @@
+.MainView .MenuToolbar {
+    position: absolute;
+    top: calc(100% - 25px - 60px);
+    border-radius: 6px;
+    box-shadow: 0 1px 9px -4px rgba(0, 0, 0, 0.73);
+    background-color: var(--Menu-Toolbar-Background);
+    pointer-events: auto;
+    padding-left: 12px;
+}
+.MenuToolbar .ToolItem,
+.DragItem,
+.Rectangle {
+    vertical-align: top;
+    position: relative;
+    display: inline-block;
+}
+
+.Rectangle {
+    width: 1px;
+    height: 60px;
+    background-color: var(--Menu-Toolbar-DragLine);
+}
+
+.Toolbar .ToolItem {
+    width: 50px;
+    height: 50px;
+    margin: 5px 3px;
+    border-radius: 5px;
+}
+.ToolItem > svg {
+    margin: 7px;
+}
+.ToolItem:hover {
+    background-color: var(--Menu-Toolbar-Item-Hover);
+}
+.ToolItem:active {
+    background-color: var(--Menu-Toolbar-Item-Active);
+}
+.Toolbar .DragItem {
+    width: 32px;
+    height: 60px;
+    border-radius: 0px 6px 6px 0px;
+    background-color: var(--Menu-Toolbar-Drag-Background);
+}
+.DragItem > svg {
+    width: 32px;
+    height: 60px;
+}
+
+.ToolItemBackground {
+    position: absolute;
+    top: -1px;
+    left: calc(10px + 56px * 5.38);
+    width: 60px;
+    height: 60px;
+}
+
+.Toolbar .toolbar-vertical-line {
+    margin: 10px;
+    height: 40px;
+    width: 1px;
+    background: var(--Menu-Toolbar-Item-Stroke);
+    opacity: 0.3;
+}
+
+.PldItemBackground {
+    position: absolute;
+    top: -1px;
+    left: calc(10px + 56px * 2);
+    width: 60px;
+    height: 60px;
+}
+
+.MarkupToolbar {
+    position: absolute;
+    top: calc(100% - 25px - 60px - 55px);
+    left: calc((100% - 600px - 5px - 2px) / 2);
+    width: calc(50px * 12);
+    border-radius: 6px;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    border: solid 2px var(--Markup-Toolbar-Border);
+}
+
+.PLDToolbar {
+    position: absolute;
+    top: calc(100% - 25px - 60px - 55px);
+    left: calc((100% - 750px - 5px - 2px) / 2);
+    width: calc(50px * 15);
+    border-radius: 6px;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    border: solid 2px var(--Markup-Toolbar-Border);
+}
+
+.MarkupToolbar .Background {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: var(--Markup-Toolbar-Background);
+    border-radius: 3px;
+}
+
+.PLDToolbar .Background {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: var(--Markup-Toolbar-Background);
+    border-radius: 3px;
+}
+
+.MarkupToolbar .MarkupItem {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border-radius: 5px;
+}
+.MarkupItem:hover {
+    background-color: var(--Markup-Toolbar-Hover);
+}
+.MarkupItem.selected,
+.MarkupItem.selected:hover {
+    background-color: var(--Markup-Toolbar-Active);
+}
+
+.MarkupItem:active {
+    background-color: var(--Markup-Toolbar-Active);
+}
+.MarkupItem > svg {
+    width: 29px;
+    height: 29px;
+    margin: 6px;
+}
+
+.PLDToolbar .PLDItem {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border-radius: 5px;
+}
+.PLDItem:hover {
+    background-color: var(--Markup-Toolbar-Hover);
+}
+.PLDItem:active {
+    background-color: var(--Markup-Toolbar-Active);
+}
+.PLDItem > svg {
+    width: 29px;
+    height: 29px;
+    margin: 6px;
+}
+
+.PLDItem.disable {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.MarkupToolbar .ToolbarItemDisable {
+    filter: opacity(0.5);
+}
+.MenuToolbar .ToolbarItemDisable {
+    filter: opacity(0.5);
+}
+
+.PLDToolbar .ToolbarItemDisable {
+    filter: opacity(0.5);
+}
+.PLDToolbar .ToolbarItemDisable {
+    filter: opacity(0.5);
+}
+
+.ToolbarItemDisable:hover {
+    background-color: transparent;
+}
+.ToolbarItemDisable:active {
+    background-color: transparent;
+}

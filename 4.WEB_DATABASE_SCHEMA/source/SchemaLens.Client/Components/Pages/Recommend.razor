@@ -1,0 +1,272 @@
+﻿@page "/recommend"
+@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@rendermode InteractiveServer
+@* @implements IDisposable *@
+@inject NavigationManager NavigationManager
+@inject TooltipService TooltipService
+@inject IPeerService PeerService
+@inject IEncyclopediaService EncyclopediaService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject NotificationService NotificationService
+
+<PageTitle>Recommand</PageTitle>
+
+@if (isLoading)
+{
+    <RadzenProgressBarCircular Style="display: flex; flex: 1 auto;" ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+}
+else
+{
+    <div id="schema-container">
+        <div id="sidebar"></div>
+        <div id="schema-detail-container">
+            <div id="breadcrumb-width-option-container">
+                @* BreadCrumbUI *@
+                <RadzenBreadCrumb>
+                    <RadzenBreadCrumbItem Path="/" Text="Home" />
+                </RadzenBreadCrumb>
+                <div id="option-container">
+                    @* OptionButtonUI *@
+                    <RadzenButton Icon="bookmark" ButtonStyle="ButtonStyle.Primary" />
+                    @* <RadzenButton Icon="lightbulb" ButtonStyle="ButtonStyle.Secondary" /> *@
+                    @* <RadzenButton Icon="description" ButtonStyle="ButtonStyle.Base" /> *@
+                </div>
+            </div>
+            
+            <RadzenStack Orientation="Orientation.Horizontal">
+                @foreach (PeerModel peer in likePeers)
+                {
+                    <RadzenLink Path="@($"http:///recommend?SearchTerm={peer.SearchTerm}")" class="rz-color-primary" Style="cursor: pointer;">@peer.SearchTerm</RadzenLink>
+                }
+            </RadzenStack>
+
+            @if (SearchTerm is not null)
+            {
+                <div id="object-title-container">
+                    <span>@(SearchTerm)</span>
+                    @if (peers?.Count() > 0)
+                    {
+                        @if (peers.First().IsApproved)
+                        {
+                            <RadzenIcon Style="margin-left: 1rem; font-variation-settings: 'FILL' 1; cursor: default;"
+                                        Icon="check_circle"
+                                        IconColor="@Colors.Primary"
+                                        MouseEnter="@(args => ShowTooltip("검증됨", args, new TooltipOptions(){ Position = TooltipPosition.Top, Duration = 500 }))">
+                            </RadzenIcon>
+                        }   
+                        @* else if (peers.First().State.Equals("Pending"))
+                        {
+                            <RadzenIcon Style="margin-left: 1rem; font-variation-settings: 'FILL' 1; cursor: default;"
+                                        Icon="alarm"
+                                        IconColor="@Colors.Primary"
+                                        MouseEnter="@(args => ShowTooltip("검토중", args, new TooltipOptions(){ Position = TooltipPosition.Top, Duration = 2000 }))">
+                            </RadzenIcon>
+                        } *@
+                }
+                </div>
+                <ul id="object-subtitle-container">
+                    @* 누가 수정했는지 알 수 있어야 함 *@
+                    @if (peers?.Count() > 0)
+                    {
+                        @if (peers.First().IsApproved)
+                        {
+                        <li>
+                            <RadzenText>
+                                등록일 @peers?.First()?.CreatedAt
+                            </RadzenText>
+                        </li>
+                        <li>
+                            <RadzenText>
+                                등록자 @peers?.First()?.Username
+                            </RadzenText>
+                        </li>
+                        }
+
+                    }
+                </ul>
+            }
+            @if (peers?.Count() < 1)
+            {
+                <div class="recommend-peer-container-subtitle-container">
+                    <RadzenText class="recommend-peer-container-subtitle">이런! 등록된 예약어가 없습니다.</RadzenText>
+                    <RadzenButton Click="OnMovePeerWritePage" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Text="지금 등록하기" />
+                </div>
+            }
+
+            @if ((peers?.Count() > 0) || encyclopedias.Count() > 0)
+            {
+                <div class="palette-information">
+                    <span class="palette-recommend palette-card">권장</span>
+                    <span class="palette-wait palette-card">검토</span>
+                    <span class="palette-related palette-card">관련</span>
+                    <span class="palette-restrict palette-card">금지</span>
+                </div>
+            }
+
+            <div class="recommend-peer-container">
+            @if (peers?.Count() > 0 || encyclopedias.Count() > 0)
+            {
+                <div id="recommend-peer-card-container">
+                    @* 등록피어 *@
+                    @if (peers?.Count() > 0 && peers.First().IsApproved)
+                    {
+                        <RadzenCard 
+                            @onclick="@(async () => await CopyToClipboard(peers.First().RelatedTerm))" 
+                            Style="background-color: var(--rz-series-7); cursor: pointer;" 
+                            Variant="@variant"
+                            MouseEnter="@(args => ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "background: var(--rz-warning-light); color: var(--rz-text-color)", Duration = null }))">
+                            <RadzenText Style="font-weight: bolder; color: white; display: flex; flex-direction: row; align-items: center;" TextStyle="TextStyle.Body1">
+                                @peers?.First()?.RelatedTerm@(peers.First().IsNull ? "?" : "")
+                                @* <RadzenIcon Style="font-size: 16px; margin-left: 0.3rem;" Icon="description"></RadzenIcon> *@
+                            </RadzenText>
+                            <RadzenText Style="font-weight: bolder; color: white; display: flex; flex-direction: row; align-items: center;" TextStyle="TextStyle.Caption">
+                                (
+                                    @peers?.First()?.DataType,
+                                    @peers?.First()?.DataSize bit
+                                )
+                            </RadzenText>
+                        </RadzenCard>
+                    }
+                    @* 대기피어 || 금지피어 *@
+                    @if (peers?.Count() > 0)
+                    {
+                        @foreach(PeerModel peer in peers)
+                        {
+                            @if (peer.State.Equals("Pending"))
+                            {
+                                <RadzenCard @onclick="@(async () => await CopyToClipboard(peer.RelatedTerm))" Style="background-color: var(--rz-warning); cursor: pointer;" Variant="@variant">
+                                    <RadzenText Style="font-weight: bolder; color: white; display: flex; flex-direction: row; align-items: center;" TextStyle="TextStyle.Body1">
+                                        @peers?.First()?.RelatedTerm@(peers.First().IsNull ? "?" : "")
+                                        @* <RadzenIcon Style="font-size: 16px; margin-left: 0.3rem;" Icon="description"></RadzenIcon> *@
+                                    </RadzenText>
+                                    <RadzenText Style="font-weight: bolder; color: white; display: flex; flex-direction: row; align-items: center;" TextStyle="TextStyle.Caption">
+                                        (
+                                        @peers?.First()?.DataType,
+                                        @peers?.First()?.DataSize bit
+                                        )
+                                    </RadzenText>
+                                </RadzenCard>
+                            }
+                        }
+                    }
+                    @* 관련피어 *@
+                    @foreach (EncyclopediaModel encyclopedia in encyclopedias)
+                    {
+                        <RadzenCard @onclick="@(async () => await CopyToClipboard(encyclopedia.RelatedTerm))" Style="background-color: var(--rz-base-500); cursor: pointer;" Variant="@variant">
+                            <RadzenText Style="font-weight: bolder; color: white; display: flex; flex-direction: row; align-items: center;" TextStyle="TextStyle.Body1">
+                                @encyclopedia.RelatedTerm
+                                @* <RadzenIcon Style="font-size: 16px; margin-left: 0.3rem;" Icon="description"></RadzenIcon> *@
+                            </RadzenText>
+                        </RadzenCard>
+                    }
+                </div>
+                @* </RadzenCardGroup> *@
+            }
+            </div>
+        </div>
+        <div id="schema-additional-container"></div>
+    </div>
+}
+
+
+
+@code {
+    bool isLoading = false;
+    bool isAuth = false;
+    IEnumerable<PeerModel> peers;
+    IEnumerable<PeerModel> likePeers;
+    IEnumerable<EncyclopediaModel> encyclopedias;
+    Variant variant = Variant.Outlined;
+    private IJSObjectReference? jsModule;
+
+    [SupplyParameterFromQuery]
+    private string? SearchTerm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        isLoading = true;
+
+        AuthenticationState auth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (auth.User.Identity?.IsAuthenticated ?? false)
+        {
+            isAuth = true;
+        }
+
+        if (SearchTerm is not null)
+        {
+            // 권장 단어 불러오기.
+            peers = await PeerService.GetPeersBySearchTerm(SearchTerm);
+            // 관련 단어 불러오기
+            encyclopedias = await EncyclopediaService.GetEncycloBySearchTerm(SearchTerm);
+            // 금지 단어 불러오기
+            // 유사 검색어 불러오기 (실수 방지)
+            likePeers = await PeerService.GetPeersByLikeSearchTerm(SearchTerm);
+        }
+
+        isLoading = false;
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            /*
+            Change the {PATH} placeholder in the next line to the path of
+            the collocated JS file in the app. Examples:
+
+            ./Components/Pages/JsCollocation2.razor.js (.NET 8 or later)
+            ./Pages/JsCollocation2.razor.js (.NET 7 or earlier)
+            */
+            // jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
+            //     "./Pages/Recommend.razor.js");
+        }
+    }
+
+    private void ShowTooltip(string text, ElementReference elementReference, TooltipOptions options = null)
+    {
+        TooltipService.Open(elementReference, text, options);
+    }
+
+    private void OnMovePeerWritePage()
+    {
+        // 만약 로그인 되어 있다면 바로 이동
+        // 로그인이 되어 있지 않다면 /signin 이동
+        if (isAuth)
+        {
+            var url = $"/peer/write";
+            NavigationManager.NavigateTo(url);
+        }
+        else
+        {
+            var url = $"/signin";
+            NavigationManager.NavigateTo(url);
+        }
+
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        // JavaScript 함수를 호출하여 클립보드에 복사
+        // if (jsModule is not null)
+        // {
+        //     await jsModule.InvokeVoidAsync("copyToClipboard", text);
+
+        //     NotificationService.Notify(new NotificationMessage
+        //         {
+        //             Severity = NotificationSeverity.Success,
+        //             Summary = "복사 완료",
+        //             Detail = $"{text}이(가) 클립보드에 복사되었습니다.",
+        //             Duration = 2000
+        //         });
+        // }
+    }
+
+    void ShowTooltipWithHtml(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
+    @<div>
+        <b>아직 준비되지 않은 기능입니다.</b>
+    </div>, options);
+}

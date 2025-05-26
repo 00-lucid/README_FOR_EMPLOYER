@@ -1,0 +1,66 @@
+﻿<div class="dropdown-container" @onclick="ToggleDropdown">
+    <label class="dropdown-label">@Label</label>
+    <div class="dropdown-selected">@SelectedValue<span class="arrow">@((isOpen ? "▲" : "▼"))</span></div>
+    @if (isOpen)
+    {
+        <ul class="dropdown-options">
+            @foreach (var option in Options)
+            {
+                <li @onclick="@(() => SelectOption(option))" 
+                    @onclick:stopPropagation 
+                    class="dropdown-item @(option == SelectedValue ? "selected" : "")">
+                    @option
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "Select Option";
+    [Parameter, EditorRequired] public IEnumerable<string> Options { get; set; } = [];
+    [Parameter] public string SelectedValue { get; set; } = "";
+    [Parameter] public EventCallback<string> SelectedValueChanged { get; set; }
+
+    private bool isOpen;
+
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+
+    private async Task SelectOption(string option)
+    {
+        SelectedValue = option;
+        isOpen = false;
+        await SelectedValueChanged.InvokeAsync(SelectedValue);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrEmpty(SelectedValue) && Options.Any())
+        {
+            SelectedValue = Options.First();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Close dropdown when clicked outside
+        documentClickHandler = async e =>
+        {
+            isOpen = false;
+            await InvokeAsync(StateHasChanged);
+        };
+        DocumentClicked += documentClickHandler;
+    }
+
+    private event Func<MouseEventArgs, Task>? DocumentClicked;
+    private Func<MouseEventArgs, Task>? documentClickHandler;
+
+    public void Dispose()
+    {
+        if (documentClickHandler != null)
+            DocumentClicked -= documentClickHandler;
+    }
+}

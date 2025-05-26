@@ -1,0 +1,74 @@
+# Blazor Hybrid / .NET 빌드 산출물
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider 캐시 폴더
+.vs/
+.idea/
+*.suo
+*.user
+*.userprefs
+*.usertasks
+*.sln.docstates
+*.sln.iml
+
+# MAUI / Xamarin 빌드 산출물
+Resource.designer.cs
+**/*.xbf
+**/*.dbmdl
+**/*.jfm
+**/*.pfx
+**/*.publishsettings
+**/android/build/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/.gradle/
+**/android/.idea/
+**/android/app/build/
+**/ios/build/
+**/ios/Pods/
+**/ios/*.xcworkspace
+**/ios/*.xcodeproj/xcuserdata/
+**/ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+**/ios-maccatalyst/
+**/Platforms/iOS/
+
+# NuGet 패키지
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# 패키지 폴더는 무시해도 되지만 패키지 참조가 필요할 경우 주석 처리
+# !**/packages/repositories.config
+# NuGet v3의 project.json 파일이 생성하는 파일
+*.nuget.props
+*.nuget.targets
+
+# 환경 설정 파일
+.env
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+# 임시 파일
+*.tmp
+*.temp
+*.swp
+*.cache
+*~
+
+# Blazor WASM / ServiceWorkers
+wwwroot/service-worker.*
+wwwroot/blazor.*
+wwwroot/_framework/

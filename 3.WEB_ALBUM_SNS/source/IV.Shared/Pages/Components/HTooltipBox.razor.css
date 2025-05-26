@@ -1,0 +1,32 @@
+﻿.h-tooltip-box {
+    position: absolute;
+    top: 100%;        /* 버튼 바로 아래쪽 */
+    left: 50%;        /* 가운데 맞춤 */
+    transform: translateX(-50%);
+    margin-top: 8px;  /* 버튼과 간격 */
+
+    background-color: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap; /* 긴 텍스트도 한 줄 표시 (필요 시 변경) */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;    /* 다른 요소보다 위에 표시 */
+
+    opacity: 1;       /* 필요 시 transition 효과를 위해 설정 */
+    transition: opacity 0.2s ease;
+}
+
+/* 화살표 모양 구현 (하단에서 위로 화살표가 보이도록) */
+.h-tooltip-box::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;      /* 툴팁 박스 위쪽 경계선 */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+    /* border-color: ↑ 상단 방향이므로, 두 번째(아래쪽)만 색상을 넣음 */
+}

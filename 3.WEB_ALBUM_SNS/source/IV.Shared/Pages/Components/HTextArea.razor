@@ -1,0 +1,69 @@
+<div class="form-group">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">@Label:</label>
+    }
+    <textarea
+        id="@Id"
+        placeholder="@PlaceHolder"
+        maxlength="@MaxLength"
+        class="form-control"
+        rows="@Rows"
+        @oninput="HandleInput">@Value</textarea>
+</div>
+
+@code {
+    /// <summary>
+    /// 레이블 텍스트
+    /// </summary>
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    /// <summary>
+    /// textarea ID 속성
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 바인딩된 텍스트
+    /// </summary>
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 값 변경 이벤트
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>
+    /// placeholder 텍스트
+    /// </summary>
+    [Parameter]
+    public string? PlaceHolder { get; set; }
+
+    /// <summary>
+    /// 입력 가능 문자수 제한
+    /// </summary>
+    [Parameter]
+    public int? MaxLength { get; set; }
+
+    /// <summary>
+    /// textarea의 기본 표시 줄 수
+    /// </summary>
+    [Parameter]
+    public int Rows { get; set; } = 3;
+
+    /// <summary>
+    /// 텍스트 변경 처리
+    /// </summary>
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (e.Value is string newValue)
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+        }
+    }
+}

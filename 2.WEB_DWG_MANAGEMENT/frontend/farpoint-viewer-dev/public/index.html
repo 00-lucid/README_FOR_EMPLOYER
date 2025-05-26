@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="kr" translate="no">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#000000" />
+        <meta http-equiv="X-UA-Compatible" content="IE=11" />
+        <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+        <title>P&ID Viewer</title>
+        <script src="/Visualize.js"></script>
+    </head>
+    <body>
+        <script>
+            function isWebGLAvailable() {
+                try {
+                    var canvas = document.createElement('canvas')
+                    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')))
+                } catch (e) {
+                    return false
+                }
+            }
+
+            function isWebGL2Available() {
+                try {
+                    var canvas = document.createElement('canvas')
+                    return !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'))
+                } catch (e) {
+                    return false
+                }
+            }
+            function downloadFile(url, fileName) {
+                var link = document.createElement('a')
+                link.href = url
+                link.download = fileName
+                link.click()
+
+                URL.revokeObjectURL(url)
+            }
+
+            if (!isWebGLAvailable() || !isWebGL2Available()) {
+                try {
+                    let objWSH = new ActiveXObject('WScript.Shell')
+                    if (objWSH) {
+                        var chrome64bitPath = 'C:\\progra~1\\google\\chrome\\application\\chrome.exe '
+                        var chrome32bitPath = 'C:\\progra~2\\google\\chrome\\application\\chrome.exe '
+                        try {
+                            objWSH.Run(chrome64bitPath + window.location.href)
+                            parent.window.open('', '_self').close()
+                        } catch (e) {
+                            try {
+                                objWSH.Run(chrome32bitPath + window.location.href)
+                                parent.window.open('', '_self').close()
+                            } catch (e) {
+                                alert('크롬 브라우저를 설치 후 새로고침 해주세요.')
+                            }
+                        }
+                    }
+                } catch (e) {
+                    var res = confirm(
+                        'Chrome으로 자동 전환 되지 않으시면 아래의 순서대로 진행해 주세요.\n\n  1. 확인 버튼을 누른 후 다운로드 된 파일을 실행 (reg_setting)\n  2. 현재 사용중인 모든 브라우저를 닫은 후 Internet Explorer를\n      다시 시작해 주세요.'
+                    )
+                    if (res) {
+                        downloadFile('http://' + window.location.host + '/reg_setting.bat', 'reg_setting.bat')
+                    }
+                }
+            }
+        </script>
+        <script>
+            var WasmUrl = '/Visualize.js.wasm'
+        </script>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+        <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    --></body>
+</html>

@@ -1,0 +1,389 @@
+﻿
+/* 상단 전체 컨테이너 */
+.top-menu-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--primary-color);
+    padding: 0 2rem;
+    border-bottom: 1px solid #ddd;
+    height: 70px;
+    position: relative; /* 추가: 자식 요소 위치의 기준점이 됨 */
+}
+
+/* 로고 영역 */
+.logo-area {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.logo-area img {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+
+.header-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--on-primary-color);
+}
+
+/* 메뉴 내비게이션 */
+nav.menu {
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+/* 작은 화면에서 메뉴 숨길 때는 none */
+nav.menu.open {
+    display: block;
+    background-color: var(--primary-color);
+}
+
+/* 메뉴 리스트(일반 화면) */
+.menu-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.menu-list li a {
+    text-decoration: none;
+    color: var(--on-primary-color);
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+
+.menu-list li a:hover {
+    color: #555;
+}
+
+/* 로그인/로그아웃 섹션 */
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* 프로필 섹션 */
+.profile-section {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+/* 로그인/로그아웃 버튼 */
+.btn-login,
+.btn-logout {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 0.5rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-login:hover,
+.btn-logout:hover {
+    background-color: #005ca9;
+}
+
+/* 햄버거 버튼 - 데스크톱에서는 기본 숨김 */
+.hamburger-button {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.hamburger-button span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    color: var(--on-primary-color);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* 반응형: 화면이 768px 이하로 줄어들었을 때 */
+@media (max-width: 768px) {
+    /* 햄버거 버튼 표시 */
+    .hamburger-button {
+        display: flex;
+    }
+
+    /* 메뉴는 기본적으로 숨김 상태 */
+    nav.menu {
+        /* CSS 애니메이션을 위해 display는 기본적으로 block 또는 다른 값이어야 합니다.
+           다만 'close' 상태에서는 시각적으로 안 보이도록 처리합니다. */
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 70px;
+        background-color: #f8f8f8;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 999;
+
+        /* 초기 상태: 위로 조금 올라가 있고 투명하게 */
+        transform: translateY(-20px);
+        opacity: 0;
+
+        /* 마우스나 터치가 안 먹히도록 */
+        pointer-events: none;
+    }
+
+    /* .open 클래스가 붙었을 때 실제로 보이면서 애니메이션 재생 */
+    nav.menu.open {
+        pointer-events: auto; /* 열릴 때 클릭 가능하도록 만듦 */
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    /* 닫힘 상태 */
+    nav.menu.close {
+        pointer-events: none;
+        animation: slideUp 0.3s ease forwards;
+    }
+
+    /* 메뉴 리스트를 세로로 배치 */
+    .menu-list {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .auth-section {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+}
+
+
+/* .nav-item가 기본 상태에서 밑줄 없이 검정색이 되도록 */
+.nav-item {
+    color: var(--on-primary-color);
+    transition: all 0.3s ease; /* 모든 속성에 0.3초 동안 부드러운 전환 */
+    padding: 1rem;
+    cursor: pointer;
+    position: relative; /* 추가: 서브메뉴 위치 기준점 */
+}
+
+/* 주변부가 어두워지는 효과 */
+/*.nav-item:hover {*/
+/*    background-color: rgba(0, 0, 0, 0.1); !* 어두운 배경(10% 불투명) *!*/
+/*    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); !* 주변부 그림자 *!*/
+/*    border-radius: 4px;  !* 모서리를 조금 둥글게 *!*/
+/*}*/
+
+/* 실제 애니메이션 정의 */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 닫힐 때(슬라이드 업) */
+@keyframes slideUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}
+
+.hamburger-button.is-open span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-button.is-open span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-button.is-open span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* 알림 아이콘 메뉴 항목 */
+.nav-item-bell {
+    position: relative;
+}
+
+/*.bell-button {*/
+/*    background: none;*/
+/*    border: none;*/
+/*    cursor: pointer;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    !* 아이콘 크기나 여백 조절 *!*/
+/*    font-size: 1.2rem;*/
+/*    color: #333;*/
+/*    padding: 0;*/
+/*    transition: color 0.2s ease;*/
+/*}*/
+
+/* 아이콘에 알림 카운트 등을 표시하려면 relative/absolute 활용 가능 */
+.bell-button::after {
+    /* 예: 알림 수 표시를 위한 빨간 점이나 숫자를 표시하려면 아래처럼 사용:
+    content: "3"; 
+    position: absolute; 
+    top: -6px;
+    right: -6px;
+    background: red;
+    color: #fff;
+    width: 18px;
+    height: 18px;
+    font-size: 0.75rem;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    */
+    content: "";
+}
+
+.bell-button {
+    position: relative; /* 자식 요소(빨간점)의 위치를 절대좌표로 배치하기 위함 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    /* 필요하면 크기, 색상 등을 조절 */
+}
+
+/* 읽지 않은 알림이 있을 때만 표시되는 빨간 점 */
+.bell-button.has-unread::after {
+    content: "";
+    position: absolute;
+    top: 0;      /* 버튼 내부에서 위치를 적절히 조절하세요 */
+    right: 0;    /* 예: 상단 오른쪽 구석에 둠 */
+    width: 8px;  /* 빨간 점의 크기 */
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.alarm-popover {
+    position: absolute; /* 또는 fixed */
+    top: 60px;          /* 메뉴 높이에 맞춰 조정 */
+    right: 20px;        /* 오른쪽 공간 */
+    z-index: 999;       /* 메뉴 위에 표시되도록 큰 z-index */
+    /* 배경, 테두리, 그림자 등 추가 */
+}
+
+/* CSS */
+.coin-container {
+    /* 3D 효과를 주기 위한 관점 설정 */
+    perspective: 1000px;
+    /* 크기가 너무 크게 잡혀서 SVG가 확대되지 않도록 실제 크기에 맞추어 줍니다 */
+    width: 32px;
+    height: 32px;
+    display: inline-block; /* 필요에 따라 block, inline-block 등 조정 */
+    cursor: pointer;
+}
+
+.coin-container svg {
+    /* 회전 애니메이션을 부드럽게 하기 위한 transition */
+    transition: transform 0.5s ease;
+    /* 3D 회전 적용을 위해 preserve-3d */
+    transform-style: preserve-3d;
+}
+
+.coin-container:hover svg {
+    /* 세로축(Y축)을 기준으로 180도 회전 */
+    transform: rotateY(360deg);
+}
+
+.sub-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* 변경: 70px에서 100%로 변경하여 nav-item 바로 아래에 위치하도록 함 */
+    left: 0; /* 추가: 왼쪽 정렬 */
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    list-style: none;
+    padding: 16px;
+    min-width: 480px; /* 2열 레이아웃을 위한 충분한 너비 */
+    z-index: 100;
+    border-radius: 8px;
+    margin-top: 0; /* 변경: 8px에서 0으로 변경하여 바로 붙이도록 함 */
+    flex-wrap: wrap;
+}
+
+.sub-menu-item {
+    width: 50%; /* 2열 레이아웃 */
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.sub-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* 메뉴 아이콘 스타일 */
+.menu-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background-color: #f0f7ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: #0066cc;
+}
+
+.sub-menu li {
+    padding: 10px 15px;
+    white-space: nowrap;
+}
+
+.sub-menu li:hover {
+    background-color: #f0f0f0;
+}
+
+.nav-item:hover .sub-menu {
+    display: flex;
+}
+
+/* 호버 시 메인 메뉴 항목 스타일 변경 */
+.nav-item:hover {
+    background-color: var(--hover-primary-color);
+}
+
+.menu-content {
+    flex-grow: 1;
+}
+
+.menu-content h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.menu-content p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}

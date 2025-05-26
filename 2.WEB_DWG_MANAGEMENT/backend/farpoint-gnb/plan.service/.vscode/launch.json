@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "watch"],
+            "skipFiles": ["<node_internals>/**"],
+            "type": "pwa-node",
+            "env": { "REGION": "kospo" }
+        }
+    ]
+}

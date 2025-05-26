@@ -1,0 +1,51 @@
+﻿@inherits LayoutComponentBase
+
+<div class="h-row-rigid @Class" style="@InlineStyle">
+    <div class="h-row-label" style="width:@LabelWidth; flex-shrink:0;">
+        @LabelContent
+    </div>
+
+    <div class="h-row-content">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 전달된 추가 CSS 클래스 (옵션)
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Label의 너비(기본값: 100px)
+    /// </summary>
+    [Parameter]
+    public string LabelWidth { get; set; } = "100px";
+
+    /// <summary>
+    /// 요소 간 간격을 설정 (기본값: 1rem)
+    /// </summary>
+    [Parameter]
+    public string Gap { get; set; } = "1rem";
+
+    /// <summary>
+    /// 행의 수직 정렬 설정 (기본값: center)
+    /// </summary>
+    [Parameter]
+    public string AlignItems { get; set; } = "center";
+
+    /// <summary>
+    /// Label 영역에 들어갈 콘텐츠
+    /// </summary>
+    [Parameter]
+    public RenderFragment? LabelContent { get; set; }
+
+    /// <summary>
+    /// 오른쪽 영역에 들어갈 콘텐츠
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string InlineStyle => $"display: flex; flex-direction: row; align-items: {AlignItems}; gap: {Gap}; width: 100%;";
+}

@@ -1,0 +1,21 @@
+﻿@using System.Collections
+<div class="h-noting-text">
+    @if (Compare is not null && Compare.Count == 0)
+    {
+        <div class="h-noting-text-wrapper">
+            <h3>@Title</h3>
+            @if (!string.IsNullOrEmpty(SubTitle))
+            {
+                <p class="h-noting-text-subtitle">@SubTitle</p>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? SubTitle { get; set; }
+
+    // Count 프로퍼티가 존재하는 타입(예: List<T>, ICollection<T>)을 파라미터로 받습니다.
+    [Parameter] public ICollection? Compare { get; set; }
+}

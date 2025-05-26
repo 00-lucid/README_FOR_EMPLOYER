@@ -1,0 +1,298 @@
+﻿@using System.Security.Claims
+@using SchemaLens.Client.Interfaces
+@inject IPeerService PeerService
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<RadzenStack Gap="1.5rem">
+    <RadzenFormField Text="데이터" >
+        <RadzenTextBox @bind-Value="@searchTerm" />
+    </RadzenFormField>
+    <RadzenFormField Text="컬럼명" >
+        <RadzenTextBox @bind-Value="@relatedTerm" />
+    </RadzenFormField>
+    <RadzenFormField Text="자료형" Variant="@variant">
+        <RadzenDropDown
+            @bind-Value="@dataType"
+            Change="@OnChangeDataType"
+            Data=@dataTypes
+            Name="DropDownVirtualization"
+            AllowVirtualization="true"
+            AllowClear="true"
+            AllowFiltering="true"
+            TValue="string"
+        />
+    </RadzenFormField>
+    <RadzenFormField Text="크기(bit)">
+        <RadzenTextBox Disabled="@true" @bind-Value="@dataSize"/>
+    </RadzenFormField>
+    
+    <div>
+        <RadzenSwitch @bind-Value=@isNull InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" />
+        <RadzenLabel Text="널여부" />
+    </div>
+    
+    <div>
+        <RadzenSwitch @bind-Value=@isDefault InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" />
+        <RadzenLabel Text="기본값"  />
+    </div>
+    <RadzenFormField>
+        <RadzenTextBox Disabled="@(!isDefault)" @bind-Value="@defaultValue"/>
+    </RadzenFormField>
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Text="Ok" Click="() => OnClickAddPeer(ds)" />
+        <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    bool isLogin = false;
+    [Parameter] public DialogService ds { get; set; }
+    [Parameter] public int userId { get; set; }
+    [Parameter]
+    public EventCallback<int> OnPeerSync { get; set; }
+    
+    Variant variant = Variant.Outlined;
+    string searchTerm;
+    string relatedTerm;
+    string dataType;
+    string dataSize;
+    bool isNull = false;
+    bool isDefault = false;
+    string defaultValue;
+    
+    IEnumerable<string> dataTypes = new string[] { 
+        "NVARCHAR(10)",
+        "NVARCHAR(50)",
+        "NVARCHAR(100)",
+        "NVARCHAR(500)",
+        "NVARCHAR(1000)",
+        "NVARCHAR(2000)",
+        "NVARCHAR(4000)",
+        "NVARCHAR(MAX)",
+        "DATETIME", 
+        "DATE", 
+        "BIGINT", 
+
+        "BINARY(8)",
+        "BINARY(80)",
+        "BINARY(800)",
+        "BINARY(8000)",
+
+        "BIT", 
+
+        "CHAR(1)",
+        "CHAR(5)",
+        "CHAR(10)",
+
+        "CHARACTER(1)",
+        "CHARACTER(5)",
+        "CHARACTER(10)",
+
+        "DATETIME2", 
+
+        "DEC 정밀도(1~9)",
+        "DEC 정밀도(10~19)",
+        "DEC 정밀도(20~38)",
+
+        "DECIMAL 정밀도(1~9)",
+        "DECIMAL 정밀도(10~19)",
+        "DECIMAL 정밀도(20~398)",
+
+        "DOUBLE PRECISION",
+
+        "FLOAT(n > 24)",
+        "FLOAT(n < 25)",
+
+        "HIERARCHYID",
+        "INT",
+        "INTEGER",
+        "MEDIUMINT",
+        "MONEY",
+
+        "NCHAR(1)",
+        "NCHAR(5)",
+        "NCHAR(10)",
+
+        "REAL",
+        "SMALLDATETIME",
+        "SMALLINT",
+        "SMALLMONEY",
+
+        "SYSNAME"
+    };
+
+    Dictionary<string, string> dataSizes = new Dictionary<string, string>()
+    {
+        // NVARCHAR 시리즈
+        {"NVARCHAR(10)", "160"},
+        {"NVARCHAR(50)", "800"},
+        {"NVARCHAR(100)", "1600"},
+        {"NVARCHAR(500)", "8000"},
+        {"NVARCHAR(1000)", "16000"},
+        {"NVARCHAR(2000)", "320000"},
+        {"NVARCHAR(4000)", "640000"},
+        {"NVARCHAR(MAX)", "8e+9"}, // VARCHAR(MAX)로 간주하고 크기를 8e+9로 설정
+
+        // DATETIME 및 날짜 관련
+        {"DATETIME", "64"},
+        {"DATE", "24"},
+
+        // 숫자 관련 데이터 타입
+        {"BIGINT", "64"},
+        {"BIT", "1"},
+        {"INT", "32"},
+        {"INTEGER", "32"},
+        {"MEDIUMINT", "32"},
+        {"MONEY", "64"},
+
+        // BINARY 시리즈
+        {"BINARY(8)", "64"},
+        {"BINARY(80)", "640"},
+        {"BINARY(800)", "6400"},
+        {"BINARY(8000)", "64000"},
+
+        // CHAR 시리즈
+        {"CHAR(1)", "8"},
+        {"CHAR(5)", "40"},
+        {"CHAR(10)", "80"},
+
+        // CHARACTER 시리즈
+        {"CHARACTER(1)", "8"},
+        {"CHARACTER(5)", "40"},
+        {"CHARACTER(10)", "80"},
+
+        // DATETIME2
+        {"DATETIME2", "64"},
+
+        // DEC, DECIMAL 관련
+        {"DEC 정밀도(1~9)", "40"},
+        {"DEC 정밀도(10~19)", "63"},
+        {"DEC 정밀도(20~38)", "104"},
+        {"DECIMAL 정밀도(1~9)", "40"},
+        {"DECIMAL 정밀도(10~19)", "63"},
+        {"DECIMAL 정밀도(20~398)", "104"},
+
+        // DOUBLE PRECISION
+        {"DOUBLE PRECISION", "64"},
+
+        // FLOAT 시리즈
+        {"FLOAT(n > 24)", "64"},
+        {"FLOAT(n < 25)", "32"},
+
+        // HIERARCHYID
+        {"HIERARCHYID", "32"},
+
+        // NCHAR 시리즈
+        {"NCHAR(1)", "16"},
+        {"NCHAR(5)", "80"},
+        {"NCHAR(10)", "160"},
+
+        // REAL
+        {"REAL", "32"},
+
+        // SMALLDATETIME
+        {"SMALLDATETIME", "32"},
+
+        // SMALLINT
+        {"SMALLINT", "16"},
+
+        // SMALLMONEY
+        {"SMALLMONEY", "32"},
+
+        // SYSNAME
+        {"SYSNAME", "2048"}
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        
+        dataType = "NVARCHAR(100)";
+        dataSize = dataSizes.GetValueOrDefault(dataType, "-1");
+        
+        AuthenticationState auth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        ClaimsPrincipal user = auth.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            isLogin = true;
+        }
+    }
+    
+    private async void OnClickAddPeer(DialogService ds)
+    {
+        if (!isLogin)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "오류",
+                Detail = $"반복되는 부적절한 등록 시도의 경우 차단됩니다.",
+                Duration = 2000
+            });
+        }
+        
+        bool isDuplicate = await PeerService.CheckDuplicatePeer(relatedTerm);
+        if (isDuplicate)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "등록 오류",
+                Detail = $"중복된 컬럼이 존재합니다.",
+                Duration = 2000
+            });
+            return;
+        }
+        
+        // 데이터와 컬럼명이 비어있지 않고, 동일한 데이터가 Peers 테이블에 존재하지 않을 때.
+        if (!string.IsNullOrEmpty(searchTerm) && !string.IsNullOrEmpty(relatedTerm) && !string.IsNullOrEmpty(dataType))
+        {
+            if (isDefault && string.IsNullOrEmpty(defaultValue))
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "오류",
+                    Detail = $"기본값을 활성화 할 경우 대상 값이 필수입니다.",
+                    Duration = 2000
+                });
+
+                return;
+            } 
+
+            Console.Write(dataSize);
+            await PeerService.CreatePeer(searchTerm, relatedTerm, userId, dataType, isNull, dataSize, defaultValue);
+            // peers = await PeerService.GetPeersByRegisteredAsync(userId);
+            ds.Close(false);
+            
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "등록",
+                Detail = $"항목이 등록되었습니다.",
+                Duration = 2000
+            });
+
+            await OnPeerSync.InvokeAsync(userId);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "등록 오류",
+                Detail = $"항목이 비어있습니다.",
+                Duration = 2000
+            });
+        }
+    }
+    
+    void OnChangeDataType(object args)
+    {
+        dataType = $"{args}";
+        dataSize = dataSizes.GetValueOrDefault(dataType, "-1");
+    }
+}

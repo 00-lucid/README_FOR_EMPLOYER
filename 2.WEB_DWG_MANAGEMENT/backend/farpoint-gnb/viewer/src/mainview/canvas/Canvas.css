@@ -1,0 +1,24 @@
+#documentCanvas,
+#markupCanvas,
+#pldSvg {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#markupCanvas {
+    pointer-events: none;
+}
+
+#inputText {
+    cursor: text;
+    border: none;
+    background: none;
+}
+#inputText:focus {
+    outline: none;
+}
+#markupCanvas,
+#pldSvg {
+    pointer-events: none;
+}

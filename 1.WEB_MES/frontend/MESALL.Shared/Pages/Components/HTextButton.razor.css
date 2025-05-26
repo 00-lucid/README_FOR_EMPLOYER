@@ -1,0 +1,59 @@
+﻿/* 기본 텍스트 버튼 스타일 */
+.h-text-button {
+    background-color: transparent;
+    border: none;
+    font-size: 1rem;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease-out;
+
+    /* 
+       버튼의 너비를 컨텐츠에 맞춰 확장하도록 설정.
+       콘텐츠 길이에 따라 자동으로 폭이 결정됩니다.
+    */
+    width: max-content;
+}
+
+/* 버튼이 active 상태인 경우 */
+.h-text-button:active {
+}
+
+/* 비활성화 상태 */
+.h-text-button:disabled {
+    cursor: not-allowed;
+    transform: none;
+    color: #666666;
+}
+
+/* Primary 타입 */
+.h-text-button-primary {
+    color: var(--primary-color);
+}
+
+/* Secondary 타입 */
+.h-text-button-secondary {
+    color: var(--secondary-color);
+}
+
+/* Danger 타입 */
+.h-text-button-danger {
+    color: #dc3545;
+}
+
+/* Success 타입 */
+.h-text-button-success {
+    color: #28a745;
+}
+
+/*!* 작아졌다가 다시 커지는 키프레임 애니메이션 *!*/
+/*@keyframes buttonScaleAnimation {*/
+/*    0% {*/
+/*        transform: scale(1);*/
+/*    }*/
+/*    50% {*/
+/*        transform: scale(0.8); !* 살짝 작아짐 *!*/
+/*    }*/
+/*    100% {*/
+/*        transform: scale(1);   !* 원래 크기로 복귀 *!*/
+/*    }*/
+/*}*/

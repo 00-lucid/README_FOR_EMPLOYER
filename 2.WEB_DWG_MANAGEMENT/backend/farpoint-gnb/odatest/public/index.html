@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <script src="/Visualize.js"></script>
+    </head>
+    <body>
+        <script>
+            const resize = () => {
+                document.body.height = window.innerHeight + 'px'
+                document.body.style.height = window.innerHeight + 'px'
+
+                document.body.width = window.innerWidth + 'px'
+                document.body.style.width = window.innerWidth + 'px'
+            }
+
+            resize()
+
+            window.addEventListener('resize', resize)
+        </script>
+
+        <script>
+            var WasmUrl = '/Visualize.js.wasm'
+        </script>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+    </body>
+</html>

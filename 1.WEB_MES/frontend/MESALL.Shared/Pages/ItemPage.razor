@@ -1,0 +1,727 @@
+﻿@page "/item"
+@using System.Text.Json
+@using System.Net.Http.Json
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.Interfaces
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IItemService ItemService
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>품목 관리</h1>
+            <span class="item-count">총 @(_filteredItems?.Count ?? 0)개의 품목</span>
+        </div>
+    </header>
+
+    <HRow JustifyContent="space-between" AlignItems="center">
+        <div class="filters-section">
+            <div class="filter-tag @(_activeFilter == null ? "active" : "")" @onclick='() => ApplyFilter(null)'>
+                전체
+            </div>
+            <div class="filter-tag @(_activeFilter == ItemType.Product ? "active" : "")" @onclick='() => ApplyFilter(ItemType.Product)'>
+                제품
+            </div>
+            <div class="filter-tag @(_activeFilter == ItemType.Semi ? "active" : "")" @onclick='() => ApplyFilter(ItemType.Semi)'>
+                반제품
+            </div>
+            <div class="filter-tag @(_activeFilter == ItemType.Row ? "active" : "")" @onclick='() => ApplyFilter(ItemType.Row)'>
+                원자재
+            </div>
+            <div class="filter-tag @(_activeFilter == ItemType.Sub ? "active" : "")" @onclick='() => ApplyFilter(ItemType.Sub)'>
+                부자재
+            </div>
+        </div>
+
+        <HRow AutoWidth="true" Gap="1rem" AlignItems="center">
+            <HTextInput
+                Width="300px"
+                PlaceHolder="품목명, 유형 검색"
+                Value="@_searchTerm"
+                ValueChanged="@((value) => { _searchTerm = value; ApplyFiltersAndSort(); })"
+                MarginBottom="0"
+            >
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="clear-search" @onclick="ClearSearch">×</button>
+                }
+            </HTextInput>
+
+            <HButton OnClick="OpenAddItemDialog">
+                <i class="fas fa-plus"></i> 품목 등록
+            </HButton>
+        </HRow>
+    </HRow>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="품목 정보를 불러오는 중입니다..." />
+    }
+    else if (_filteredItems == null || _filteredItems.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>품목이 없습니다</h3>
+            @if (!string.IsNullOrEmpty(_searchTerm) || _activeFilter != null)
+            {
+                <p>검색어 또는 필터에 해당하는 품목이 없습니다.</p>
+                <button class="secondary-btn" @onclick="ClearFilters">
+                    필터 초기화
+                </button>
+            }
+            else
+            {
+                <p>첫 번째 품목을 등록해 보세요!</p>
+                <button class="primary-btn" @onclick="OpenAddItemDialog">
+                    <i class="fas fa-plus"></i> 품목 등록
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        @if (_viewMode == ViewMode.List)
+        {
+            <div class="list-view">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="image-cell">이미지</th>
+                        <th @onclick='() => SortItems("name")' class="sortable-header">
+                            이름 @GetSortIcon("name")
+                        </th>
+                        <th @onclick='() => SortItems("type")' class="sortable-header">
+                            유형 @GetSortIcon("type")
+                        </th>
+                        <th>단위</th>
+                        <th @onclick='() => SortItems("price")' class="sortable-header">
+                            판매가 @GetSortIcon("price")
+                        </th>
+                        <th @onclick='() => SortItems("date")' class="sortable-header">
+                            등록일 @GetSortIcon("date")
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in _filteredItems)
+                    {
+                        <tr>
+                            <td class="image-cell">
+                                @if (!string.IsNullOrEmpty(item.ItemPhotoUri))
+                                {
+                                    <img src="@item.ItemPhotoUri" alt="@item.ItemName" />
+                                }
+                                else
+                                {
+                                    <div class="no-image">
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="48" height="48" rx="4" fill="#F5F7FA" />
+                                            <path d="M32 24C32 28.4183 28.4183 32 24 32C19.5817 32 16 28.4183 16 24C16 19.5817 19.5817 16 24 16C28.4183 16 32 19.5817 32 24Z" stroke="#BDBDBD" stroke-width="2" />
+                                            <path d="M24 20V28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                            <path d="M20 24H28" stroke="#BDBDBD" stroke-width="2" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                }
+                            </td>
+                            <td>@item.ItemName</td>
+                            <td>
+                                <HBadge Type="@GetItemTypeClass(item.ItemType).Replace("type-", "")">
+                                    @GetItemTypeDisplayName(item.ItemType)
+                                </HBadge>
+                            </td>
+                            <td>@item.Unit</td>
+                            <td>@item.SalePrice.ToString("N0")원</td>
+                            <td>@item.CreatedAt.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="card-view">
+                @foreach (var item in _filteredItems)
+                {
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <HBadge Type="@GetItemTypeClass(item.ItemType).Replace("type-", "")">
+                                @GetItemTypeDisplayName(item.ItemType)
+                            </HBadge>
+                            <div class="card-actions">
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditItemDialog(item)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="icon-btn delete-btn" @onclick="() => ConfirmDeleteItem(item)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="item-card-image">
+                            @if (!string.IsNullOrEmpty(item.ItemPhotoUri))
+                            {
+                                <img src="@item.ItemPhotoUri" alt="@item.ItemName" />
+                            }
+                            else
+                            {
+                                <div class="no-image">
+                                    <svg width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="200" height="200" rx="8" fill="#F5F7FA" />
+                                        <rect x="40" y="60" width="120" height="80" rx="4" stroke="#BDBDBD" stroke-width="4" stroke-dasharray="8 8" />
+                                        <path d="M100 75V125" stroke="#BDBDBD" stroke-width="4" stroke-linecap="round" />
+                                        <path d="M75 100H125" stroke="#BDBDBD" stroke-width="4" stroke-linecap="round" />
+                                        <path d="M70 140L90 120M130 140L110 120" stroke="#BDBDBD" stroke-width="3" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                            }
+                        </div>
+                        <div class="item-card-content">
+                            <h3 class="item-name">@item.ItemName</h3>
+                            <div class="item-details">
+                                <div class="item-detail">
+                                    <span class="detail-label">단위:</span>
+                                    <span class="detail-value">@item.Unit</span>
+                                </div>
+                                <div class="item-detail">
+                                    <span class="detail-label">판매가:</span>
+                                    <span class="detail-value price">@item.SalePrice.ToString("N0")원</span>
+                                </div>
+                                <div class="item-detail">
+                                    <span class="detail-label">등록일:</span>
+                                    <span class="detail-value">@item.CreatedAt.ToString("yyyy-MM-dd")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<HDialog @bind-IsOpen="_showItemDialog" Title=@(_editingItem.ItemId == 0 ? "품목 등록" : "품목 수정")>
+    <ChildContent>
+        <HTextInput
+            Id="itemName"
+            Label="품목명"
+            Value="@_editingItem.ItemName"
+            ValueChanged="@((value) => _editingItem.ItemName = value)"
+            PlaceHolder="품목명을 입력하세요"
+            Required="true"
+            Validation="@((value) => string.IsNullOrWhiteSpace(value) ? "품목명을 입력해주세요." : null)">
+        </HTextInput>
+
+        <HRow JustifyContent="space-between">
+            <HDropDown TEnum="ItemType"
+                       Id="itemType"
+                       Label="품목 유형"
+                       Value="@_editingItem.ItemType"
+                       ValueChanged="@((value) => _editingItem.ItemType = value)"
+                       PlaceHolder="품목 유형을 선택하세요"
+                       Required="true"
+                       Items="@_itemTypeOptions">
+            </HDropDown>
+            <HTextInput
+                Id="unit"
+                Label="단위"
+                Value="@_editingItem.Unit"
+                ValueChanged="@((value) => _editingItem.Unit = value)"
+                PlaceHolder="예: EA, KG, BOX"
+                Required="true"
+                Validation="@((value) => string.IsNullOrWhiteSpace(value) ? "단위를 입력해주세요." : null)">
+            </HTextInput>
+        </HRow>
+
+        <HNumberInput
+            Id="salePrice"
+            Label="판매가"
+            Value="@_editingItem.SalePrice"
+            ValueChanged="@((value) => _editingItem.SalePrice = value)"
+            Min="0"
+            Step="1000"
+            Required="true"
+            Validation="@((value) => value <= 0 ? "판매가를 입력해주세요." : null)">
+            <span class="price-suffix">원</span>
+        </HNumberInput>
+
+
+        <div class="form-row">
+            <div class="form-group photo-upload">
+                <label>품목 이미지</label>
+                <div class="photo-preview-container">
+                    @if (!string.IsNullOrEmpty(_editingItem.ItemPhotoUri))
+                    {
+                        <div class="photo-preview">
+                            <img src="@_editingItem.ItemPhotoUri" alt="품목 이미지" />
+                            <button class="remove-photo" @onclick="RemovePhoto">×</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="upload-placeholder" @onclick="UploadPhoto">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>이미지 업로드</p>
+                            <small>JPG, PNG 파일 (최대 5MB)</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="SaveItem">
+            @(_editingItem.ItemId == 0 ? "등록" : "수정")
+        </HButton>
+    </FooterContent>
+</HDialog>
+
+@if (_showDeleteConfirm)
+{
+    <div class="modal-backdrop" @onclick="CancelDeleteItem">
+        <div class="confirm-dialog" @onclick:stopPropagation="true">
+            <div class="confirm-icon warning">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>품목을 삭제하시겠습니까?</h3>
+            <p>
+                <strong>@_itemToDelete?.ItemName</strong> 품목을 삭제하면 복구할 수 없습니다.
+                관련된 모든 데이터가 함께 삭제됩니다.
+            </p>
+            <div class="confirm-actions">
+                <button class="secondary-btn" @onclick="CancelDeleteItem">취소</button>
+                <button class="danger-btn" @onclick="DeleteItem">삭제</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<HDropDown<ItemType>.DropDownItem> _itemTypeOptions = new()
+    {
+        new() { Value = ItemType.Product.ToString(), Text = "제품" },
+        new() { Value = ItemType.Semi.ToString(), Text = "반제품" },
+        new() { Value = ItemType.Row.ToString(), Text = "원자재" },
+        new() { Value = ItemType.Sub.ToString(), Text = "부자재" }
+    };
+
+    private enum ViewMode
+    {
+        List,
+        Card
+    }
+
+    // 상태 변수
+    private List<Item>? _items;
+    private List<Item>? _filteredItems;
+    private bool _isLoading = true;
+    private ViewMode _viewMode = ViewMode.List;
+    private string _searchTerm = string.Empty;
+    private ItemType? _activeFilter = null;
+    private string _sortOption = "date_desc";
+    private string _sortField = "date";
+    private bool _sortAscending = false;
+
+    // 품목 추가/수정 관련
+    private bool _showItemDialog = false;
+    private Item _editingItem = new();
+    private Dictionary<string, string> _validationErrors = new();
+
+    // 삭제 확인 관련
+    private bool _showDeleteConfirm = false;
+    private Item? _itemToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadItems();
+    }
+
+    private async Task LoadItems()
+    {
+        _isLoading = true;
+
+        try
+        {
+            // ItemService를 통해 품목 목록 가져오기
+            _items = await ItemService.GetAllItemsAsync();
+            ApplyFiltersAndSort();
+        }
+        catch (Exception ex)
+        {
+            // 오류 처리
+            await JSRuntime.InvokeVoidAsync("alert", $"품목 정보를 불러오는 데 실패했습니다: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ApplyFiltersAndSort()
+    {
+        if (_items == null) return;
+
+        // 검색어와 필터 적용
+        var filtered = _items.Where(item =>
+            (string.IsNullOrEmpty(_searchTerm) ||
+             item.ItemName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+             GetItemTypeDisplayName(item.ItemType).Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+            (_activeFilter == null || item.ItemType == _activeFilter)
+        ).ToList();
+
+        // 정렬 적용
+        ApplySorting(filtered);
+
+        _filteredItems = filtered;
+    }
+
+    private void ApplySorting(List<Item> items)
+    {
+        switch (_sortOption)
+        {
+            case "name_asc":
+                items.Sort((a, b) => string.Compare(a.ItemName, b.ItemName, StringComparison.OrdinalIgnoreCase));
+                _sortField = "name";
+                _sortAscending = true;
+                break;
+            case "name_desc":
+                items.Sort((a, b) => string.Compare(b.ItemName, a.ItemName, StringComparison.OrdinalIgnoreCase));
+                _sortField = "name";
+                _sortAscending = false;
+                break;
+            case "price_asc":
+                items.Sort((a, b) => a.SalePrice.CompareTo(b.SalePrice));
+                _sortField = "price";
+                _sortAscending = true;
+                break;
+            case "price_desc":
+                items.Sort((a, b) => b.SalePrice.CompareTo(a.SalePrice));
+                _sortField = "price";
+                _sortAscending = false;
+                break;
+            case "date_asc":
+                items.Sort((a, b) => a.CreatedAt.CompareTo(b.CreatedAt));
+                _sortField = "date";
+                _sortAscending = true;
+                break;
+            case "date_desc":
+            default:
+                items.Sort((a, b) => b.CreatedAt.CompareTo(a.CreatedAt));
+                _sortField = "date";
+                _sortAscending = false;
+                break;
+        }
+    }
+
+    private void SortItems(string field)
+    {
+        if (_sortField == field)
+        {
+            // 같은 필드를 클릭하면 정렬 방향을 변경
+            _sortAscending = !_sortAscending;
+        }
+        else
+        {
+            // 다른 필드를 클릭하면 해당 필드로 오름차순 정렬
+            _sortField = field;
+            _sortAscending = true;
+        }
+
+        // 정렬 옵션 업데이트
+        _sortOption = $"{_sortField}_{(_sortAscending ? "asc" : "desc")}";
+
+        ApplyFiltersAndSort();
+    }
+
+    private string GetSortIcon(string field)
+    {
+        if (_sortField != field) return "";
+        return _sortAscending ? "↑" : "↓";
+    }
+
+    private void ApplyFilter(ItemType? filter)
+    {
+        _activeFilter = filter;
+        ApplyFiltersAndSort();
+    }
+
+    private void ClearFilters()
+    {
+        _searchTerm = string.Empty;
+        _activeFilter = null;
+        _sortOption = "date_desc";
+        ApplyFiltersAndSort();
+    }
+
+    private void ClearSearch()
+    {
+        _searchTerm = string.Empty;
+        ApplyFiltersAndSort();
+    }
+
+    private string GetItemTypeDisplayName(ItemType itemType)
+    {
+        return itemType switch
+        {
+            ItemType.Product => "제품",
+            ItemType.Semi => "반제품",
+            ItemType.Row => "원자재",
+            ItemType.Sub => "부자재",
+            _ => itemType.ToString()
+        };
+    }
+
+    private string GetItemTypeClass(ItemType itemType)
+    {
+        return itemType switch
+        {
+            ItemType.Product => "type-product",
+            ItemType.Semi => "type-semi",
+            ItemType.Row => "type-raw",
+            ItemType.Sub => "type-sub",
+            _ => ""
+        };
+    }
+
+    // 품목 추가 다이얼로그 열기
+    private void OpenAddItemDialog()
+    {
+        _editingItem = new Item
+        {
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
+        _validationErrors.Clear();
+        _showItemDialog = true;
+    }
+
+    // 품목 수정 다이얼로그 열기
+    private void OpenEditItemDialog(Item item)
+    {
+        // 객체를 복제하여 작업 (참조를 그대로 사용하지 않음)
+        _editingItem = new Item
+        {
+            ItemId = item.ItemId,
+            ItemName = item.ItemName,
+            ItemType = item.ItemType,
+            Unit = item.Unit,
+            SalePrice = item.SalePrice,
+            CreatedAt = item.CreatedAt,
+            UpdatedAt = DateTime.Now, // 현재 시간으로 업데이트
+            ItemPhotoUri = item.ItemPhotoUri,
+            CompanyId = item.CompanyId
+        };
+
+        _validationErrors.Clear();
+        _showItemDialog = true;
+    }
+
+    // 품목 저장 (추가 또는 수정)
+    private async Task SaveItem()
+    {
+        // 입력 유효성 검증
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(_editingItem.ItemName))
+        {
+            isValid = false;
+            await JSRuntime.InvokeVoidAsync("alert", "품목명을 입력해주세요.");
+        }
+        else if (string.IsNullOrWhiteSpace(_editingItem.Unit))
+        {
+            isValid = false;
+            await JSRuntime.InvokeVoidAsync("alert", "단위를 입력해주세요.");
+        }
+        else if (_editingItem.SalePrice <= 0)
+        {
+            isValid = false;
+            await JSRuntime.InvokeVoidAsync("alert", "판매가를 입력해주세요.");
+        }
+
+        if (!isValid) return;
+
+        try
+        {
+            // 새 품목 추가
+            if (_editingItem.ItemId == 0)
+            {
+                // 한글 품목 타입을 영문으로 변환
+                string itemTypeStr = _editingItem.ItemType switch
+                {
+                    ItemType.Product => "제품",
+                    ItemType.Semi => "반제품",
+                    ItemType.Row => "원자재",
+                    ItemType.Sub => "부자재",
+                    _ => _editingItem.ItemType.ToString()
+                };
+
+                // CreateItemRequest 객체 생성
+                var createRequest = new CreateItemRequest
+                {
+                    ItemName = _editingItem.ItemName,
+                    ItemType = itemTypeStr,  // 한글로 변환된 품목 타입
+                    Unit = _editingItem.Unit,
+                    SalePrice = _editingItem.SalePrice,
+                    ItemPhotoUri = _editingItem.ItemPhotoUri,
+                    CompanyId = 1 // 기본값으로 설정, 실제 값으로 대체 필요
+                };
+
+                var createdItem = await ItemService.CreateItemAsync(createRequest);
+                if (createdItem != null)
+                {
+                    // 새로 생성된 품목을 목록에 추가
+                    if (_items == null) _items = new List<Item>();
+                    _items.Add(createdItem);
+
+                    await JSRuntime.InvokeVoidAsync("alert", "품목이 성공적으로 등록되었습니다.");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "품목 등록에 실패했습니다.");
+                    return;
+                }
+            }
+            // 기존 품목 수정
+            else
+            {
+                // 한글 품목 타입을 영문으로 변환
+                string itemTypeStr = _editingItem.ItemType switch
+                {
+                    ItemType.Product => "제품",
+                    ItemType.Semi => "반제품",
+                    ItemType.Row => "원자재",
+                    ItemType.Sub => "부자재",
+                    _ => _editingItem.ItemType.ToString()
+                };
+
+                // UpdateItemRequest 객체 생성
+                var updateRequest = new UpdateItemRequest
+                {
+                    ItemName = _editingItem.ItemName,
+                    ItemType = itemTypeStr,  // 한글로 변환된 품목 타입
+                    Unit = _editingItem.Unit,
+                    SalePrice = _editingItem.SalePrice,
+                    ItemPhotoUri = _editingItem.ItemPhotoUri
+                };
+
+                var updatedItem = await ItemService.UpdateItemAsync(_editingItem.ItemId, updateRequest);
+                if (updatedItem != null && _items != null)
+                {
+                    // 업데이트된 품목으로 목록 업데이트
+                    var index = _items.FindIndex(i => i.ItemId == updatedItem.ItemId);
+                    if (index >= 0)
+                    {
+                        _items[index] = updatedItem;
+                    }
+
+                    await JSRuntime.InvokeVoidAsync("alert", "품목이 성공적으로 수정되었습니다.");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("alert", "품목 수정에 실패했습니다.");
+                    return;
+                }
+            }
+
+            // 필터 및 정렬 다시 적용
+            ApplyFiltersAndSort();
+
+            // 다이얼로그 닫기
+            _showItemDialog = false;
+        }
+        catch (Exception ex)
+        {
+            // 오류 처리
+            await JSRuntime.InvokeVoidAsync("alert", $"품목 저장에 실패했습니다: {ex.Message}");
+        }
+    }
+
+    // 이미지 업로드
+    private async Task UploadPhoto()
+    {
+        try
+        {
+            // JSInterop를 통해 파일 선택기 열기
+            var fileInput = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/fileUpload.js");
+            var fileInfo = await fileInput.InvokeAsync<string>("selectFile", "image/*");
+
+            if (!string.IsNullOrEmpty(fileInfo))
+            {
+                // 실제 환경에서는 서버에 이미지 업로드 후 URL을 받아와야 함
+                // 현재는 임시로 선택한 파일 정보만 활용
+                _editingItem.ItemPhotoUri = "images/sample-upload.jpg";
+
+                // 실제 구현: 파일을 서버에 업로드하고 URL을 받아옴
+                // var uploadResult = await UploadImageToServer(fileInfo);
+                // _editingItem.ItemPhotoUri = uploadResult.Url;
+
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"이미지 업로드 중 오류가 발생했습니다: {ex.Message}");
+        }
+    }
+
+    // 이미지 제거
+    private void RemovePhoto()
+    {
+        _editingItem.ItemPhotoUri = null;
+    }
+
+    // 삭제 확인 다이얼로그 표시
+    private void ConfirmDeleteItem(Item item)
+    {
+        _itemToDelete = item;
+        _showDeleteConfirm = true;
+    }
+
+    // 삭제 취소
+    private void CancelDeleteItem()
+    {
+        _showDeleteConfirm = false;
+        _itemToDelete = null;
+    }
+
+    // 품목 삭제
+    private async Task DeleteItem()
+    {
+        if (_itemToDelete == null || _items == null) return;
+
+        try
+        {
+            // ItemService를 통한 품목 삭제
+            bool success = await ItemService.DeleteItemAsync(_itemToDelete.ItemId);
+
+            if (success)
+            {
+                // 목록에서 삭제된 품목 제거
+                _items.RemoveAll(i => i.ItemId == _itemToDelete.ItemId);
+
+                // 필터 및 정렬 다시 적용
+                ApplyFiltersAndSort();
+
+                await JSRuntime.InvokeVoidAsync("alert", "품목이 성공적으로 삭제되었습니다.");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "품목 삭제에 실패했습니다.");
+            }
+
+            // 다이얼로그 닫기
+            _showDeleteConfirm = false;
+            _itemToDelete = null;
+        }
+        catch (Exception ex)
+        {
+            // 오류 처리
+            await JSRuntime.InvokeVoidAsync("alert", $"품목 삭제에 실패했습니다: {ex.Message}");
+        }
+    }
+}

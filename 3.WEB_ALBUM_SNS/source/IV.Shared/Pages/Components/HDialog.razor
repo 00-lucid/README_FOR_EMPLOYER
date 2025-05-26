@@ -1,0 +1,72 @@
+@inherits LayoutComponentBase
+
+@if (IsOpen)
+{
+    <div class="h-dialog-mask" @onclick="CloseDialog">
+        <!-- 이벤트 메서드와 stopPropagation 옵션 분리 -->
+        <div class="h-dialog-content" @onclick="@StopPropagation" @onclick:stopPropagation="true">
+            <div class="h-dialog-header">
+                <h3 class="h-dialog-title">@Title</h3>
+                <button class="h-dialog-close" @onclick="CloseDialog">×</button>
+            </div>
+            <div class="h-dialog-body">
+                @ChildContent
+            </div>
+            <div class="h-dialog-footer">
+                @FooterContent
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 다이얼로그의 표시 여부. true면 표시, false면 숨김.
+    /// </summary>
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    /// <summary>
+    /// IsOpen 상태가 변경되었을 때 상위 컴포넌트와
+    /// 상호작용하기 위한 이벤트 콜백(양방향 바인딩).
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>
+    /// 다이얼로그의 타이틀(헤더).
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = "Dialog Title";
+
+    /// <summary>
+    /// 다이얼로그의 본문 영역.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 다이얼로그 하단(푸터)에 들어갈 내용(버튼 등).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    /// <summary>
+    /// 다이얼로그를 닫는 메서드. 
+    /// 외부나 '×' 버튼 클릭 시 호출됩니다.
+    /// </summary>
+    private void CloseDialog()
+    {
+        IsOpen = false;
+        IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    /// <summary>
+    /// 다이얼로그 내부 클릭 시 이벤트 전파를 막아,
+    /// 다이얼로그가 닫히지 않도록 처리합니다.
+    /// </summary>
+    private void StopPropagation(MouseEventArgs e)
+    {
+        // 내부 클릭 시 닫히지 않도록 이벤트 전파 중단
+    }
+}

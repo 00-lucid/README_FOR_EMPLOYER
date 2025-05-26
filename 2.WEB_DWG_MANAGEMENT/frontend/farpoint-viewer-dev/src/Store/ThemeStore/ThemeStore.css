@@ -1,0 +1,63 @@
+@font-face {
+    font-family: 'NanumBarunGothic';
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    src: url('./NanumBarunGothic.otf');
+}
+
+* {
+    font-family: NanumBarunGothic;
+    transition: margin 0.2s ease-out;
+}
+
+.App {
+    --SideMenuWidth: 80px;
+    --Text-Highlight: #4a70f7;
+    --Text-Normal: #464646;
+    --Text-Hover: #4a70f7;
+    --Text-Active: #3b5bd1;
+    --Background-Highlight: #4a70f7;
+    --Background-Highlight-Hover: #4265e3;
+    --Background-Highlight-Active: #3b5bd1;
+    --Background-Normal: #f4f6fc;
+    --Background-Normal-Hover: #e1e3e8;
+    --Background-Normal-Active: #d3d5db;
+    --Stroke-Highlight: #fff;
+    --Stroke-Normal: #464646;
+    --Separate-Line: #c5cbcf;
+    --Icon-Normal: #5e6467;
+    --Icon-Highlight: #fff;
+    --Table-Row-Highlight: #e7edf1;
+    --Table-Row-Hover: #dce1e6;
+    --Table-Row-Active: #d3d8de;
+    --SubTable-Row-Highlight: #ebebe3;
+    --Btn-delete-background: #cc0000;
+    --Scroll-Stroke: #969696;
+    --Scroll-Background: #dddddd;
+}
+
+/* common control */
+.CommonComponent {
+    --Component-Border: #e6e8ef;
+    --Component-Background: #fff;
+    --Component-Background-Hover: #f8f8f8;
+    --Component-Background-Active: #f0f0f0;
+    --Component-Active: #4a70f7;
+    --Component-Stroke: #464646;
+    --Component-Disable: #a4a4a4;
+    --Component-Shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+}
+
+.DarkTheme .CommonComponent {
+    --Component-Border: #5e6467;
+    --Component-Background: #e7edf1;
+    --Component-Background-Hover: #dce1e6;
+    --Component-Background-Active: #d3d8de;
+    --Component-Active: #4a70f7;
+    --Component-Stroke: #464646;
+    --Component-Disable: #a4a4a4;
+    --Component-Shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+}

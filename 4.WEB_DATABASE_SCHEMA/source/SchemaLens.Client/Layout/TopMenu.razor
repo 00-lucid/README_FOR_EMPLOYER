@@ -1,0 +1,89 @@
+﻿@using SchemaLens.Client.Interfaces
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<header id="header-container">
+    @if (!isRootPage)
+    {
+        <span id="logo" @onclick="@(() =>
+                                  {
+                                      if (isLogin)
+                                      {
+                                          NavigationManager.NavigateTo("/main");
+                                      }
+                                      else
+                                      {
+                                          NavigationManager.NavigateTo("/");
+                                      }
+                                  })" style="cursor: pointer;">SCHEMALENS</span>
+    }
+    @if (isLogin)
+    {
+        if (authority.Equals("USER") || authority.Equals("DBA"))
+        {
+            @* 피어작성 *@
+            <RadzenButton Click=@OnMovePeerWritePage Style="margin-right: 1rem;" Variant="Variant.Flat" Icon="add" ButtonStyle="ButtonStyle.Primary" />
+            if (authority.Equals("DBA"))
+            {
+                @* 피어관리 *@
+                <RadzenButton Click=@OnMovePeerExaminePage Style="margin-right: 1rem;" Variant="Variant.Flat" Icon="build" ButtonStyle="ButtonStyle.Base" />
+            }
+        }
+        @* 로그아웃 *@
+        <RadzenButton Click=@OnLogOut Style="margin-right: 1rem;" Variant="Variant.Outlined" Text="로그아웃" ButtonStyle="ButtonStyle.Base" />   
+    }
+    else
+    {
+        @* 로그인 *@
+        <RadzenButton Click="@(() => NavigationManager.NavigateTo("/signin"))" Style="margin-right: 1rem;" Variant="Variant.Flat" Text="로그인" ButtonStyle="ButtonStyle.Primary" />
+    }
+    <div style="margin-right: 1rem;">
+        <RadzenAppearanceToggle />
+    </div>
+</header>
+
+@code {
+    private bool isRootPage => NavigationManager.Uri.EndsWith("/main");
+
+    [Parameter]
+    public bool isLogin { get; set; }
+    [Parameter]
+    public string authority { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // NavigationManager의 LocationChanged 이벤트 구독
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // URL 변경 시 UI를 다시 렌더링
+        StateHasChanged();
+    }
+
+    // public void Dispose()
+    // {
+    //     // 이벤트 구독 해제
+    //     NavigationManager.LocationChanged -= OnLocationChanged;
+    // }
+
+    private async Task OnLogOut()
+    {
+        await AuthenticationService.Logout();
+
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void OnMovePeerWritePage()
+    {
+        var url = $"/peer/write";
+        NavigationManager.NavigateTo(url);
+    }
+
+    private void OnMovePeerExaminePage()
+    {
+        var url = $"/peer/examine";
+        NavigationManager.NavigateTo(url);
+    }
+}

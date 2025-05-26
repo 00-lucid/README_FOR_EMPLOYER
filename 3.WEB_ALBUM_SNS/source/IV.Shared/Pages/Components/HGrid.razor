@@ -1,0 +1,25 @@
+﻿<div class="hgrid" style="@GetPaddingStyle()">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// Grid 내부에 표시할 자식 콘텐츠를 설정합니다.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Padding (CSS 단위): 예) "16px" 또는 "1rem 2rem"
+    /// </summary>
+    [Parameter]
+    public string Padding { get; set; } = "0px";
+
+    /// <summary>
+    /// 지정된 Padding 값을 style 문자열에 반영합니다.
+    /// </summary>
+    private string GetPaddingStyle()
+    {
+        return $"padding: {Padding};";
+    }
+}

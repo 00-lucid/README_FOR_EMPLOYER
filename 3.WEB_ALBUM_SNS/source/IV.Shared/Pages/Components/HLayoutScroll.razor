@@ -1,0 +1,27 @@
+﻿<div id="@Id" @onscroll="OnScroll" style="@Style">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? BackgroundColor { get; set; } = "transparent";
+
+    [Parameter]
+    public string? Height { get; set; } = "100vh";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<EventArgs> OnScroll { get; set; }
+
+    [Parameter]
+    public string Id { get; set; } = "layoutScroll"; // 기본 ID 설정
+
+    private string Style => $@"
+        width: 100%; 
+        height: {Height}; 
+        overflow-y: auto; 
+        background-color: {BackgroundColor};
+    ";
+}

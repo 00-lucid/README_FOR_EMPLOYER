@@ -1,0 +1,29 @@
+.MydocMenu {
+    position: absolute;
+    width: var(--MydocMenuWidth);
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.MydocMenu .topline {
+    height: 1px;
+    margin-top: 110px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: #d5dadd;
+}
+
+.MydocMenu .ControlView {
+    position: absolute;
+    top: 65px;
+    left: 25px;
+    height: 40px;
+}
+
+#mydocMenuTreeView {
+    position: absolute;
+    top: 70px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}

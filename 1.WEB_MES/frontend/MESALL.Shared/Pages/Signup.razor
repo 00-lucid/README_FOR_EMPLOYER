@@ -1,0 +1,198 @@
+@page "/signup"
+@using MESALL.Shared.Interfaces
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.utils
+@inject NavigationManager NavigationManager
+@inject ILoginService LoginService
+
+<HLayoutCenter>
+    <HColumn Gap="1rem">
+        <HColumn Gap="1rem" MinWidth="20rem">
+            <!-- 단계 표시기 -->
+            @* <div class="step-indicator"> *@
+            @*     <span class="@(SignupState.CurrentStep >= 1 ? "active" : "")">이메일</span> > *@
+            @*     <span class="@(SignupState.CurrentStep >= 2 ? "active" : "")">인증</span> > *@
+            @*     <span class="@(SignupState.CurrentStep >= 3 ? "active" : "")">정보 입력</span> *@
+            @* </div> *@
+
+            <!-- 단계 1: 이메일 입력 -->
+            <div class="@(CurrentStep == 1 ? "form-step active" : "form-step")">
+                <HTextInput
+                    Label="이메일"
+                    Type="email"
+                    Id="email"
+                    @bind-Value="@Email"
+                    PlaceHolder="이메일을 입력하세요"
+                    Validation="Validator.ValidateEmail"
+                    OnValidationChange="@(isValid => EmailValid = isValid)"
+                />
+                <HButton Disabled="@(!EmailValid)" OnClick="@HandleEmailStep">다음</HButton>
+            </div>
+
+            <!-- 단계 2: 인증 코드 입력 -->
+            <div class="@(CurrentStep == 2 ? "form-step active" : "form-step")">
+                <HTextInput
+                    Label="인증 코드"
+                    Type="text"
+                    Id="verification-code"
+                    @bind-Value="@VerificationCode"
+                    Validation="Validator.ValidateVerificationCode"
+                    OnValidationChange="@(isValid => VerificationCodeValid = isValid)"
+                    PlaceHolder="이메일로 전송된 인증 코드를 입력하세요"
+                />
+                <div class="button-group">
+                    <HButton OnClick="@HandlePreviousStep">이전</HButton>
+                    <HButton Disabled="@(!VerificationCodeValid)" OnClick="@HandleVerificationStep">다음</HButton>
+                </div>
+            </div>
+
+            <!-- 단계 3: 사용자 정보 입력 -->
+            <div class="@(CurrentStep == 3 ? "form-step active" : "form-step")">
+                <HTextInput
+                    Label="사용자 이름"
+                    Type="text"
+                    Id="username"
+                    @bind-Value="@Username"
+                    Validation="Validator.ValidateUsername"
+                    OnValidationChange="@(isValid => UsernameValid = isValid)"
+                    PlaceHolder="사용자 이름을 입력하세요"
+                />
+                <HTextInput
+                    Label="비밀번호"
+                    Type="password"
+                    Id="password"
+                    @bind-Value="@Password"
+                    Validation="Validator.ValidatePassword"
+                    OnValidationChange="@(isValid => PasswordValid = isValid)"
+                    PlaceHolder="비밀번호를 입력하세요"
+                />
+                <HTextInput
+                    Label="비밀번호 확인"
+                    Type="password"
+                    Id="confirm-password"
+                    @bind-Value="@ConfirmPassword"
+                    Validation="@(confirmPwd => Validator.ValidateConfirmPassword(confirmPwd, Password))"
+                    OnValidationChange="@(isValid => ConfirmPasswordValid = isValid)"
+                    PlaceHolder="비밀번호를 한 번 더 입력하세요"
+                />
+                <div class="button-group">
+                    <HButton OnClick="HandlePreviousStep">이전</HButton>
+                    <HButton Disabled="@(!(UsernameValid && PasswordValid && ConfirmPasswordValid))" OnClick="HandleSignup">완료</HButton>
+                </div>
+            </div>
+        </HColumn>
+
+        <!-- 로그인 리디렉션 -->
+        <div class="auxiliary-links">
+            <p>
+                계정이 이미 있나요?
+                <a href="/login">로그인</a>
+            </p>
+        </div>
+    </HColumn>
+</HLayoutCenter>
+
+@code {
+    private string Username { get; set; } = string.Empty;
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string ConfirmPassword { get; set; } = string.Empty;
+    public string VerificationCode { get; set; } = string.Empty;
+
+    private bool IsEmailSent = false;
+    private int CurrentStep { get; set; } = 1;
+
+    // 유효성 검사 결과 상태
+    private bool EmailValid { get; set; } = false;
+    private bool VerificationCodeValid { get; set; } = false;
+    private bool UsernameValid { get; set; } = false;
+    private bool PasswordValid { get; set; } = false;
+    private bool ConfirmPasswordValid { get; set; } = false;
+    
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+
+    // 이메일 단계 처리
+    private async Task HandleEmailStep()
+    {
+        // 이메일 인증 코드 발송 로직
+        try {
+            // TODO: 실제 이메일 인증 코드 발송 로직 구현
+            // var verificationCode = new Random().Next(100000, 999999).ToString();
+            // await EmailService.SendAsync(Email, "이메일 인증", $"인증 코드: {verificationCode}");
+            // await SaveVerificationCodeAsync(Email, verificationCode);
+
+            // 인증 코드 발송 성공 후 단계 이동
+            IsEmailSent = true;
+            CurrentStep = 2;
+        }
+        catch (Exception ex) {
+            Console.WriteLine($"이메일 인증 오류: {ex.Message}");
+        }
+    }
+
+    // 인증 코드 단계 처리
+    private async Task HandleVerificationStep()
+    {
+        // TODO: 실제 인증 코드 검증 로직 구현
+        // var isValid = await VerifyCodeAsync(Email, VerificationCode);
+        // if (!isValid) {
+        //     return;
+        // }
+
+        // 인증 성공 후 다음 단계로 이동
+        CurrentStep = 3;
+    }
+
+    private async Task HandleSignup()
+    {
+        // 폼 제출 시 마지막 단계에서만 처리
+        if (CurrentStep != 3) {
+            return;
+        }
+
+        // 유효성 검사 (이메일 형식 여부 추가)
+        if (string.IsNullOrWhiteSpace(Email)
+            || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(Email))
+        {
+            // 오류 처리
+            return;
+        }
+
+        // API 호출 및 회원가입 처리
+        try
+        {
+            // 회원가입 로직
+            bool isSignup = await LoginService.SignupAsync(Username, Email, Password);
+
+            if (isSignup)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            // 리다이렉션 또는 다른 작업
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Signup error: {ex.Message}");
+        }
+    }
+
+    private Task SaveVerificationCodeAsync(string email, string code)
+    {
+        // EmailService.SaveVerificationCode(email, code);
+        return Task.CompletedTask;
+    }
+
+    // 이전 버튼 클릭 처리를 위한 메소드
+    private void HandlePreviousStep()
+    {
+        if (CurrentStep == 2)
+        {
+            CurrentStep = 1;
+        }
+        else if (CurrentStep == 3)
+        {
+            CurrentStep = 2;
+        }
+    }
+}

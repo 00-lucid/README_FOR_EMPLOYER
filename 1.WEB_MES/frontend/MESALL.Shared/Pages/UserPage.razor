@@ -1,0 +1,756 @@
+﻿@page "/user"
+@using System.Text.Json
+@using System.Net.Http.Json
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>구성원 관리</h1>
+            <span class="user-count">총 @(_filteredUsers?.Count ?? 0)명의 구성원</span>
+        </div>
+    </header>
+
+    <HRow JustifyContent="space-between" AlignItems="center">
+        <div class="filters-section">
+            <div class="filter-tag @(_activeDepFilter == null ? "active" : "")" @onclick='() => ApplyDepartmentFilter(null)'>
+                전체 부서
+            </div>
+            <div class="filter-tag @(_activeDepFilter == "개발팀" ? "active" : "")" @onclick='() => ApplyDepartmentFilter("개발팀")'>
+                개발팀
+            </div>
+            <div class="filter-tag @(_activeDepFilter == "디자인팀" ? "active" : "")" @onclick='() => ApplyDepartmentFilter("디자인팀")'>
+                디자인팀
+            </div>
+            <div class="filter-tag @(_activeDepFilter == "영업팀" ? "active" : "")" @onclick='() => ApplyDepartmentFilter("영업팀")'>
+                영업팀
+            </div>
+            <div class="filter-tag @(_activeDepFilter == "경영지원팀" ? "active" : "")" @onclick='() => ApplyDepartmentFilter("경영지원팀")'>
+                경영지원팀
+            </div>
+            <div class="filter-tag @(_activeDepFilter == "인사팀" ? "active" : "")" @onclick='() => ApplyDepartmentFilter("인사팀")'>
+                인사팀
+            </div>
+        </div>
+
+        <HRow AutoWidth="true" Gap="1rem" AlignItems="center">
+            <HTextInput
+                Width="300px"
+                PlaceHolder="이름, 직급, 부서 검색"
+                Value="@_searchTerm"
+                ValueChanged="@((value) => { _searchTerm = value; ApplyFiltersAndSort(); })"
+                MarginBottom="0">
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="clear-search" @onclick="ClearSearch">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                }
+            </HTextInput>
+            
+            <div class="view-toggle">
+                <button class="view-toggle-btn @(_viewMode == ViewMode.List ? "active" : "")" 
+                        @onclick="() => _viewMode = ViewMode.List">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="view-toggle-btn @(_viewMode == ViewMode.Card ? "active" : "")" 
+                        @onclick="() => _viewMode = ViewMode.Card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </button>
+            </div>
+
+            <HButton OnClick="OpenAddUserDialog">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                 구성원 등록
+            </HButton>
+        </HRow>
+    </HRow>
+    
+    <div class="status-filter-section">
+        <div class="status-filter-group">
+            <div class="status-filter @(_activeStatusFilter == UserStatus.All ? "active" : "")" @onclick='() => ApplyStatusFilter(UserStatus.All)'>
+                <div class="status-icon all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                </div>
+                <span>전체</span>
+                <span class="filter-count">@_allUsers?.Count</span>
+            </div>
+            <div class="status-filter @(_activeStatusFilter == UserStatus.Active ? "active" : "")" @onclick='() => ApplyStatusFilter(UserStatus.Active)'>
+                <div class="status-icon active">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <span>재직중</span>
+                <span class="filter-count">@_allUsers?.Count(u => u.Status == UserStatus.Active)</span>
+            </div>
+            <div class="status-filter @(_activeStatusFilter == UserStatus.Vacation ? "active" : "")" @onclick='() => ApplyStatusFilter(UserStatus.Vacation)'>
+                <div class="status-icon vacation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <span>휴가중</span>
+                <span class="filter-count">@_allUsers?.Count(u => u.Status == UserStatus.Vacation)</span>
+            </div>
+            <div class="status-filter @(_activeStatusFilter == UserStatus.OnLeave ? "active" : "")" @onclick='() => ApplyStatusFilter(UserStatus.OnLeave)'>
+                <div class="status-icon on-leave">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34"></path>
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                        <path d="M18 17v1a2 2 0 0 1-2 2h3a2 2 0 0 0 2-2v-1"></path>
+                    </svg>
+                </div>
+                <span>휴직중</span>
+                <span class="filter-count">@_allUsers?.Count(u => u.Status == UserStatus.OnLeave)</span>
+            </div>
+            <div class="status-filter @(_activeStatusFilter == UserStatus.Resigned ? "active" : "")" @onclick='() => ApplyStatusFilter(UserStatus.Resigned)'>
+                <div class="status-icon resigned">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                <span>퇴사</span>
+                <span class="filter-count">@_allUsers?.Count(u => u.Status == UserStatus.Resigned)</span>
+            </div>
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="구성원 정보를 불러오는 중입니다..." />
+    }
+    else if (_filteredUsers == null || _filteredUsers.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <h3>구성원이 없습니다</h3>
+            @if (!string.IsNullOrEmpty(_searchTerm) || _activeDepFilter != null || _activeStatusFilter != UserStatus.All)
+            {
+                <p>검색어 또는 필터에 해당하는 구성원이 없습니다.</p>
+                <button class="secondary-btn" @onclick="ClearFilters">
+                    필터 초기화
+                </button>
+            }
+            else
+            {
+                <p>첫 번째 구성원을 등록해 보세요!</p>
+                <button class="primary-btn" @onclick="OpenAddUserDialog">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    구성원 등록
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        @if (_viewMode == ViewMode.List)
+        {
+            <div class="list-view">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="image-cell">프로필</th>
+                            <th @onclick='() => SortUsers("name")' class="sortable-header">
+                                이름 @GetSortIcon("name")
+                            </th>
+                            <th @onclick='() => SortUsers("department")' class="sortable-header">
+                                부서 @GetSortIcon("department")
+                            </th>
+                            <th @onclick='() => SortUsers("position")' class="sortable-header">
+                                직급 @GetSortIcon("position")
+                            </th>
+                            <th>이메일</th>
+                            <th>연락처</th>
+                            <th @onclick='() => SortUsers("status")' class="sortable-header">
+                                상태 @GetSortIcon("status")
+                            </th>
+                            <th @onclick='() => SortUsers("joinDate")' class="sortable-header">
+                                입사일 @GetSortIcon("joinDate")
+                            </th>
+                            @* <th class="actions-cell">작업</th> *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in _filteredUsers)
+                        {
+                            <tr @onclick="() => OpenUserDetailDialog(user)" class="user-row">
+                                <td class="image-cell" @onclick:stopPropagation>
+                                    @if (!string.IsNullOrEmpty(user.ProfilePhotoUri))
+                                    {
+                                        <img src="@user.ProfilePhotoUri" alt="@user.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar-placeholder">
+                                            @GetInitials(user.Name)
+                                        </div>
+                                    }
+                                </td>
+                                <td>@user.Name</td>
+                                <td>@user.Department</td>
+                                <td>@user.Position</td>
+                                <td>@user.Email</td>
+                                <td>@FormatPhoneNumber(user.PhoneNumber)</td>
+                                <td>
+                                    <span class="user-status @GetStatusClass(user.Status)">
+                                        @GetStatusDisplayName(user.Status)
+                                    </span>
+                                </td>
+                                <td>@user.JoinDate.ToString("yyyy-MM-dd")</td>
+                                @* <td class="actions-cell" @onclick:stopPropagation> *@
+                                @*     <button class="icon-btn edit-btn" @onclick:stopPropagation @onclick="() => OpenEditUserDialog(user)"> *@
+                                @*         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> *@
+                                @*             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path> *@
+                                @*             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path> *@
+                                @*         </svg> *@
+                                @*     </button> *@
+                                @*     <button class="icon-btn status-btn" @onclick:stopPropagation @onclick="() => OpenStatusChangeDialog(user)"> *@
+                                @*         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> *@
+                                @*             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path> *@
+                                @*             <polyline points="14 2 14 8 20 8"></polyline> *@
+                                @*             <line x1="16" y1="13" x2="8" y2="13"></line> *@
+                                @*             <line x1="16" y1="17" x2="8" y2="17"></line> *@
+                                @*             <polyline points="10 9 9 9 8 9"></polyline> *@
+                                @*         </svg> *@
+                                @*     </button> *@
+                                @*     <button class="icon-btn delete-btn" @onclick:stopPropagation @onclick="() => ConfirmDeleteUser(user)"> *@
+                                @*         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> *@
+                                @*             <polyline points="3 6 5 6 21 6"></polyline> *@
+                                @*             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path> *@
+                                @*             <line x1="10" y1="11" x2="10" y2="17"></line> *@
+                                @*             <line x1="14" y1="11" x2="14" y2="17"></line> *@
+                                @*         </svg> *@
+                                @*     </button> *@
+                                @* </td> *@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="card-view">
+                @foreach (var user in _filteredUsers)
+                {
+                    <div class="user-card" @onclick="() => OpenUserDetailDialog(user)">
+                        <div class="user-card-header">
+                            <span class="user-status-badge @GetStatusClass(user.Status)">
+                                @GetStatusDisplayName(user.Status)
+                            </span>
+                            <div class="card-actions" @onclick:stopPropagation>
+                                <button class="icon-btn edit-btn" @onclick="() => OpenEditUserDialog(user)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn status-btn" @onclick="() => OpenStatusChangeDialog(user)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="user-card-profile">
+                            @if (!string.IsNullOrEmpty(user.ProfilePhotoUri))
+                            {
+                                <img src="@user.ProfilePhotoUri" alt="@user.Name" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">
+                                    @GetInitials(user.Name)
+                                </div>
+                            }
+                        </div>
+                        <div class="user-card-content">
+                            <h3 class="user-name">@user.Name</h3>
+                            <div class="user-position">@user.Position</div>
+                            <div class="user-department">@user.Department</div>
+                            
+                            <div class="user-details">
+                                <div class="user-detail">
+                                    <span class="detail-label">이메일</span>
+                                    <span class="detail-value">@user.Email</span>
+                                </div>
+                                <div class="user-detail">
+                                    <span class="detail-label">연락처</span>
+                                    <span class="detail-value">@FormatPhoneNumber(user.PhoneNumber)</span>
+                                </div>
+                                <div class="user-detail">
+                                    <span class="detail-label">입사일</span>
+                                    <span class="detail-value">@user.JoinDate.ToString("yyyy년 MM월 dd일")</span>
+                                </div>
+                                @if (user.Status == UserStatus.Resigned && user.ResignDate.HasValue)
+                                {
+                                    <div class="user-detail">
+                                        <span class="detail-label">퇴사일</span>
+                                        <span class="detail-value">@user.ResignDate.Value.ToString("yyyy년 MM월 dd일")</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<UserModel> _allUsers;
+    private List<UserModel> _filteredUsers;
+    private bool _isLoading = true;
+    private string _searchTerm = "";
+    private string _activeDepFilter = null;
+    private UserStatus _activeStatusFilter = UserStatus.All;
+    private ViewMode _viewMode = ViewMode.List;
+    private string _sortField = null;
+    private bool _sortAscending = true;
+
+    // 화면 렌더링 모드 열거형
+    private enum ViewMode
+    {
+        List,
+        Card
+    }
+
+    // 사용자 상태 열거형
+    public enum UserStatus
+    {
+        All,
+        Active,
+        Vacation,
+        OnLeave,
+        Resigned
+    }
+
+    // 사용자 모델 클래스
+    public class UserModel
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Name { get; set; }
+        public string Department { get; set; }
+        public string Position { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string ProfilePhotoUri { get; set; }
+        public UserStatus Status { get; set; } = UserStatus.Active;
+        public DateTime JoinDate { get; set; } = DateTime.Now;
+        public DateTime? ResignDate { get; set; }
+        public string Address { get; set; }
+        public DateTime BirthDate { get; set; } = DateTime.Now.AddYears(-30);
+        public string EmployeeId { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _isLoading = true;
+        
+        try
+        {
+            // 실제 구현에서는 API에서 데이터를 가져옵니다.
+            // 여기서는 테스트용 샘플 데이터를 만듭니다.
+            await Task.Delay(500);
+            _allUsers = GenerateSampleUsers();
+            ApplyFiltersAndSort();
+        }
+        catch (Exception)
+        {
+            // 오류 처리
+            _allUsers = new List<UserModel>();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private List<UserModel> GenerateSampleUsers()
+    {
+        var users = new List<UserModel>
+        {
+            new UserModel
+            {
+                Name = "김민준",
+                Department = "개발팀",
+                Position = "선임개발자",
+                Email = "minjun.kim@company.com",
+                PhoneNumber = "01012345678",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2020-03-15"),
+                EmployeeId = "EMP20200315",
+                Address = "서울시 강남구"
+            },
+            new UserModel
+            {
+                Name = "이서연",
+                Department = "디자인팀",
+                Position = "시니어 디자이너",
+                Email = "seoyeon.lee@company.com",
+                PhoneNumber = "01023456789",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2019-05-20"),
+                EmployeeId = "EMP20190520",
+                Address = "서울시 서초구"
+            },
+            new UserModel
+            {
+                Name = "박지훈",
+                Department = "개발팀",
+                Position = "백엔드 개발자",
+                Email = "jihoon.park@company.com",
+                PhoneNumber = "01034567890",
+                Status = UserStatus.Vacation,
+                JoinDate = DateTime.Parse("2021-02-10"),
+                EmployeeId = "EMP20210210",
+                Address = "서울시 마포구"
+            },
+            new UserModel
+            {
+                Name = "최수빈",
+                Department = "영업팀",
+                Position = "영업 매니저",
+                Email = "subin.choi@company.com",
+                PhoneNumber = "01045678901",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2018-08-05"),
+                EmployeeId = "EMP20180805",
+                Address = "경기도 성남시"
+            },
+            new UserModel
+            {
+                Name = "정도윤",
+                Department = "경영지원팀",
+                Position = "팀장",
+                Email = "doyoon.jung@company.com",
+                PhoneNumber = "01056789012",
+                Status = UserStatus.OnLeave,
+                JoinDate = DateTime.Parse("2015-11-11"),
+                EmployeeId = "EMP20151111",
+                Address = "서울시 송파구"
+            },
+            new UserModel
+            {
+                Name = "한지아",
+                Department = "디자인팀",
+                Position = "UI/UX 디자이너",
+                Email = "jia.han@company.com",
+                PhoneNumber = "01067890123",
+                Status = UserStatus.Resigned,
+                JoinDate = DateTime.Parse("2019-04-01"),
+                ResignDate = DateTime.Parse("2022-08-31"),
+                EmployeeId = "EMP20190401",
+                Address = "인천시 연수구"
+            },
+            new UserModel
+            {
+                Name = "송태환",
+                Department = "개발팀",
+                Position = "프론트엔드 개발자",
+                Email = "taehwan.song@company.com",
+                PhoneNumber = "01078901234",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2021-09-15"),
+                EmployeeId = "EMP20210915",
+                Address = "서울시 용산구"
+            },
+            new UserModel
+            {
+                Name = "임하은",
+                Department = "인사팀",
+                Position = "인사 담당자",
+                Email = "haeun.lim@company.com",
+                PhoneNumber = "01089012345",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2020-01-06"),
+                EmployeeId = "EMP20200106",
+                Address = "경기도 고양시"
+            },
+            new UserModel
+            {
+                Name = "강준호",
+                Department = "영업팀",
+                Position = "영업 사원",
+                Email = "junho.kang@company.com",
+                PhoneNumber = "01090123456",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2021-11-22"),
+                EmployeeId = "EMP20211122",
+                Address = "서울시 강서구"
+            },
+            new UserModel
+            {
+                Name = "윤소라",
+                Department = "인사팀",
+                Position = "팀장",
+                Email = "sora.yoon@company.com",
+                PhoneNumber = "01012347890",
+                Status = UserStatus.Active,
+                JoinDate = DateTime.Parse("2017-06-03"),
+                EmployeeId = "EMP20170603",
+                Address = "서울시 중구"
+            }
+        };
+        
+        return users;
+    }
+
+    private void ApplyDepartmentFilter(string department)
+    {
+        _activeDepFilter = department;
+        ApplyFiltersAndSort();
+    }
+
+    private void ApplyStatusFilter(UserStatus status)
+    {
+        _activeStatusFilter = status;
+        ApplyFiltersAndSort();
+    }
+
+    private void ApplyFiltersAndSort()
+    {
+        if (_allUsers == null)
+            return;
+
+        var query = _allUsers.AsEnumerable();
+
+        // 부서 필터 적용
+        if (!string.IsNullOrEmpty(_activeDepFilter))
+        {
+            query = query.Where(u => u.Department == _activeDepFilter);
+        }
+
+        // 상태 필터 적용
+        if (_activeStatusFilter != UserStatus.All)
+        {
+            query = query.Where(u => u.Status == _activeStatusFilter);
+        }
+
+        // 검색어 필터 적용
+        if (!string.IsNullOrEmpty(_searchTerm))
+        {
+            string search = _searchTerm.ToLower();
+            query = query.Where(u => 
+                u.Name.ToLower().Contains(search) || 
+                u.Department.ToLower().Contains(search) || 
+                u.Position.ToLower().Contains(search) || 
+                u.Email.ToLower().Contains(search) ||
+                u.PhoneNumber.Contains(search)
+            );
+        }
+
+        // 정렬 적용
+        if (!string.IsNullOrEmpty(_sortField))
+        {
+            switch (_sortField)
+            {
+                case "name":
+                    query = _sortAscending
+                        ? query.OrderBy(u => u.Name)
+                        : query.OrderByDescending(u => u.Name);
+                    break;
+                case "department":
+                    query = _sortAscending
+                        ? query.OrderBy(u => u.Department)
+                        : query.OrderByDescending(u => u.Department);
+                    break;
+                case "position":
+                    query = _sortAscending
+                        ? query.OrderBy(u => u.Position)
+                        : query.OrderByDescending(u => u.Position);
+                    break;
+                case "status":
+                    query = _sortAscending
+                        ? query.OrderBy(u => u.Status)
+                        : query.OrderByDescending(u => u.Status);
+                    break;
+                case "joinDate":
+                    query = _sortAscending
+                        ? query.OrderBy(u => u.JoinDate)
+                        : query.OrderByDescending(u => u.JoinDate);
+                    break;
+            }
+        }
+        else
+        {
+            // 기본 정렬은 이름 오름차순
+            query = query.OrderBy(u => u.Name);
+        }
+
+        _filteredUsers = query.ToList();
+        StateHasChanged();
+    }
+
+    private void SortUsers(string field)
+    {
+        if (_sortField == field)
+        {
+            // 같은 필드를 다시 클릭하면 정렬 방향을 변경
+            _sortAscending = !_sortAscending;
+        }
+        else
+        {
+            // 다른 필드를 클릭하면 해당 필드로 오름차순 정렬
+            _sortField = field;
+            _sortAscending = true;
+        }
+
+        ApplyFiltersAndSort();
+    }
+
+    private string GetSortIcon(string field)
+    {
+        if (_sortField != field)
+            return "";
+
+        return _sortAscending
+            ? "▲"
+            : "▼";
+    }
+
+    private void ClearSearch()
+    {
+        _searchTerm = "";
+        ApplyFiltersAndSort();
+    }
+
+    private void ClearFilters()
+    {
+        _searchTerm = "";
+        _activeDepFilter = null;
+        _activeStatusFilter = UserStatus.All;
+        ApplyFiltersAndSort();
+    }
+
+    private string GetStatusDisplayName(UserStatus status)
+    {
+        return status switch
+        {
+            UserStatus.Active => "재직중",
+            UserStatus.Vacation => "휴가중",
+            UserStatus.OnLeave => "휴직중",
+            UserStatus.Resigned => "퇴사",
+            _ => "알 수 없음"
+        };
+    }
+
+    private string GetStatusClass(UserStatus status)
+    {
+        return status switch
+        {
+            UserStatus.Active => "active",
+            UserStatus.Vacation => "vacation",
+            UserStatus.OnLeave => "on-leave",
+            UserStatus.Resigned => "resigned",
+            _ => ""
+        };
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return "?";
+
+        if (name.Length <= 2)
+            return name;
+
+        // 한국어 이름을 위한 이니셜 처리
+        return name.Substring(0, 2);
+    }
+
+    private string FormatPhoneNumber(string phoneNumber)
+    {
+        if (string.IsNullOrEmpty(phoneNumber))
+            return "";
+
+        if (phoneNumber.Length == 11)
+        {
+            return $"{phoneNumber.Substring(0, 3)}-{phoneNumber.Substring(3, 4)}-{phoneNumber.Substring(7)}";
+        }
+
+        return phoneNumber;
+    }
+
+    // 다이얼로그 메서드들
+    private void OpenAddUserDialog()
+    {
+        // 실제 구현에서는 사용자 추가 다이얼로그를 표시합니다.
+        // 샘플 코드에서는 구현하지 않습니다.
+    }
+
+    private void OpenEditUserDialog(UserModel user)
+    {
+        // 실제 구현에서는 사용자 편집 다이얼로그를 표시합니다.
+        // 샘플 코드에서는 구현하지 않습니다.
+    }
+
+    private void OpenStatusChangeDialog(UserModel user)
+    {
+        // 실제 구현에서는 상태 변경 다이얼로그를 표시합니다.
+        // 샘플 코드에서는 구현하지 않습니다.
+    }
+
+    private void OpenUserDetailDialog(UserModel user)
+    {
+        // 실제 구현에서는 사용자 상세 정보 다이얼로그를 표시합니다.
+        // 샘플 코드에서는 구현하지 않습니다.
+    }
+
+    private void ConfirmDeleteUser(UserModel user)
+    {
+        // 실제 구현에서는 삭제 확인 다이얼로그를 표시합니다.
+        // 샘플 코드에서는 구현하지 않습니다.
+    }
+}

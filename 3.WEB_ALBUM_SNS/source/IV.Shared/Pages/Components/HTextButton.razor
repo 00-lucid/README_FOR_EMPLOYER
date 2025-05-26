@@ -1,0 +1,89 @@
+﻿@inherits LayoutComponentBase
+
+<button @onclick="HandleClick"
+        class="@GetButtonClass()"
+        disabled="@Disabled"
+        id="@Id"
+        name="@Name"
+        aria-label="@AriaLabel">
+    @ChildContent
+</button>
+
+@code {
+    /// <summary>
+    /// 버튼을 비활성화할지 여부.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// 버튼 내부에 표시할 콘텐츠(RenderFragment).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 버튼 클릭 시 호출될 콜백 메서드.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// 버튼의 id 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// 버튼의 name 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// 접근성(ARIA) 향상을 위한 aria-label 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// 텍스트 버튼의 타입(Primary, Secondary, Danger, Success).
+    /// </summary>
+    [Parameter]
+    public ButtonType Type { get; set; } = ButtonType.Primary;
+
+    /// <summary>
+    /// 클릭 이벤트 처리.
+    /// Disabled가 false일 때만 OnClick 실행.
+    /// </summary>
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (!Disabled && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+
+    /// <summary>
+    /// 버튼 타입에 따라 CSS 클래스를 생성.
+    /// </summary>
+    private string GetButtonClass() => Type switch
+    {
+        ButtonType.Primary => "h-text-button h-text-button-primary",
+        ButtonType.Secondary => "h-text-button h-text-button-secondary",
+        ButtonType.Danger => "h-text-button h-text-button-danger",
+        ButtonType.Success => "h-text-button h-text-button-success",
+        _ => "h-text-button"
+    };
+
+    /// <summary>
+    /// 버튼의 유형(스타일).
+    /// </summary>
+    public enum ButtonType
+    {
+        Primary,
+        Secondary,
+        Danger,
+        Success
+    }
+}

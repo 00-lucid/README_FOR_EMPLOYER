@@ -1,0 +1,128 @@
+﻿@using System.Timers
+
+@using System.Timers
+
+<!-- position: fixed; top/right 등을 조정해 화면에 고정 -->
+<div class="HAlert @GetAlertClass()">
+    <div class="alert-icon">
+        @GetAlertIcon()
+    </div>
+    <div class="alert-body">
+        <div class="alert-header">
+            @Title
+        </div>
+        <div class="alert-subtitle">
+            @Subtitle
+        </div>
+
+        <!-- 게이지바 -->
+        <div class="alert-timer">
+            <div class="alert-timer-fill" style="width:@ProgressPercent" />
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 알림 유형
+    /// </summary>
+    public enum AlertType
+    {
+        Warning,
+        Error,
+        Success,
+        Information
+    }
+
+    /// <summary>
+    /// 알림 타이틀
+    /// </summary>
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 알림 서브 타이틀
+    /// </summary>
+    [Parameter] public string Subtitle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 알림 메시지 유형
+    /// </summary>
+    [Parameter] public AlertType Type { get; set; } = AlertType.Information;
+
+    /// <summary>
+    /// 알림 표시 지속 시간(밀리초)
+    /// </summary>
+    [Parameter] public int Duration { get; set; } = 3000;
+
+    // 알림이 끝났음을 알리는 이벤트 (AlertModel 등 필요 시 직접 전달)
+    [Parameter] public EventCallback OnAlertFinished { get; set; }
+    
+    private Timer? _timer;
+    private double _progressValue = 0.0; // 0.0 ~ 1.0 (게이지)
+
+    /// <summary>
+    /// 게이지바에 적용할 % 문자열
+    /// </summary>
+    private string ProgressPercent => $"{_progressValue * 100}%";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // 알림 표시 시간에 맞춰 게이지바가 차오르게 하는 타이머 시작
+            StartTimer();
+        }
+    }
+
+    /// <summary>
+    /// 알림 유형에 따른 스타일 클래스를 반환
+    /// </summary>
+    private string GetAlertClass() => Type switch
+    {
+        AlertType.Warning => "HAlert-warning",
+        AlertType.Error => "HAlert-error",
+        AlertType.Success => "HAlert-success",
+        AlertType.Information => "HAlert-info",
+        _ => string.Empty
+    };
+
+    /// <summary>
+    /// AlertType에 따른 아이콘 코드를 반환
+    /// (아래는 FontAwesome 예시. 원하는 아이콘으로 변경하세요.)
+    /// </summary>
+    private RenderFragment GetAlertIcon() => Type switch
+    {
+        AlertType.Warning => @<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>,
+        AlertType.Error => @<i class="fa fa-times-circle" aria-hidden="true"></i>,
+        AlertType.Success => @<i class="fa fa-check-circle" aria-hidden="true"></i>,
+        AlertType.Information => @<i class="fa fa-info-circle" aria-hidden="true"></i>,
+        _ => @<i class="fa fa-info-circle" aria-hidden="true"></i>
+    };
+
+    private void StartTimer()
+    {
+        _timer = new Timer(50);
+        _timer.Elapsed += (sender, args) =>
+        {
+            InvokeAsync(async () =>
+            {
+                _progressValue += 1.0 / (Duration / 50.0);
+                if (_progressValue >= 1.0)
+                {
+                    _progressValue = 1.0;
+                    _timer?.Stop();
+
+                    // Duration 소진 시, 상위로 알림 종료 이벤트 알림
+                    if (OnAlertFinished.HasDelegate)
+                    {
+                        await OnAlertFinished.InvokeAsync();
+                    }
+                }
+
+                StateHasChanged();
+            });
+        };
+        _timer.Start();
+    }
+
+}

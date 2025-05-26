@@ -1,0 +1,362 @@
+.procedure-container {
+	 width: 820px;
+	 background: var(--toolbar-background);
+	 display: flex;
+	 flex-direction: column;
+	 position: absolute;
+	 top: 50%;
+	 left: 50%;
+	 transform: translate(-50%, -50%);
+	 color: var(--Text-Normal);
+	 padding: 30px 30px 0;
+	 border-radius: 10px;
+	 box-shadow: 3px 3px 3px 3px black;
+	 z-index: 1;
+}
+ .procedure-container .procedure-body {
+	 display: flex;
+	 flex-direction: column;
+}
+ .procedure-container .procedure-body .procedure-input-body {
+	 width: 80%;
+}
+ .procedure-container .procedure-body .CommonComponent {
+	 position: relative;
+	 width: 100%;
+	 height: 40px;
+}
+ .procedure-container .procedure-body .procedure-input {
+	 display: flex;
+	 align-items: center;
+	 margin-bottom: 20px;
+}
+ .procedure-container .procedure-body .procedure-input .procedure-input-div {
+	 width: 20%;
+}
+ .procedure-container .procedure-body .procedure-input:nth-child(1) {
+	 margin-top: 30px;
+}
+ .procedure-container .procedure-body .procedure-select {
+	 display: flex;
+	 align-items: center;
+	 justify-content: space-around;
+}
+ .procedure-container .procedure-body .procedure-select .procedure-select-div {
+	 width: 53%;
+}
+ .procedure-container .procedure-body .procedure-select .SelectControl {
+	 margin-top: 0;
+	 left: 0;
+	 width: 95%;
+	 margin-left: 10px;
+}
+ .procedure-table {
+	 display: flex;
+	 flex-direction: column;
+	 margin-top: 30px;
+	 background-color: var(--Markup-Popup-Background);
+	 color: var(--Text-Normal);
+	 font-size: 13px;
+}
+ .procedure-table table {
+	 border-collapse: collapse;
+	 background-color: #8e8e8e;
+}
+ .procedure-table table .addHover:hover {
+	 background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+ .procedure-table table th {
+	 padding: 15px 0;
+	 font-weight: 100;
+	 color: white;
+}
+ .procedure-table table td {
+	 max-width: 250px;
+	 min-width: none;
+	 padding: 10px 0;
+	 white-space: normal !important;
+}
+ .procedure-table table tbody {
+	 background-color: var(--Markup-Popup-Background);
+	 text-align: center;
+}
+ .procedure-table table tr {
+	 border-bottom: 2px solid #8e8e8e;
+}
+ .procedure-table .procedure-add-pmdc-table {
+	 width: 100%;
+	 border-collapse: collapse;
+	 background-color: #8e8e8e;
+}
+ .procedure-table .procedure-add-pmdc-table .addHover:hover {
+	 background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+ .procedure-table .procedure-add-pmdc-table th {
+	 padding: 15px 0;
+	 font-weight: 100;
+	 color: white;
+}
+ .procedure-table .procedure-add-pmdc-table td {
+	 max-width: 0;
+	 padding: 10px 0;
+	 overflow: hidden;
+	 text-overflow: ellipsis;
+	 white-space: nowrap !important;
+}
+ .procedure-table .procedure-add-pmdc-table tbody {
+	 background-color: var(--Markup-Popup-Background);
+	 text-align: center;
+}
+ .procedure-table .procedure-add-pmdc-table tr {
+	 border-bottom: 2px solid #8e8e8e;
+}
+ .procedure-table .procedure-table-btn {
+	 width: 150px;
+	 padding: 10px 0;
+	 text-align: center;
+	 align-self: center;
+	 border-radius: 10px;
+	 background-color: #4069f0;
+	 color: white;
+}
+ .procedure-table .procedure-table-btn:hover {
+	 background-color: #6181ed;
+	 cursor: pointer;
+}
+ .procedure-footer {
+	 display: flex;
+	 justify-content: center;
+	 align-items: center;
+	 margin: 10px 0;
+}
+ .procedure-footer .procedure-footer-btn {
+	 display: flex;
+	 justify-content: center;
+	 align-items: center;
+	 width: 150px;
+	 height: 50px;
+	 border-radius: 10px;
+}
+ .procedure-footer .procedure-footer-btn:nth-child(1) {
+	 margin-right: 20px;
+}
+ .procedure-footer .procedure-footer-btn:hover {
+	 background-color: var(--Markup-Popup-ColorPicker-Button-hover);
+	 cursor: pointer;
+}
+ .prcedure-add-container {
+	 width: 700px;
+	 background: var(--toolbar-background);
+	 display: flex;
+	 flex-direction: column;
+	 position: absolute;
+	 top: 50%;
+	 left: 50%;
+	 transform: translate(-50%, -50%);
+	 color: var(--Text-Normal);
+	 padding: 30px 50px 0;
+	 border-radius: 10px;
+	 box-shadow: 3px 3px 3px 3px black;
+	 z-index: 2;
+}
+ .prcedure-add-container .procedure-add-header {
+	 margin-bottom: 20px;
+}
+ .prcedure-add-container .procedure-add-body .CommonComponent {
+	 position: relative;
+	 width: 100%;
+	 height: 40px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-title {
+	 display: flex;
+	 align-items: center;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-title div {
+	 white-space: nowrap;
+	 margin-right: 40px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-title div:nth-child(2) {
+	 margin-right: 70px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-title div:last-child {
+	 margin-right: 0;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-equip {
+	 display: flex;
+	 align-items: center;
+	 margin: 20px 0 25px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-equip div {
+	 white-space: nowrap;
+	 margin-right: 40px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-equip div:nth-child(2) {
+	 color: white;
+	 width: 90px;
+	 padding: 5px 0;
+	 border-radius: 7px;
+	 text-align: center;
+	 background-color: #4069f0;
+	 margin-right: 30px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-equip div:nth-child(2):hover {
+	 cursor: pointer;
+	 background-color: #6181ed;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-equip div:last-child {
+	 margin-right: 0;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-pmdc {
+	 display: flex;
+	 align-items: center;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-pmdc div {
+	 white-space: nowrap;
+	 margin-right: 23px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-pmdc div:nth-child(2) {
+	 color: white;
+	 width: 90px;
+	 padding: 5px 0;
+	 border-radius: 7px;
+	 text-align: center;
+	 background-color: #4069f0;
+	 margin-right: 30px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-pmdc div:nth-child(2):hover {
+	 cursor: pointer;
+	 background-color: #6181ed;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-pmdc div:last-child {
+	 margin-right: 0;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content {
+	 display: flex;
+	 align-items: center;
+	 height: 250px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content div {
+	 white-space: nowrap;
+	 margin-right: 40px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content .CommonComponent {
+	 width: 100%;
+	 position: relative;
+	 height: 200px;
+	 margin-right: 20px;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content #procedureContent {
+	 width: 100%;
+	 height: 100%;
+	 font-size: 14px;
+	 padding: 10px 10px;
+	 color: var(--Component-Stroke);
+	 background-color: var(--Component-Background);
+	 border: solid 1px var(--Component-Border);
+	 border-radius: 8px;
+	 resize: none;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content #procedureContent:hover {
+	 background-color: var(--Component-Background-Hover);
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content #procedureContent:active {
+	 background-color: var(--Component-Background-Active);
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content #procedureContent:focus {
+	 border: solid 2px var(--Component-Active);
+	 outline: none;
+}
+ .prcedure-add-container .procedure-add-body .procedure-add-content #procedureContent::placeholder {
+	 color: var(--Component-Disable);
+}
+ .procedure-change-container {
+	 width: 700px;
+	 background-color: var(--toolbar-background);
+	 display: flex;
+	 flex-direction: column;
+	 position: absolute;
+	 top: 50%;
+	 left: 50%;
+	 transform: translate(-50%, -50%);
+	 color: var(--Text-Normal);
+	 padding: 30px 30px 0;
+	 box-shadow: 3px 3px 3px 3px black;
+	 border-radius: 10px;
+	 z-index: 3;
+}
+ .procedure-change-container .procedure-change-header {
+	 margin-bottom: 20px;
+}
+ .procedure-change-container .procedure-change-body > div {
+	 margin-bottom: 20px;
+}
+ .procedure-change-container .CommonComponent {
+	 position: relative;
+	 width: 100%;
+	 height: 40px;
+}
+ .procedure-change-container .CommonComponent .SelectControl {
+	 margin-top: 0;
+	 left: 0;
+	 width: 95%;
+}
+ .procedure-change-container .procedure-change-select {
+	 display: flex;
+}
+ .procedure-change-container .procedure-change-cnt {
+	 display: flex;
+	 white-space: nowrap;
+	 align-items: center;
+}
+ .procedure-change-container .procedure-change-cnt .procedure-change-cnt-title {
+	 display: flex;
+	 justify-content: end;
+	 width: 100%;
+	 margin-right: 20px;
+}
+ .procedure-change-container .procedure-change-search {
+	 display: flex;
+	 white-space: nowrap;
+	 align-items: center;
+}
+ .procedure-change-container .procedure-change-search .CommonComponent {
+	 width: 90%;
+}
+ .procedure-change-container .procedure-change-search .procedure-select-box {
+	 width: 150px;
+	 height: 40px;
+	 margin-right: 20px;
+	 padding-left: 5px;
+	 border-radius: 5px;
+}
+ .procedure-change-container .procedure-change-search .procedure-change-search-btn {
+	 width: 100px;
+	 padding: 10px 0;
+	 background-color: #4069f0;
+	 text-align: center;
+	 border-radius: 4px;
+	 color: white;
+	 margin: 0 12px;
+}
+ .procedure-change-container .procedure-change-search .procedure-change-search-btn:hover {
+	 cursor: pointer;
+	 background-color: #6181ed;
+}
+ .procedure-change-container .procedure-change-pmdc-search {
+	 display: flex;
+	 flex-direction: column;
+}
+ .procedure-change-container .procedure-change-pmdc-search > div {
+	 display: flex;
+}
+ .procedure-change-container .procedure-change-pmdc-search > div:nth-child(1) {
+	 margin-bottom: 15px;
+}
+ .procedure-change-container .procedure-change-pmdc-search > div:nth-child(1) .CommonComponent:nth-child(1) {
+	 margin-right: 20px;
+}
+ .procedure-change-container .procedure-change-pmdc-search .procedure-change-search-btn {
+	 margin: 0;
+	 margin-left: 20px;
+}
+ 

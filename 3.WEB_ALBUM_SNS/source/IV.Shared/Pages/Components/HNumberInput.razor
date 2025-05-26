@@ -1,0 +1,61 @@
+﻿<div class="form-group number-input-container">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">@Label:</label>
+    }
+    <div class="input-wrapper">
+        <input
+            type="number"
+            id="@Id"
+            value="@Value"
+            placeholder="@PlaceHolder"
+            min="@Min"
+            max="@Max"
+            step="@Step"
+            class="form-control"
+            @oninput="HandleInput" />
+
+        <!-- 추가 요소 영역 -->
+        <div class="input-addon">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter]
+    public decimal Value { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? PlaceHolder { get; set; }
+
+    [Parameter]
+    public double? Min { get; set; }
+
+    [Parameter]
+    public double? Max { get; set; }
+
+    [Parameter]
+    public double Step { get; set; } = 1;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value?.ToString(), out decimal newValue))
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+        }
+    }
+}

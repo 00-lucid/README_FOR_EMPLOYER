@@ -1,0 +1,75 @@
+.EquipmentSearchView {
+    --EquipmentSearchResultWidth: 482px;
+    position: absolute;
+    top: 0px;
+    width: var(--EquipmentSearchResultWidth);
+    height: 100%;
+    background-color: var(--Background-Normal);
+}
+
+.EquipmentSearchView .ListView {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    overflow-y: scroll;
+    border-collapse: collapse;
+}
+
+.EquipmentSearchView .ListView::-webkit-scrollbar {
+    display: none;
+}
+
+.EquipmentSearchView .ListView table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.EquipmentSearchView .ListView tr {
+    height: 40px;
+    color: var(--Text-Normal);
+}
+
+.EquipmentSearchView .ListView td {
+    padding: 10px 0 10px 0;
+    font-size: 13px;
+}
+
+.EquipmentSearchView .ListView th {
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.EquipmentSearchView .ListView tbody tr:nth-child(odd) {
+    background-color: var(--Table-Row-Highlight);
+}
+.EquipmentSearchView .ListView tbody tr:hover {
+    background-color: var(--Table-Row-Hover);
+}
+.EquipmentSearchView .ListView tbody tr:active {
+    background-color: var(--Table-Row-Active);
+}
+
+.EquipmentSearchView .ListView td:first-child {
+    border-top-left-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+
+.EquipmentSearchView .ListView td:last-child {
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+.EquipmentSearchView .ListView .Header .First {
+    width: 200px;
+}
+.EquipmentSearchView .ListView .Header .Third {
+    width: 40px;
+}
+.EquipmentSearchView .ListView .RowItem .First {
+    padding-left: 10px;
+}
+.EquipmentSearchView .ListView .RowItem .Third {
+    text-align: center;
+}

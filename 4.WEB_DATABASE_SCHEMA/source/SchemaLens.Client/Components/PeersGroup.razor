@@ -1,0 +1,110 @@
+﻿@using SchemaLens.Client.Interfaces
+@using SchemaLens.Client.Model
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject IPeersGroupService PeersGroupService
+
+<div style="display: flex; justify-content: start; flex-wrap: wrap; gap: 1rem; overflow-y: scroll; width: 100%; height: 100%; margin-top: 1rem;">
+    <RadzenCard class="rz-border rz-border-color-primary" Style="width: 250px; height: 330px; background-color: var(--rz-base-lighter); margin: 0; --rz-border-width: 1px;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            @* border-radius: 50%; *@
+            <div style="width: 100px; height: 100px; background-color: var(--rz-base-lighter);"></div>
+            @* <RadzenImage Path="images/empty-image.jpg" Style="width: 100px; height: 100px; background-color: whitesmoke;" /> *@
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
+            @* <RadzenButton Variant="Variant.Text" class="rz-text-secondary-color" Text="" /> *@
+            <RadzenButton Click="OnClickAddPeersGroupDialog" Variant="Variant.Filled" Icon="add" Text="생성하기" />
+        </RadzenStack>
+    </RadzenCard>
+    @if (peersGroups is not null)
+    {
+        @foreach (PeersGroupModel peersGroupModel in peersGroups)
+        {
+            <RadzenCard class="rz-border rz-border-color-primary" Style="width: 250px; height: 330px; background-color: var(--rz-base-lighter); margin: 0;">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+                    @* border-radius: 50%; *@
+                    <div style="width: 100px; height: 100px; background-color: var(--rz-base-lighter);"></div>
+                    @* <RadzenImage Path="images/empty-image.jpg" Style="width: 100px; height: 100px; background-color: whitesmoke;" /> *@
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-black)" class="rz-display-flex rz-mt-2 rz-my-0">그룹명</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1" Style="color: var(--rz-black)"><b>@peersGroupModel?.GroupName</b></RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+                <RadzenCard class="rz-background-color-primary-light rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem calc(-1 * var(--rz-card-padding));">
+                    @* <RadzenText TextStyle="TextStyle.H6" class="rz-color-on-primary-light"><strong>예약어</strong></RadzenText>
+                    <RadzenRow RowGap="0">
+                    </RadzenRow> *@
+                </RadzenCard>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0">
+                    @* <RadzenButton Variant="Variant.Text" class="rz-text-secondary-color" Text="" /> *@
+                    <RadzenButton Click="() => OnMovePeersGroupDetailPage(peersGroupModel.PeersGroupId)" Variant="Variant.Text" Text="자세히" />
+                </RadzenStack>
+            </RadzenCard>
+        }
+    }
+    
+</div>
+
+@code {
+    string groupName;
+    string discription;
+
+    IEnumerable<PeersGroupModel> peersGroups;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        peersGroups = await PeersGroupService.GetPeersGroupByAllAsync();
+    }
+
+    private async void OnClickAddPeersGroupDialog()
+    {
+        await DialogService.OpenAsync("규칙", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenFormField Text="그룹명" Style="width: 100%;">
+                <RadzenTextBox @bind-Value="@groupName" />
+            </RadzenFormField>
+            <RadzenFormField Text="요약" Style="width: 100%;">
+                <RadzenTextBox @bind-Value="@discription" />
+            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => OnClickAddPeersGroup(ds)" Style="width: 80px;" />
+                <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+        , options: new DialogOptions { CloseDialogOnOverlayClick = true });
+    }
+
+    private async void OnClickAddPeersGroup(DialogService ds)
+    {
+        // 데이터와 컬럼명이 비어있지 않고, 동일한 데이터가 Peers 테이블에 존재하지 않을 때.
+        if (!string.IsNullOrEmpty(groupName) && !string.IsNullOrEmpty(discription))
+        {
+            await PeersGroupService.CreatePeersGroup(groupName, discription, 1);
+            
+            // 생성되면 생성된 그룹 페이지로 바로 이동
+            // NavigationManager.NavigateTo($"/peer/group/detail?={ds.}")
+
+            ds.Close(false);
+            StateHasChanged();
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "등록 오류",
+                    Detail = $"항목이 비어있습니다.",
+                    Duration = 2000
+                });
+        }
+    }
+
+    void OnMovePeersGroupDetailPage(int peersGroupId)
+    {
+        var url = $"/peer/group/detail?PeersGroupId={peersGroupId}";
+        NavigationManager.NavigateTo(url);
+    }
+}

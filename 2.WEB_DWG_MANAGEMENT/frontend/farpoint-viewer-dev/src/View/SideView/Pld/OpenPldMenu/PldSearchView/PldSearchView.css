@@ -1,0 +1,194 @@
+.PldSearchView {
+    --PldSearchResultWidth: 582px;
+    position: absolute;
+    top: 0px;
+    width: var(--PldSearchResultWidth);
+    height: 100%;
+    background-color: var(--Background-Normal);
+}
+
+/* ListView 영역 */
+.PldSearchView .ListView {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 2px;
+    bottom: 10px;
+    overflow-y: scroll;
+}
+
+.PldSearchView .ListView::-webkit-scrollbar {
+    /*display: none;*/
+    width: 8px;
+}
+.PldSearchView .ListView::-webkit-scrollbar-thumb {
+    background-color: var(--Scroll-Stroke);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+.PldSearchView .ListView::-webkit-scrollbar-track {
+    background-color: var(--Scroll-Background);
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px white;
+}
+
+/* 메인 table 영역 */
+.PldSearchView .ListView table.Main {
+    width: 100%;
+    border-spacing: 0 5px;
+}
+
+/* thead 영역 */
+.PldSearchView .ListView th {
+    font-size: 15px;
+    font-weight: normal;
+}
+.PldSearchView .ListView .Header .First {
+    width: 100px;
+}
+.PldSearchView .ListView .Header .Second {
+    width: 150px;
+}
+.PldSearchView .ListView .Header .Fourth {
+    width: 70px;
+}
+
+/* RowItem 영역 */
+.PldSearchView .ListView tr.RowItem {
+    height: 40px;
+    color: var(--Text-Normal);
+    border-top: 12px;
+}
+.PldSearchView .ListView tbody tr.RowItem {
+    /* .PldSearchView .ListView tbody tr.RowItem:nth-child(odd) {  */
+    background-color: var(--Table-Row-Highlight);
+}
+.PldSearchView .ListView tbody tr.RowItem:hover {
+    background-color: var(--Table-Row-Hover);
+}
+.PldSearchView .ListView tbody tr.RowItem:active {
+    background-color: var(--Table-Row-Active);
+}
+.PldSearchView .ListView .RowItem td {
+    font-size: 13px;
+    text-align: center;
+}
+.PldSearchView .ListView .RowItem td:first-child {
+    border-top-left-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+.PldSearchView .ListView .RowItem td:last-child {
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+/* RowTable 영역 */
+.PldSearchView .ListView tr.RowTable {
+    height: 25px;
+    width: 40px;
+    color: var(--Text-Normal);
+    animation: fade-in 0.5s;
+}
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.PldSearchView .ListView tr.RowTable.hidden {
+    opacity: 0;
+    display: none;
+}
+
+/* 서브 table 영역 */
+.PldSearchView .ListView table.Sub {
+    table-layout: fixed;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 100%;
+    height: 100%;
+}
+.PldSearchView .ListView table.Sub tr {
+    height: 25px;
+}
+.PldSearchView .ListView table.Sub td:not(.innerTd) {
+    padding-top: 2px;
+    font-size: 13px;
+    text-align: center;
+    word-wrap: break-word;
+    border: 1px solid #444444;
+}
+.PldSearchView .ListView table.Sub td.ColorType {
+    background-color: var(--SubTable-Row-Highlight);
+}
+.PldSearchView .ListView table.Sub td.LeftAlign {
+    text-align: left;
+    padding-left: 10px;
+}
+.PldSearchView .ListView table.Sub td.BothAlign {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.PldSearchView .ListView table.Sub tr.First > td:first-child {
+    border-top-left-radius: 11px;
+}
+.PldSearchView .ListView table.Sub tr.First > td:last-child {
+    border-top-right-radius: 11px;
+}
+.PldSearchView .ListView table.Sub tr.Last > td:first-child {
+    border-bottom-left-radius: 11px;
+}
+.PldSearchView .ListView table.Sub tr.Last > td:last-child {
+    border-bottom-right-radius: 11px;
+}
+
+/* 관련도면 table 영역 */
+.PldSearchView .ListView table.RelDrawing {
+    width: 100%;
+}
+.PldSearchView .ListView table.RelDrawing tbody td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.PldSearchView .ListView table.RelDrawing td:first-child {
+    text-align: center;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.PldSearchView .ListView table.RelDrawing td:last-child {
+    text-align: left;
+    padding-right: 5px;
+    padding-left: 7px;
+}
+
+/* 상세보기 버튼 */
+.PldSearchView .DetailButton {
+    position: relative;
+    margin-left: 25px;
+    /* margin-top: 24px; */
+    width: calc(100% - 20px - 20px);
+    height: 25px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+}
+.PldSearchView .DetailButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.PldSearchView .DetailButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+.PldSearchView .DetailButton > div {
+    width: 100%;
+    /* height: 20px; */
+    font-size: 13px;
+    text-align: center;
+    color: white;
+    vertical-align: middle;
+}

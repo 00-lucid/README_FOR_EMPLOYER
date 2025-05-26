@@ -1,0 +1,28 @@
+.MainView .PopupMenu {
+    position: absolute;
+    width: auto;
+    height: auto;
+    left: calc(100% / 2);
+    top: calc(100% / 2);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px 1px rgba(0, 0, 0, 0.73);
+    background-color: var(--Background-Normal);
+    overflow: hidden;
+    outline: none;
+}
+
+.PopupMenu .PopupItem {
+    position: relative;
+    width: auto;
+    margin: 0px 10px 0px 10px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.PopupItem .Text {
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    color: var(--Stroke-Normal);
+}

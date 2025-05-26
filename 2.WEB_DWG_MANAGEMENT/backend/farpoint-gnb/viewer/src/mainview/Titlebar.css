@@ -1,0 +1,89 @@
+.DarkTheme {
+    --Titlebar-Underline: #d5dadd;
+    --Titlebar-Icon-Fill: #dde3f3;
+    --Titlebar-Icon-Stroke: #5c616a;
+    --Titlebar-Shadow: 0 3px 12px 3px rgba(0, 0, 0, 0.67);
+}
+
+.LightTheme {
+    --Titlebar-Underline: #7b8185;
+    --Titlebar-Icon-Fill: #8b8d90;
+    --Titlebar-Icon-Stroke: #25272d;
+    --Titlebar-Shadow: 0 3px 10px 1px rgba(0, 0, 0, 0.73);
+}
+
+.RightViewFrame .Titlebar {
+    position: relative;
+    width: 346px;
+    margin-right: 15px;
+    border-radius: 15px;
+    box-shadow: var(--Titlebar-Shadow);
+    background-color: var(--Background-Normal);
+    transition: all 0.3s;
+    overflow: hidden;
+    outline: none;
+    pointer-events: all;
+}
+
+.RightViewFrame .Titlebar .TitlebarItem .ItemText {
+    width: calc(100% - 40px - 35px);
+    color: var(--Text-Normal);
+}
+.RightViewFrame .Titlebar .TitlebarItem .HighlightItemText {
+    width: calc(100% - 40px - 35px);
+    color: var(--Text-Highlight);
+}
+
+.RightViewFrame .Titlebar .CurrentText {
+    position: relative;
+    color: var(--Text-Normal);
+    height: 36px;
+}
+
+.RightViewFrame .Titlebar .TitlebarItem {
+    position: relative;
+    width: 100%;
+    height: 36px;
+}
+
+.RightViewFrame .Titlebar .TitlebarItem .Underline {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    margin: 36px 0 35.8px;
+    background-color: var(--Titlebar-Underline);
+}
+
+.RightViewFrame .Titlebar .CountIcon {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 15px;
+    top: 9px;
+}
+
+.RightViewFrame .Titlebar .CurrentText {
+    width: calc(100% - 40px - 11px);
+}
+
+.RightViewFrame .Titlebar .Text {
+    position: absolute;
+    height: 36px;
+    left: 40px;
+    top: 0px;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.RightViewFrame .Titlebar .TitlebarItem .Close {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: calc(100% - 18px - 11px);
+    top: 9px;
+}

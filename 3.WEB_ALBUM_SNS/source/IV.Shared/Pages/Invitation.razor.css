@@ -1,0 +1,81 @@
+﻿.invitation-page {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.infinite-gallery {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    /* 기존 width: 100%, overflow: hidden 유지 시 */
+    width: 100%;
+    overflow: hidden;
+
+    /* 수평 가운데 정렬의 핵심 */
+    justify-content: center;
+}
+
+
+/* 개별 컬럼(세로줄) */
+.image-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 한 컬럼이 화면 높이보다 크게 만들어야 이동 효과가 잘 보임 */
+    overflow: hidden;
+}
+
+/* 태블릿(768px~1199px): 앞선 10줄만 보이고, 11~20줄은 숨김 */
+@media (max-width: 1199px) and (min-width: 768px) {
+    .image-column:nth-child(n+11) {
+        display: none;
+    }
+}
+
+/* 모바일(767px 이하): 앞선 5줄만 보이고, 6~20줄은 숨김 */
+@media (max-width: 767px) {
+    .image-column:nth-child(n+6) {
+        display: none;
+    }
+}
+
+/* 이미지 아이템 */
+.pinterest-item {
+    width: 80px;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-bottom: 10px;
+    /* 스타일 자유롭게 */
+}
+
+/* 짝수 컬럼: 위로 올라가는 반복 */
+.scroll-up {
+    animation: scrollUp 10s linear infinite;
+}
+
+/* 홀수 컬럼: 아래로 내려가는 반복 */
+.scroll-down {
+    animation: scrollDown 10s linear infinite;
+}
+
+/* 두 세트를 이어 붙였으므로, 절반 지점(50%)까지 이동 후 반복 */
+@keyframes scrollUp {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+@keyframes scrollDown {
+    0% {
+        transform: translateY(-50%); /* 처음에 두 번째 세트가 위쪽에 “대기”하도록 */
+    }
+    100% {
+        transform: translateY(0%);   /* 첫 번째 세트가 밑으로 사라지고, 두 번째가 내려와 자리를 차지 */
+    }
+}

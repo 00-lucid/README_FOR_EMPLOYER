@@ -1,0 +1,87 @@
+﻿@inherits LayoutComponentBase
+
+@if (IsOpen)
+{
+    <div class="h-snackbar">
+        <div class="h-snackbar-message">
+            @Message
+        </div>
+        @if (!string.IsNullOrEmpty(ActionLabel))
+        {
+            <button class="h-snackbar-action" @onclick="HandleActionClick">@ActionLabel</button>
+        }
+        <button class="h-snackbar-close" @onclick="CloseSnackbar">×</button>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 스낵바가 열림/닫힘 상태인지 나타내는 플래그
+    /// </summary>
+    [Parameter] public bool IsOpen { get; set; }
+
+    /// <summary>
+    /// 스낵바 열림/닫힘 상태 변경 시 상위로 알림
+    /// </summary>
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>
+    /// 스낵바에 보여줄 메인 메시지
+    /// </summary>
+    [Parameter] public string? Message { get; set; }
+
+    /// <summary>
+    /// 스낵바에서 제공할 액션의 라벨 (예: "취소", "재실행" 등)
+    /// </summary>
+    [Parameter] public string? ActionLabel { get; set; }
+
+    /// <summary>
+    /// 액션 버튼 클릭 시 실행할 콜백
+    /// </summary>
+    [Parameter] public EventCallback OnActionClicked { get; set; }
+
+    /// <summary>
+    /// 스낵바가 열렸을 때 자동으로 닫히는 데 걸리는 시간(밀리초, 기본 3000)
+    /// 설정 시 해당 시간 후에 자동 닫힘
+    /// </summary>
+    [Parameter] public int Duration { get; set; } = 3000;
+
+    // 컴포넌트 초기화 시 자동 닫힘 타이머 세팅
+    protected override void OnParametersSet()
+    {
+        if (IsOpen)
+        {
+            // 백그라운드 스레드 대신 InvokeAsync를 통해 메인 스레드로 돌아와서 처리
+            _ = InvokeAsync(async () =>
+            {
+                await Task.Delay(Duration);
+                await CloseSnackbar();
+            });
+        }
+    }
+
+    // 액션 버튼 클릭 시 처리
+    private async Task HandleActionClick()
+    {
+        // 사용자 정의 로직 실행 (OnActionClicked가 있으면)
+        if (OnActionClicked.HasDelegate)
+        {
+            await OnActionClicked.InvokeAsync();
+        }
+
+        // 액션 실행 후 스낵바가 그대로 남아있어야 하면 아래 줄을 주석 처리하시고
+        // 유지하지 않고 닫으시려면 사용하세요.
+        await CloseSnackbar();
+    }
+
+    // 닫기 버튼 또는 내부 로직에서 스낵바 닫기
+    private async Task CloseSnackbar()
+    {
+        IsOpen = false;
+        if (IsOpenChanged.HasDelegate)
+        {
+            await IsOpenChanged.InvokeAsync(false);
+        }
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,139 @@
+.EquipmentMenu {
+    position: absolute;
+    width: var(--EquipmentMenuWidth);
+    height: 100%;
+    /* background-color: var(--Background-Normal); */
+}
+
+#equipmentMenuTreeView {
+    position: absolute;
+    top: 65px;
+    left: 15px;
+    right: 2px;
+    bottom: 15px;
+    height: 50%;
+}
+.EquipmentMenu > .ShowAllIcon {
+    position: absolute;
+    top: 22px;
+    left: 70px;
+    width: 24px;
+    height: 24px;
+}
+
+.EquipmentMenu > .ShowAllBackground {
+    position: absolute;
+    top: 14px;
+    left: 62px;
+    width: 40px;
+    height: 40px;
+}
+
+.EquipmentMenu .TreeViewItem .ShowAllIcon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+}
+
+.EquipmentMenu .ShowAllIcon :hover {
+    --CloseIcon-Fill: #d7dbe6;
+    --CloseIcon-Stroke: #555;
+}
+
+.EquipmentMenu .TreeViewItem .ShowAllBackground {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+}
+.InnerSearchView {
+    position: absolute;
+    top: calc(50% + 68px);
+    width: 100%;
+    height: calc(50% - 78px);
+    border-top: 1px solid #d5dadd;
+    margin-top: 10px;
+}
+
+.InnerSearchView .ControlsView .CommonComponent {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 25px;
+    margin-right: 25px;
+    height: 40px;
+}
+
+.InnerSearchView .SearchButton {
+    position: relative;
+    margin-left: 25px;
+    margin-top: 12px;
+    width: calc(100% - 25px - 25px);
+    height: 40px;
+    border-radius: 8px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+}
+
+.InnerSearchView .SearchButton > div {
+    width: 100%;
+    height: 20px;
+    font-size: 20px;
+    text-align: center;
+    color: white;
+}
+
+.InnerSearchView .ListView {
+    margin: 10px 2px 0 25px;
+    overflow-y: scroll;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.InnerSearchView .TreeViewItem .Label {
+    border-radius: 10px;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.InnerSearchView .TreeViewItem .Label:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.InnerSearchView .TreeViewItem .Label:active {
+    background-color: var(--Background-Normal-Active);
+}
+.InnerSearchView .TreeViewItem .SelectedLabel {
+    background-color: var(--Background-Highlight);
+}
+.InnerSearchView .TreeViewItem .SelectedLabel:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.InnerSearchView .TreeViewItem .SelectedLabel:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.InnerSearchView .TreeViewItem .Label .Image3 {
+    margin-left: 8px;
+    width: 24px;
+    height: 24px;
+}
+.InnerSearchView .ListView::-webkit-scrollbar {
+    /*display: none;*/
+    width: 8px;
+}
+.InnerSearchView .ListView::-webkit-scrollbar-thumb {
+    background-color: var(--Scroll-Stroke);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+.InnerSearchView .ListView::-webkit-scrollbar-track {
+    background-color: var(--Scroll-Background);
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px white;
+}

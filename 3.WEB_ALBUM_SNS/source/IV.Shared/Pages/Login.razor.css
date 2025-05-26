@@ -1,0 +1,92 @@
+/* Login Page Styles */
+.login-container {
+    width: max-content;
+    max-width: 370px; /* min-width 대신 max-width로 변경 */
+    margin: auto; /* 부모 요소 안에서 수평으로 가운데 정렬 */
+    padding: 20px;
+    /*border: 1px solid var(--secondary-color);*/
+    border-radius: 10px;
+    /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
+    background-color: var(--light-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* 반응형: 768px 이하일 때 */
+@media (max-width: 768px) {
+    .login-container {
+        width: 90%;
+        max-width: 370px;    /* 최대 너비는 동일하게 유지 */
+        padding: 1rem;       /* 패딩을 좀 더 줄여서 모바일에서 여백 확보 */
+    }
+
+    h1 {
+        font-size: 1.5rem;   /* 화면이 작을 때 글자 크기 살짝 축소 */
+    }
+
+    button {
+        font-size: 1rem;     /* 버튼 글자 크기 조정 */
+        padding: 0.8rem;
+    }
+}
+
+/* 반응형: 480px 이하일 때 (더 작은 화면) */
+@media (max-width: 480px) {
+    .login-container {
+        width: 95%;
+        max-width: none;  /* 370px 제한을 풀면 아주 작은 화면에서도 자연스럽게 줄어듦 */
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+    }
+}
+
+
+form > div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color); /* 텍스트 색상을 전역 변수로 설정 */
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--secondary-color); /* 전역 변수 사용 */
+    border-radius: 5px;
+    background-color: var(--light-color); /* 입력 필드 배경색 */
+    color: var(--text-color); /* 텍스트 색상 */
+}
+
+input:focus {
+    border-color: var(--primary-color); /* 초점 시 Primary 색상 */
+    outline: none;
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--primary-color); /* 버튼 배경색 */
+    color: var(--light-color); /* 텍스트 색상 */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--secondary-color); /* 호버 시 Secondary 색상 */
+}
+
+.error-message {
+    color: var(--error-color); /* 에러 메시지 색상 수정 */
+    font-weight: bold;
+}

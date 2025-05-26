@@ -1,0 +1,35 @@
+.CreatePldMenu .ListView {
+    margin-top: 20px;
+    margin-left: 20px;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: calc(100% - 40px);
+    height: 200px;
+    font-size: 13px;
+    border: solid 0.2px;
+}
+
+.CreatePldMenu td {
+    height: 30px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.CreatePldMenu .ListView span {
+    margin-left: 3px;
+    white-space: nowrap;
+}
+
+.CreatePldMenu .PldPreview {
+    font-size: 13px;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: var(--Text-Highlight);
+}
+
+.CreatePldMenu .PldPreview .Item :first-child {
+    width: 80px;
+}

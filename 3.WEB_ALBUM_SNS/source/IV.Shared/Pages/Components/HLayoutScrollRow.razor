@@ -1,0 +1,31 @@
+﻿<div id="@Id" @onscroll="OnScroll" style="@Style">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? BackgroundColor { get; set; } = "transparent";
+
+    [Parameter]
+    public string? Width { get; set; } = "100%";
+
+    [Parameter]
+    public string? Height { get; set; } = "auto";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<EventArgs> OnScroll { get; set; }
+
+    [Parameter]
+    public string Id { get; set; } = "layoutScrollRow";
+
+    private string Style => $@"
+        width: {Width};
+        height: {Height};
+        overflow-x: auto;
+        white-space: nowrap;
+        background-color: {BackgroundColor};
+    ";
+}

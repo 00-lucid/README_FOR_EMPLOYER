@@ -1,0 +1,23 @@
+
+#@host=http://localhost:4000
+@host=http://192.168.1.53:4000
+
+###
+GET {{host}}/epnid/api/url/funcName?userId=test&functionName=2435-441-J-HS-0690-B
+Accept: application/json
+Content-Type: application/json
+
+###
+GET {{host}}/epnid/api/url/equipNo?userId=test&equipmentNo=10674260
+Accept: application/json
+Content-Type: application/json
+
+###
+GET {{host}}/plantCode/folders?plantCode=2810
+Accept: application/json
+Content-Type: application/json
+
+###
+GET {{host}}/test/imgInsert
+Accept: application/json
+Content-Type: application/json

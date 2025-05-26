@@ -1,0 +1,9 @@
+.picture-box-edit-container {
+    display: flex;
+    border-radius: 0.325rem;
+    min-height: 4rem;
+    /* 스크롤바 크기로 인한 부자연스러움 해결을 위해 4%의 여유 공간을 둔다 */
+    min-width: 22%;
+    margin: 1%;
+    background-color: gray;
+}

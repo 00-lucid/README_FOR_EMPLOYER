@@ -1,0 +1,127 @@
+<div class="form-group">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    <div class="input-wrapper">
+        <textarea
+            id="@Id"
+            placeholder="@PlaceHolder"
+            maxlength="@MaxLength"
+            class="@GetInputClass()"
+            rows="@Rows"
+            @onblur="OnBlur"
+            @oninput="HandleInput">@Value</textarea>
+
+        <!-- 버튼 컨테이너 추가 (필요시 추가 기능을 위한 공간) -->
+        <div class="button-container">
+            @ChildContent
+        </div>
+    </div>
+
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="error-message">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty; // 레이블 텍스트
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty; // ID 속성
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty; // 바인딩 값
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; } // 값 변경 이벤트
+
+    [Parameter]
+    public string? PlaceHolder { get; set; } // Placeholder 텍스트
+
+    [Parameter]
+    public int? MaxLength { get; set; } // 입력 가능 문자수 제한
+
+    [Parameter]
+    public int Rows { get; set; } = 3; // textarea의 기본 표시 줄 수
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } // 추가 버튼 등을 위한 자식 내용
+    
+    [Parameter]
+    public Func<string, string?>? Validation { get; set; } // 유효성 검사 함수
+
+    [Parameter]
+    public EventCallback<bool> OnValidationChange { get; set; } // 유효성 검사 결과를 알리는 이벤트 콜백
+    
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; } // 추가 속성
+    
+    private bool _isValid = false; // 유효성 검사 결과 상태
+    public bool IsValid => _isValid; // 외부에서 현재 컴포넌트의 유효성 검사 결과 확인 가능
+
+    private string? ErrorMessage { get; set; }
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    private bool IsValidated { get; set; } = false;
+
+    // 포커스를 잃었을 때 유효성 검사 실행
+    private async Task OnBlur()
+    {
+        await ValidateInput();
+    }
+
+    private async Task ValidateInput()
+    {
+        IsValidated = true;
+        bool oldIsValid = _isValid;
+
+        if (Validation != null)
+        {
+            ErrorMessage = Validation(Value);
+            _isValid = string.IsNullOrEmpty(ErrorMessage);
+        }
+        else
+        {
+            ErrorMessage = null;
+            _isValid = true;
+        }
+
+        // 유효성 상태가 변경되었을 때만 이벤트 발생
+        if (oldIsValid != _isValid)
+        {
+            await OnValidationChange.InvokeAsync(_isValid);
+        }
+    }
+
+    private string GetInputClass()
+    {
+        if (!IsValidated || string.IsNullOrEmpty(Value)) // 아직 유효성 검사가 되지 않은 경우 또는 값이 없는 경우
+        {
+            return "form-control";
+        }
+
+        if (HasError) // 오류가 있는 경우
+        {
+            return "form-control error";
+        }
+
+        // 유효성 검사가 통과된 경우
+        return "form-control valid";
+    }
+    
+    // 입력 처리
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        if (e.Value is string newValue)
+        {
+            Value = newValue;
+            await ValueChanged.InvokeAsync(newValue);
+            
+            await ValidateInput();
+        }
+    }
+}

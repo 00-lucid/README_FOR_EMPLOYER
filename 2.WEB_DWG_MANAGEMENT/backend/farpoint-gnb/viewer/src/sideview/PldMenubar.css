@@ -1,0 +1,83 @@
+.PldMenubar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 13px;
+    z-index: 50;
+}
+
+.PldMenubar {
+    background-color: #2d688f;
+}
+
+.PldMenubar > .Logo {
+    margin: 7px;
+    margin-bottom: 30px;
+    filter: brightness(0) invert(1);
+}
+
+@media screen and (max-height: 500px) {
+    .PldMenubar > .line {
+        display: none;
+    }
+}
+
+.PldMenubar .MenuItem {
+    position: relative;
+    margin-top: 6px;
+    margin-left: 7px;
+    width: 66px;
+    height: 66px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.MenuItem .MenuIcon {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.PldMenubar .MenuItem .MenuLabel {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+
+.MenuItemOn {
+    background-color: #e1e3e8;
+}
+.MenuItemOn:hover {
+    background-color: #dfe2e0;
+}
+.MenuItemOn:active {
+    background-color: #d8f1f1;
+}
+
+.MenuItemOff:hover {
+    background-color: #2ac3c6;
+}
+.MenuItemOff:active {
+    background-color: var(--Background-Normal-Active);
+}
+
+.PldMenubar .MenuItemOn .MenuLabel {
+    color: #000;
+}
+.PldMenubar .MenuItemOff .MenuLabel {
+    color: #fff;
+}
+
+.PldMenubar .line {
+    position: relative;
+    margin: 19px;
+    margin-top: 30px;
+    width: 43px;
+    height: 1px;
+    background-color: var(--Separate-Line);
+}
+
+.disable {
+    pointer-events: none;
+    opacity: 40%;
+}

@@ -1,0 +1,25 @@
+﻿.peer-detail-item {
+    position: relative;
+}
+
+.peer-section-summary {
+    font-size: clamp(1.59375rem, 18.7895px + 1.39803vw, 1.125rem);
+    font-weight: bolder;
+}
+
+.peer-section-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    position: sticky;
+    top: -1.5rem;
+}
+
+@media (max-width: 1680px) {
+    .radzen-card-scrollable {
+        overflow-x: auto; /* 가로 스크롤 활성화 */
+        display: block;   /* 블록 요소로 유지 */
+        white-space: nowrap; /* 내용을 한 줄로 표시, 줄바꿈 방지 */
+    }
+}

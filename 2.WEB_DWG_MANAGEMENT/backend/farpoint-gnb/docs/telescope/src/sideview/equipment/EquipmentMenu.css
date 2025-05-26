@@ -1,0 +1,34 @@
+.EquipmentListMenu {
+    position: absolute;
+    width: var(--EquipmentListMenuWidth);
+    height: 100%;
+    /* background-color: var(--Background-Normal); */
+}
+
+.EquipmentListMenu > .ShowAllIcon {
+    position: absolute;
+    top: 22px;
+    left: 70px;
+    width: 24px;
+    height: 24px;
+}
+.EquipmentListMenu > .ShowAllIcon:hover {
+    --CloseIcon-Fill: #d7dbe6;
+    --CloseIcon-Stroke: #555;
+}
+
+.EquipmentListMenu > .ShowAllBackground {
+    position: absolute;
+    top: 14px;
+    left: 62px;
+    width: 40px;
+    height: 40px;
+}
+
+#treeView {
+    position: absolute;
+    top: 65px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+}

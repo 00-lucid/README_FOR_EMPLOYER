@@ -1,0 +1,63 @@
+﻿<div class="h-toggle-switch @GetSizeClass() @(IsToggled ? "on" : "off") @(Disabled ? "disabled" : "")"
+     @onclick="@(Disabled ? null : OnToggle)">
+    <div class="h-toggle-knob"></div>
+</div>
+
+@code {
+    /// <summary>
+    /// 현재 토글 상태
+    /// </summary>
+    [Parameter]
+    public bool IsToggled { get; set; }
+
+    /// <summary>
+    /// 토글 상태 변경을 외부에 알리는 이벤트
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> IsToggledChanged { get; set; }
+
+    /// <summary>
+    /// 토글 스위치 크기(Small, Medium, Large)
+    /// </summary>
+    [Parameter]
+    public HToggleButtonSize Size { get; set; } = HToggleButtonSize.Medium;
+    
+    /// <summary>
+    /// 토글이 비활성화 되었는지 여부. (비활성화되면 클릭 동작 불가능)
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+    
+    private async Task OnToggle()
+    {
+        if (Disabled)
+            return;
+
+        // 상태 반전
+        IsToggled = !IsToggled;
+
+        // 외부에서 바인딩(리스너)할 수 있도록 알림
+        await IsToggledChanged.InvokeAsync(IsToggled);
+    }
+    
+    /// <summary>
+    /// 사이즈 파라미터에 따른 CSS 클래스를 결정
+    /// </summary>
+    private string GetSizeClass() => Size switch
+    {
+        HToggleButtonSize.Small => "h-toggle-switch-small",
+        HToggleButtonSize.Medium => "h-toggle-switch-medium",
+        HToggleButtonSize.Large => "h-toggle-switch-large",
+        _ => "h-toggle-switch-medium"
+    };
+    
+    /// <summary>
+    /// 토글 버튼의 크기를 정의하는 열거형
+    /// </summary>
+    public enum HToggleButtonSize
+    {
+        Small,
+        Medium,
+        Large
+    }
+}

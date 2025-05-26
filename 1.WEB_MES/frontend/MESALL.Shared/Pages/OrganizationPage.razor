@@ -1,0 +1,553 @@
+﻿@page "/organization"
+@using System.Collections.Generic
+@using System.Linq
+@using MESALL.Shared.Enums
+@using MESALL.Shared.Models
+@using MESALL.Shared.Pages.Components
+@using MESALL.Shared.Interfaces
+@inject IOrganizationService OrganizationService
+
+<div class="page-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>조직 관리</h1>
+            <span class="organization-count">총 @(_organizations?.Count ?? 0)개의 조직</span>
+        </div>
+    </header>
+
+    <div class="controls-section">
+        <div class="view-options">
+            @* <div class="view-option @(_layoutDirection == LayoutDirection.Vertical ? "active" : "")" *@
+            @*      @onclick="() => _layoutDirection = LayoutDirection.Vertical"> *@
+            @*     <i class="fas fa-arrow-down"></i> 아래로 배치 *@
+            @* </div> *@
+            @* <div class="view-option @(_layoutDirection == LayoutDirection.Horizontal ? "active" : "")" *@
+            @*      @onclick="() => _layoutDirection = LayoutDirection.Horizontal"> *@
+            @*     <i class="fas fa-arrow-right"></i> 옆으로 배치 *@
+            @* </div> *@
+            @* <button class="view-option" @onclick="ResetZoomAndPan"> *@
+            @*     <i class="fas fa-sync-alt"></i> 초기화 *@
+            @* </button> *@
+        </div>
+    </div>
+
+    @if (_isLoading)
+    {
+        <HLoading LoadingText="조직 정보를 불러오는 중입니다..." />
+    }
+    else if (_organizations == null || _organizations.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="3" y="14" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="17" y="14" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="10" y="14" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 7V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M5 14V12C5 11.4477 5.44772 11 6 11H18C18.5523 11 19 11.4477 19 12V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 10H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 10H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h3>조직이 없습니다</h3>
+            <p>첫 번째 조직을 생성해 보세요!</p>
+            <button class="primary-btn" @onclick="CreateRootOrganization">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                루트 조직 생성
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="organization-viewport" 
+             @onmousedown="HandleMouseDown"
+             @onmousemove="HandleMouseMove"
+             @onmouseup="HandleMouseUp"
+             @onmouseleave="HandleMouseUp"
+             @onwheel="HandleMouseWheel"
+             @onwheel:preventDefault>
+            <div class="organization-chart @(_layoutDirection == LayoutDirection.Horizontal ? "horizontal" : "vertical") @(_isDragging ? "dragging" : "")"
+                 style="transform: scale(@_scale); margin-left: @(_offsetX)px; margin-top: @(_offsetY)px;">
+                <div class="chart-container">
+                    @foreach (var rootOrg in _rootOrganizations)
+                    {
+                        <HOrganizationTreeNode
+                            Organization="rootOrg"
+                            OnSelect="SelectOrganization"
+                            OnDelete="DeleteOrganization"
+                            OnRestore="RestoreOrganization"
+                            OnAddChild="ShowCreateOrganizationDialog"
+                            LayoutDirection="_layoutDirection" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (_showMemberDialog)
+{
+    <div class="modal-backdrop" @onclick="CloseModals">
+        <div class="dialog-container" @onclick:stopPropagation="true">
+            <div class="dialog-header">
+                <h2>@_selectedOrganization.OrganizationName 구성원 관리</h2>
+                <button class="close-btn" @onclick="CloseModals">×</button>
+            </div>
+            <div class="dialog-content">
+                <div class="tabs">
+                    <div class="tab @(_activeTab == "current" ? "active" : "")" @onclick='() => _activeTab = "current"'>
+                        현재 구성원 (@(_selectedOrganizationUsers?.Count ?? 0))
+                    </div>
+                </div>
+
+                @if (_isMembersLoading)
+                {
+                    <div class="loading-members">
+                        <p>구성원 정보를 불러오는 중입니다...</p>
+                    </div>
+                }
+                else if (_activeTab == "current")
+                {
+                    @if (_selectedOrganizationUsers == null || _selectedOrganizationUsers.Count == 0)
+                    {
+                        <div class="empty-members">
+                            <p>현재 구성원이 없습니다.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="member-list">
+                            @foreach (var member in _selectedOrganizationUsers)
+                            {
+                                <div class="member-item">
+                                    <div class="member-info">
+                                        <div class="member-avatar">
+                                            @(string.IsNullOrEmpty(member.Username) ? "?" : member.Username.Substring(0, 1))
+                                        </div>
+                                        <div class="member-details">
+                                            <div class="member-name">@member.Username</div>
+                                            <div class="member-email">@member.Email</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else if (_activeTab == "add")
+                {
+                    <div class="add-member-form">
+                        <div class="form-group">
+                            <label>이름 <span class="required">*</span></label>
+                            <input type="text" @bind="_newUser.Username" placeholder="이름 입력" />
+                        </div>
+                        <div class="form-group">
+                            <label>이메일</label>
+                            <input type="email" @bind="_newUser.Email" placeholder="이메일 입력" />
+                        </div>
+                        <button class="primary-btn" @onclick="AddNewUser">
+                            <i class="fas fa-plus"></i> 구성원 추가
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (_showCreateDialog)
+{
+    <div class="modal-backdrop" @onclick="CloseModals">
+        <div class="dialog-container small" @onclick:stopPropagation="true">
+            <div class="dialog-header">
+                <h2>@(_parentOrganization?.OrganizationName ?? "루트") 하위 조직 생성</h2>
+                <button class="close-btn" @onclick="CloseModals">×</button>
+            </div>
+            <div class="dialog-content">
+                <div class="form-group">
+                    <HTextInput
+                        Id="NewOrganizationName"
+                        Label="조직명"
+                        Value="@_newOrganizationName"
+                        ValueChanged="@((value) => _newOrganizationName = value)"
+                        PlaceHolder="조직명 입력"
+                        Required="true"
+                        Validation="@((value) => string.IsNullOrWhiteSpace(value) ? "조직명을 입력해주세요." : null)">
+                    </HTextInput>
+                </div>
+                <div class="dialog-actions">
+                    <button class="primary-btn" @onclick="CreateOrganization">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4V20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg> 조직 생성
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<HDialog @bind-IsOpen="_showDeleteDialog" Title="조직 삭제">
+    <ChildContent>
+        <div class="delete-dialog-content">
+            <div class="delete-warning-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <p class="delete-warning-text">
+                <strong>@_organizationToDelete?.OrganizationName</strong> 조직을 정말 삭제하시겠습니까?
+            </p>
+            <p class="delete-warning-subtext">
+                이 작업은 되돌릴 수 없으며, 하위 조직이 있는 경우 모두 함께 삭제됩니다.
+            </p>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="ConfirmDeleteOrganization">
+            삭제
+        </HButton>
+    </FooterContent>
+</HDialog>
+
+@code {
+    private bool _isLoading = true;
+    private List<Organization> _organizations = new List<Organization>();
+    private List<Organization> _rootOrganizations = new List<Organization>();
+    private LayoutDirection _layoutDirection = LayoutDirection.Vertical;
+
+    // 구성원 관리 다이얼로그
+    private bool _showMemberDialog;
+    private Organization _selectedOrganization;
+    private List<User> _selectedOrganizationUsers;
+    private bool _isMembersLoading;
+    private string _activeTab = "current";
+    private User _newUser = new User();
+
+    // 조직 생성 다이얼로그
+    private bool _showCreateDialog;
+    private Organization _parentOrganization;
+    private string _newOrganizationName;
+
+    // 삭제 관련 변수 추가
+    private bool _showDeleteDialog = false;
+    private Organization _organizationToDelete;
+    private bool _hasChildOrganizations = false;
+    private bool _hasOrganizationUsers = false;
+    
+    // 패닝 및 줌 관련 변수
+    private bool _isDragging = false;
+    private double _lastMouseX;
+    private double _lastMouseY;
+    private double _offsetX = -650;
+    private double _offsetY = -420;
+    private double _scale = 1.0;
+    private const double MIN_SCALE = 0.3;
+    private const double MAX_SCALE = 2.0;
+    private const double SCALE_FACTOR = 0.1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            await LoadOrganizationsFromApi();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"조직 데이터 로딩 중 오류 발생: {ex.Message}");
+            // 실제 애플리케이션에서는 적절한 오류 처리 필요
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    // 패닝 및 줌 관련 메서드
+    private void HandleMouseDown(MouseEventArgs e)
+    {
+        _isDragging = true;
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+    }
+
+    private void HandleMouseMove(MouseEventArgs e)
+    {
+        if (_isDragging)
+        {
+            // 마우스 이동 거리 계산
+            var deltaX = e.ClientX - _lastMouseX;
+            var deltaY = e.ClientY - _lastMouseY;
+
+            // 오프셋 업데이트
+            _offsetX += deltaX;
+            _offsetY += deltaY;
+
+            // 마지막 마우스 위치 업데이트
+            _lastMouseX = e.ClientX;
+            _lastMouseY = e.ClientY;
+        }
+    }
+
+    private void HandleMouseUp(MouseEventArgs e)
+    {
+        _isDragging = false;
+    }
+
+    private void HandleMouseWheel(WheelEventArgs e)
+    {
+        // 휠 방향에 따라 확대/축소
+        var zoom = e.DeltaY < 0 ? SCALE_FACTOR : -SCALE_FACTOR;
+        var newScale = _scale + zoom;
+    
+        // 최소 확대/축소 제한 (최대 확대는 1.0(100%)로 제한)
+        if (newScale >= MIN_SCALE && newScale <= 1.0)
+        {
+            // 확대/축소 적용
+            _scale = newScale;
+        }
+        // 이미 100%인 상태(1.0)에서 더 확대하려는 경우는 무시됨
+    }
+
+    private void ResetZoomAndPan()
+    {
+        _scale = 1.0;
+        _offsetX = 0;
+        _offsetY = 0;
+    }
+
+    private async Task LoadOrganizationsFromApi()
+    {
+        // 1. 모든 조직 데이터 가져오기
+        _organizations = await OrganizationService.GetOrganizationsByCompanyIdAsync(2);
+
+        // 2. 조직 트리 구성하기
+        if (_organizations != null && _organizations.Count > 0)
+        {
+            _rootOrganizations = await OrganizationService.BuildOrganizationTreeAsync(_organizations);
+        }
+    }
+
+    private async Task SelectOrganization(Organization org)
+    {
+        // 드래그 중이면 선택 무시
+        if (_isDragging)
+            return;
+            
+        _selectedOrganization = org;
+        _showMemberDialog = true;
+        _activeTab = "current";
+
+        // 구성원 정보 로드
+        await LoadOrganizationUsers(org.OrganizationId);
+    }
+
+    private async Task LoadOrganizationUsers(int organizationId)
+    {
+        _isMembersLoading = true;
+
+        try
+        {
+            // 조직 상세 정보를 로드하여 사용자 목록 가져오기
+            var organizationDetail = await OrganizationService.GetOrganizationByIdAsync(organizationId);
+
+            if (organizationDetail != null)
+            {
+                _selectedOrganizationUsers = organizationDetail.Users ?? new List<User>();
+            }
+            else
+            {
+                _selectedOrganizationUsers = new List<User>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"조직 구성원 로딩 중 오류 발생: {ex.Message}");
+            _selectedOrganizationUsers = new List<User>();
+        }
+        finally
+        {
+            _isMembersLoading = false;
+        }
+    }
+
+    private void ShowCreateOrganizationDialog(Organization parent)
+    {
+        // 드래그 중이면 다이얼로그 무시
+        if (_isDragging)
+            return;
+            
+        _parentOrganization = parent;
+        _newOrganizationName = string.Empty;
+        _showCreateDialog = true;
+    }
+
+    private void CreateRootOrganization()
+    {
+        _parentOrganization = null;
+        _newOrganizationName = string.Empty;
+        _showCreateDialog = true;
+    }
+
+    private async Task CreateOrganization()
+    {
+        if (string.IsNullOrWhiteSpace(_newOrganizationName))
+            return;
+
+        // 실제 API 연동
+        var request = new CreateOrganizationRequest
+        {
+            OrganizationName = _newOrganizationName,
+            CompanyId = 2,
+            UserIds = [],
+            ParentOrganizationId = _parentOrganization?.OrganizationId
+        };
+
+        var result = await OrganizationService.CreateOrganizationAsync(request);
+
+        if (result != null)
+        {
+            // 조직 목록 새로고침
+            await LoadOrganizationsFromApi();
+        }
+
+        CloseModals();
+    }
+    
+    // 삭제 프로세스 시작 (삭제 버튼 클릭시 호출됨)
+    private async Task DeleteOrganization(Organization org)
+    {
+        // 드래그 중이면 명령 무시
+        if (_isDragging)
+            return;
+            
+        // 삭제할 조직 정보 저장
+        _organizationToDelete = org;
+        
+        // 하위 조직 여부 확인
+        _hasChildOrganizations = org.Children != null && org.Children.Count > 0;
+        
+        // 구성원 여부 확인
+        var organizationDetail = await OrganizationService.GetOrganizationByIdAsync(org.OrganizationId);
+        _hasOrganizationUsers = (organizationDetail?.Users?.Count ?? 0) > 0;
+        
+        // 삭제 확인 다이얼로그 표시
+        _showDeleteDialog = true;
+    }
+    
+    // 삭제 취소
+    private void CancelDeleteOrganization()
+    {
+        _showDeleteDialog = false;
+        _organizationToDelete = null;
+    }
+    
+    // 삭제 확인 후 실제 삭제 수행
+    private async Task ConfirmDeleteOrganization()
+    {
+        if (_organizationToDelete == null)
+            return;
+    
+        try
+        {
+            // 삭제할 조직과 모든 하위 조직 ID를 수집
+            var orgIdsToDelete = new List<int>();
+            CollectOrganizationIdsToDelete(_organizationToDelete, orgIdsToDelete);
+        
+            // 하위 조직부터 삭제하기 위해 리스트 순서 반전 (자식 → 부모 순으로)
+            orgIdsToDelete.Reverse();
+        
+            // 수집된 모든 ID의 조직을 하나씩 삭제
+            foreach (var orgId in orgIdsToDelete)
+            {
+                var result = await OrganizationService.DeleteOrganizationAsync(orgId);
+                if (!result)
+                {
+                    // 삭제 실패 시 처리 (로그 기록 또는 사용자에게 알림)
+                    Console.WriteLine($"조직 ID {orgId} 삭제 실패");
+                }
+            }
+        
+            // 조직 목록 새로고침
+            await LoadOrganizationsFromApi();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"조직 삭제 중 오류 발생: {ex.Message}");
+            // 실제 애플리케이션에서는 적절한 오류 처리와 사용자 알림 필요
+        }
+        finally
+        {
+            // 다이얼로그 닫기 및 상태 초기화
+            _showDeleteDialog = false;
+            _organizationToDelete = null;
+        }
+    }
+
+    // 삭제할 조직 ID를 재귀적으로 수집하는 메서드
+    private void CollectOrganizationIdsToDelete(Organization org, List<int> orgIds)
+    {
+        if (org == null)
+            return;
+        
+        // 현재 조직 ID 추가
+        orgIds.Add(org.OrganizationId);
+    
+        // 모든 하위 조직도 재귀적으로 추가
+        if (org.Children != null)
+        {
+            foreach (var child in org.Children)
+            {
+                CollectOrganizationIdsToDelete(child, orgIds);
+            }
+        }
+    }
+
+    private async Task AddNewUser()
+    {
+        if (string.IsNullOrWhiteSpace(_newUser.Username))
+            return;
+
+        // 실제 API 연동
+        // TODO: 구성원 추가 API 호출
+        // await OrganizationService.AddUserToOrganizationAsync(_selectedOrganization.OrganizationId, _newUser.Id);
+
+        // 구성원 목록 새로고침
+        await LoadOrganizationUsers(_selectedOrganization.OrganizationId);
+
+        _newUser = new User();
+        _activeTab = "current";
+    }
+
+    private async Task RestoreOrganization(Organization org)
+    {
+        // 드래그 중이면 명령 무시
+        if (_isDragging)
+            return;
+            
+        // 실제 API 연동
+        // TODO: 조직 복원 API 구현 필요
+        // await OrganizationService.RestoreOrganizationAsync(org.OrganizationId);
+
+        // 조직 목록 새로고침
+        await LoadOrganizationsFromApi();
+    }
+
+    private void CloseModals()
+    {
+        _showMemberDialog = false;
+        _showCreateDialog = false;
+        _showDeleteDialog = false;
+        _selectedOrganizationUsers = null;
+        _organizationToDelete = null;
+    }
+}

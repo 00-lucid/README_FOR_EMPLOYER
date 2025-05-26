@@ -1,0 +1,13 @@
+.CommonComponent .Calendar {
+    position: relative;
+}
+
+.CommonComponent .Calendar .Day {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.CommonComponent .Calendar .Day .Empty {
+    width: 100%;
+    height: 100%;
+}

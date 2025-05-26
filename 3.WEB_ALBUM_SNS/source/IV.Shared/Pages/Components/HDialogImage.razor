@@ -1,0 +1,109 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@if (IsOpen)
+{
+    <div class="h-image-dialog-mask" @onclick="CloseDialog">
+        <!-- 닫기(X) 버튼 -->
+        <button class="h-image-dialog-close"
+                @onclick="CloseDialog"
+                @onclick:stopPropagation="true">×</button>
+        
+        <!-- 이미지 영역 -->
+        @if (ImageUrls is not null && ImageUrls.Count > 0)
+        {
+            <img class="h-image-dialog-img"
+                 src="@(ImageUrls[SafeIndex] + "?" + Configuration.GetConnectionString("BlobStorageToken"))"
+                 alt="Photo"
+                 @onclick="StopPropagation" />
+        }
+        else
+        {
+            <p @onclick="StopPropagation" class="no-image-message">표시할 이미지가 없습니다.</p>
+        }
+
+        <!-- 이전/다음/삭제 버튼 -->
+        <div class="h-image-dialog-navigation" @onclick="StopPropagation">
+            <button class="nav-button"
+                    @onclick="OnPrevImage"
+                    @onclick:stopPropagation="true"
+                    disabled="@(CanPrev is false)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M560-280 360-480l200-200v400Z"/></svg>
+            </button>
+            <button class="nav-button"
+                    @onclick="OnNextImage"
+                    @onclick:stopPropagation="true"
+                    disabled="@(CanNext is false)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M400-280v-400l200 200-200 200Z"/></svg>
+            </button>
+            <button class="nav-button delete-button"
+                    @onclick="OnDeleteImageClicked"
+                    @onclick:stopPropagation="true"
+                    disabled="@(!HasAnyImage)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter] public List<string>? ImageUrls { get; set; }
+    [Parameter] public int CurrentIndex { get; set; }
+    [Parameter] public EventCallback<int> CurrentIndexChanged { get; set; }
+
+    [Parameter] public EventCallback OnDeleteImage { get; set; }
+    
+    private int SafeIndex => 
+        (ImageUrls is not null && ImageUrls.Count > 0)
+            ? Math.Clamp(CurrentIndex, 0, ImageUrls.Count - 1)
+            : 0;
+
+    private bool HasAnyImage => ImageUrls is not null && ImageUrls.Count > 0;
+    private bool CanPrev => HasAnyImage && ImageUrls!.Count > 1 && SafeIndex > 0;
+    private bool CanNext => HasAnyImage && ImageUrls!.Count > 1 && SafeIndex < ImageUrls.Count - 1;
+
+    private async Task OnPrevImage()
+    {
+        if (CanPrev)
+        {
+            int newIndex = SafeIndex - 1;
+            await CurrentIndexChanged.InvokeAsync(newIndex);
+        }
+    }
+
+    private async Task OnNextImage()
+    {
+        if (CanNext)
+        {
+            int newIndex = SafeIndex + 1;
+            await CurrentIndexChanged.InvokeAsync(newIndex);
+        }
+    }
+
+    private void CloseDialog()
+    {
+        IsOpen = false;
+        IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    private void StopPropagation(MouseEventArgs e)
+    {
+        // 내부 클릭 시 이벤트 전파 방지
+    }
+    
+    // 삭제 버튼 클릭 시 부모 컴포넌트(또는 상위)에서 전달된 OnDeleteImage 콜백을 호출
+    private async Task OnDeleteImageClicked()
+    {
+        if (OnDeleteImage.HasDelegate)
+        {
+            await OnDeleteImage.InvokeAsync();
+        }
+    }
+
+}

@@ -1,0 +1,10 @@
+.PrintSelect {
+    width: 84%;
+    left: calc(8%);
+    margin-top: 10px;
+    outline: none;
+    border-radius: 8px;
+    border: solid 1px var(--Component-Border);
+    background-color: var(--Component-Background);
+    transition: all 0.1s;
+}

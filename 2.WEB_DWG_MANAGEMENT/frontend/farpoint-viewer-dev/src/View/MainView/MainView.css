@@ -1,0 +1,29 @@
+.MainView {
+    position: absolute;
+    left: var(--SideMenuWidth);
+    right: 0px;
+    height: 100%;
+}
+
+.MainView .BackgroundLogo {
+    position: absolute;
+    left: calc((100% - 282px) / 2);
+    top: calc((100% - 263px) / 2);
+    width: 282px;
+    height: 263px;
+    filter: brightness(0) invert(1);
+}
+
+.MainView .Background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.MainView .RightViewFrame {
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    height: calc(100% - 130px);
+    pointer-events: none;
+}

@@ -1,0 +1,132 @@
+.DarkTheme {
+    --Menu-Toolbar-Background: #f4f6fc;
+    --Menu-Toolbar-DragLine: #c5cbcf;
+    --Menu-Toolbar-Drag-Background: #dfe6ea;
+    --Menu-Toolbar-Item-Hover: #dde6e5;
+    --Menu-Toolbar-Item-Active: #d5dadd;
+    --Menu-Toolbar-Item-Stroke: #444a4d;
+    --Markup-Toolbar-Background: rgba(230, 230, 230, 0.76);
+    --Markup-Toolbar-Border: #c5cacd;
+    --Markup-Toolbar-Hover: rgba(210, 210, 210, 0.56);
+    --Markup-Toolbar-Active: rgba(210, 210, 210);
+}
+
+.LightTheme {
+    --Menu-Toolbar-Background: #494d4f;
+    --Menu-Toolbar-DragLine: #353535;
+    --Menu-Toolbar-Drag-Background: #3c3f41;
+    --Menu-Toolbar-Item-Hover: #414344;
+    --Menu-Toolbar-Item-Active: #393d3f;
+    --Menu-Toolbar-Item-Stroke: #fff;
+    --Markup-Toolbar-Background: rgba(73, 77, 79, 0.76);
+    --Markup-Toolbar-Border: #2b2d2e;
+    --Markup-Toolbar-Hover: rgba(80, 80, 80, 0.36);
+    --Markup-Toolbar-Active: rgba(80, 80, 80, 0.56);
+}
+
+.SelectDate:focus {
+    outline: none;
+}
+
+.SelectDate .CurrentDate {
+    position: absolute;
+    width: 115px;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: solid 1px #26282a6f;
+    background-color: var(--Markup-Toolbar-Background);
+    color: var(--Menu-Toolbar-Item-Stroke);
+}
+
+.SelectDate .SelectCalendar {
+    z-index: 1;
+    position: fixed;
+    background-color: var(--Background-Normal);
+    border-radius: 6px;
+    box-shadow: 0 0 6px 3px rgba(0, 0, 0, 0.28), inset 0 0 0 2px rgba(110, 110, 110, 0.5);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+}
+
+.SelectDate .SelectCalendar .TopView {
+    position: relative;
+    width: auto;
+    height: 16px;
+    margin: 14px 15px 14px 15px;
+}
+
+.SelectDate .SelectCalendar .ControlsFrame {
+    display: flex;
+    justify-content: center;
+}
+
+.SelectDate .SelectCalendar .Controls {
+    position: absolute;
+    width: auto;
+}
+
+.SelectDate .SelectCalendar .Controls > * {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.SelectDate .SelectCalendar .TopView .MonthName {
+    color: var(--Text-Normal);
+    font-size: 14px;
+    opacity: 0.9;
+    margin: 0px 10px 0px 10px;
+}
+
+.SelectDate .SelectCalendar .TopView .CloseButton {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.SelectDate .SelectCalendar .Day {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin: 0px 4px 1px 4px;
+}
+
+.SelectDate .SelectCalendar .Day .Text {
+    border-radius: 50%;
+    color: var(--Text-Normal);
+    font-size: 12px;
+    /* test center */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.SelectDate .SelectCalendar .Day .Text:hover {
+    background-color: var(--Background-Normal-Hover);
+}
+.SelectDate .SelectCalendar .Day .Text:active {
+    background-color: var(--Background-Normal-Active);
+}
+
+.SelectDate .SelectCalendar .Day .Today {
+    background-color: var(--Component-Active);
+}
+
+.SelectDate .SelectCalendar .Calendar {
+    margin: 0px 10px 10px 10px;
+}
+
+.SelectDate .SelectCalendar .WeekDayNames {
+    margin: 0px 10px 4px 10px;
+}
+
+.SelectDate .SelectCalendar .WeekDayNames > div {
+    opacity: 0.5;
+    color: var(--Text-Normal);
+    display: inline-block;
+    vertical-align: top;
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    margin: 0px 4px 0px 4px;
+}

@@ -1,0 +1,244 @@
+@page "/albums"
+@using IV.Shared.Model
+@using IV.Shared.Pages.Components
+@using IV.Shared.Interfaces
+@using IV.Shared.Interfaces.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using SchemaLens.Client.Utils
+@inject IAlbumService AlbumService
+@inject IUserService UserService
+@inject IAlbumSubscriptionService AlbumSubscriptionService
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<HLayoutScroll>
+    <HRow Padding="16px 16px 0px 16px">
+        <!-- 새 앨범 버튼 클릭 시 다이얼로그 열림 -->
+        <HButton OnClick="OpenDialog">새 앨범</HButton>
+    </HRow>
+    <HColumn IsBottomSpace="true">
+        @if (_albums.Count == 0)
+        {
+            <HNotingText Title="\(o_o)/" SubTitle="No albums found!" Compare="@_albums" />
+        }
+        else
+        {
+            <HGrid Padding="16px 0px 16px 0px">
+                @foreach (var album in _albums)
+                {
+                    // _thumbnails에 앨범 ID가 있는지 확인하여, 있으면 그 URL을 사용
+                    var albumThumbnailUrl = _thumbnails.GetValueOrDefault(album.AlbumId, "https://ivblobstorage.blob.core.windows.net/images/default-album.png");
+
+                    if (album.IsPrivate)
+                    {
+                        // TODO blur 효과를 css로 주는 것이 아니라 블러가 적용된 사진이 저장되고 불러와야 함.
+                        <div style="position: relative;">
+                            <HCardImage
+                                ImageUrl="@albumThumbnailUrl"
+                                OnClick="() => NavigateToPrivateAlbumDetail(album.AlbumId, album.UserId)"
+                                Title="@album.AlbumTitle"
+                                Subtitle="@album.AlbumDescription"
+                                IsBlur="true"
+                            />
+                            <div class="private-lock-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="32px"
+                                     height="32px"
+                                     viewBox="0 0 24 24"
+                                     fill="#FFFFFF">
+                                    <path d="M17 8V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H5c-1.1 0-2 .9-2 2v10
+                                       c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2h-2zm-2 0H9V6
+                                       c0-1.65 1.35-3 3-3s3 1.35 3 3v2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <HCardImage
+                            ImageUrl="@albumThumbnailUrl"
+                            OnClick="() => NavigateToAlbumDetail(album.AlbumId)"
+                            Title="@album.AlbumTitle"
+                            Subtitle="@album.AlbumDescription"/>
+                    }
+                    
+                }
+            </HGrid>
+        }
+    </HColumn>
+</HLayoutScroll>
+
+<!-- HDialog 컴포넌트 사용 -->
+<HDialog Title="새 앨범 생성"
+         IsOpen="@_dialogOpen"
+         IsOpenChanged="@OnDialogOpenChanged">
+    <ChildContent>
+        <p>새 앨범에 대한 정보를 입력하세요.</p>
+        <!-- 앨범 제목 입력 -->
+        <HTextInput
+            Label="앨범 제목"
+            Value="@_albumTitle"
+            ValueChanged="@(value => _albumTitle = value)"
+            PlaceHolder="앨범 제목을 입력하세요." />
+
+        <!-- 앨범 소개 입력(TextArea) -->
+        <HTextArea
+            Label="앨범 소개"
+            Value="@_albumDescription"
+            ValueChanged="@(value => _albumDescription = value)"
+            PlaceHolder="간단한 앨범 소개를 작성하세요."
+            Rows="5" />
+
+        <HRow AlignItems="center" Gap="8px">
+            <HText TextType="HText.HTextType.Caption" TextColorType="HText.HTextColorType.Info">비공개</HText>
+            <HTooltipButton Size="HTooltipButton.TooltipButtonSize.Small" Text="비공개 할 경우 허용된 사용자에게만 공개됩니다."/>
+            <HToggleSwitch Size="HToggleSwitch.HToggleButtonSize.Small" IsToggled="_isPrivateAlbumCreate" IsToggledChanged="TogglePrivateAlbumCreate"/>
+        </HRow>
+    </ChildContent>
+    <FooterContent>
+        <HButton OnClick="@RegisterAlbum">등록</HButton>
+        <HButton @onclick="CloseDialog">닫기</HButton>
+    </FooterContent>
+</HDialog>
+
+@code {
+    private int _userId;
+    
+    private bool _dialogOpen; // 다이얼로그 열림 여부
+    private string _albumTitle = string.Empty; // 입력된 앨범 제목
+    private string _albumDescription = string.Empty; // 입력된 앨범 소개
+    
+    // 앨범 목록을 보관할 리스트
+    private List<AlbumModel> _albums = new();
+    
+    // 앨범 ID별 썸네일 URL을 보관할 Dictionary
+    private readonly Dictionary<int, string> _thumbnails = new();
+
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthState { get; set; }
+    
+    // 비밀 앨범 토글
+    private bool _isPrivateAlbumCreate;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        _userId = await UserService.GetUserIdAsync();
+        
+        // 1) 앨범 목록 가져오기
+        _albums = await AlbumService.GetAlbumByUserIdAsync(_userId);
+
+        // 2) 각 앨범 ID별 썸네일 가져오기
+        foreach (var album in _albums)
+        {
+            var thumbnails = await AlbumService.GetAlbumThumbnailByIdAsync(album.AlbumId);
+            
+            // 썸네일 목록이 있으면 첫 번째 사진 URL만 저장
+            if (thumbnails.Count > 0)
+            {
+                _thumbnails[album.AlbumId] = thumbnails.First().PhotoUrl;
+            }
+            else
+            {
+                // 썸네일이 없는 경우에 대한 처리
+                _thumbnails[album.AlbumId] = "https://ivblobstorage.blob.core.windows.net/images/default-album.png";
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// 새 앨범 다이얼로그를 여는 메서드
+    /// </summary>
+    private void OpenDialog()
+    {
+        _dialogOpen = true;
+    }
+
+    /// <summary>
+    /// 다이얼로그 열림 상태 변경 시 호출되는 메서드
+    /// </summary>
+    /// <param name="value">다이얼로그의 새로운 열림 상태</param>
+    private async Task OnDialogOpenChanged(bool value)
+    {
+        _dialogOpen = value;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// 다이얼로그를 닫는 메서드
+    /// </summary>
+    private void CloseDialog()
+    {
+        _dialogOpen = false;
+    }
+
+    /// <summary>
+    /// 새 앨범을 등록하는 비동기 메서드
+    /// </summary>
+    private async Task RegisterAlbum()
+    {
+        try
+        {
+            // 입력된 제목과 설명을 사용하여 새 앨범 모델 생성
+            var newAlbum = new AlbumModel
+            {
+                UserId = _userId,
+                AlbumTitle = _albumTitle,
+                AlbumDescription = _albumDescription,
+                CreatedAt = DateTime.UtcNow,
+                IsPrivate = _isPrivateAlbumCreate
+            };
+
+            // 생성할 앨범 리스트에 새 앨범 추가
+            var albumsToCreate = new List<AlbumModel> { newAlbum };
+
+            // AlbumService를 통해 앨범을 비동기로 생성
+            var createdAlbumIds = await AlbumService.CreateAlbumsAsync(albumsToCreate);
+
+            // 생선한 자신의 앨범은 자동 구독
+            await AlbumSubscriptionService.SubscribeToAlbumAsync(_userId, createdAlbumIds.FirstOrDefault());
+            
+            // 생성된 AlbumId를 사용하여 새 앨범에 설정 (옵션)
+            newAlbum.AlbumId = createdAlbumIds.FirstOrDefault();
+
+            // 로컬 앨범 리스트에 새 앨범 추가하여 UI 업데이트
+            _albums.Insert(0, newAlbum);
+
+            // 입력 필드 초기화
+            _albumTitle = string.Empty;
+            _albumDescription = string.Empty;
+
+            // 다이얼로그 닫기
+            CloseDialog();
+        }
+        catch (Exception ex)
+        {
+            // 오류 발생 시 예외 처리 (예: 사용자에게 오류 메시지 표시)
+            // 실제 구현 시 UI에 오류를 표시하는 로직을 추가할 수 있습니다.
+            Console.Error.WriteLine($"앨범 등록 중 오류 발생: {ex.Message}");
+        }
+    }
+
+    private void NavigateToAlbumDetail(int albumId)
+    {
+        NavigationManager.NavigateTo($"/albums/detail/{albumId}");
+    }
+    
+    private void TogglePrivateAlbumCreate(bool newValue)
+    {
+        _isPrivateAlbumCreate = newValue;
+    }
+
+    private void NavigateToPrivateAlbumDetail(int albumId, int albumOwner)
+    {
+        
+        if (_userId.Equals(albumOwner))
+        {
+            NavigationManager.NavigateTo($"/albums/detail/{albumId}");
+        }
+    }
+}

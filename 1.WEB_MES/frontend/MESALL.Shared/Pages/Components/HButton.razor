@@ -1,0 +1,95 @@
+﻿@inherits LayoutComponentBase
+
+<button @onclick="HandleClick"
+        class="@GetButtonClass()"
+        disabled="@Disabled"
+        id="@Id"
+        name="@Name"
+        aria-label="@AriaLabel">
+    @ChildContent
+</button>
+
+@code {
+    /// <summary>
+    /// 버튼의 기본 CSS 클래스(스타일).
+    /// </summary>
+    [Parameter]
+    public string Class { get; set; } = "h-button";
+
+    /// <summary>
+    /// 버튼을 비활성화할지 여부.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// 버튼 클릭 시 호출될 콜백 메서드.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// 버튼 내부에 표시할 콘텐츠(RenderFragment).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 버튼의 id 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// 버튼의 name 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// 접근성(ARIA) 향상을 위한 aria-label 속성 값.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// 버튼의 타입을 설정하여 스타일을 변경.
+    /// </summary>
+    [Parameter]
+    public ButtonType Type { get; set; } = ButtonType.Primary;
+
+    /// <summary>
+    /// 버튼 클릭 이벤트를 처리하는 메서드. 
+    /// Disabled가 false이고 OnClick에 델리게이트가 할당된 경우에만 실행됩니다.
+    /// </summary>
+    private async Task HandleClick()
+    {
+        if (!Disabled && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+
+    /// <summary>
+    /// 버튼 유형에 따른 CSS 클래스를 반환합니다.
+    /// </summary>
+    private string GetButtonClass() => Type switch
+    {
+        ButtonType.Primary => $"{Class} h-button-primary",
+        ButtonType.Secondary => $"{Class} h-button-secondary",
+        ButtonType.Danger => $"{Class} h-button-danger",
+        ButtonType.Success => $"{Class} h-button-success",
+        _ => Class,
+    };
+
+    /// <summary>
+    /// 버튼의 유형 (스타일).
+    /// </summary>
+    public enum ButtonType
+    {
+        Primary,
+        Secondary,
+        Danger,
+        Success
+    }
+}

@@ -1,0 +1,29 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.122.1/containers/docker-existing-dockerfile
+{
+    "name": "${containerWorkspaceFolderBasename}",
+    "context": ".",
+    "dockerFile": "Dockerfile",
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+        "source=farpoint,target=/farpoint,type=volume"
+    ],
+    "remoteEnv": {
+        "SOLUTION_PATH": "${containerWorkspaceFolder}",
+        "SOLUTION_NAME": "${containerWorkspaceFolderBasename}"
+    },
+    "extensions": [
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "firsttris.vscode-jest-runner"
+    ],
+    "forwardPorts": [
+        3000,
+        4000
+    ],
+    "runArgs": [
+        "--publish-all"
+    ],
+    "postCreateCommand": ".devcontainer/postCreateCommand.sh"
+}

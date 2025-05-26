@@ -1,0 +1,175 @@
+﻿@using SchemaLens.Client.Enums
+@using SchemaLens.Client.Model
+@using SchemaLens.Client.Utils
+@inject DialogService DialogService
+
+<div class="peer-detail-item">
+    <div class="peer-section-container">
+        <h1 class="peer-section-summary">@(isOnline ? "대기" : "처리완료")</h1>
+    </div>
+        @if (isOnline)
+        {
+            if (peers?.Count() > 0)
+            {
+                foreach (PeerModel peer in peers)
+                {
+                    <RadzenCard Style="height: 79px; display: flex; margin-bottom: 1rem; padding: 0;" Variant="@variant">
+                        <RadzenStack Style="width:100%;" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenStack Style="width: 50px;" Gap="0rem">
+                                @if (peer.State.Equals("Pending"))
+                                {
+                                    <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Warning"/>
+                                }
+                                else if (peer.State.Equals("Approval"))
+                                {
+                                    <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Success"/>
+                                }
+                                else if (peer.State.Equals("Disapproval"))
+                                {
+                                    <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Danger"/>
+                                }
+                            </RadzenStack>
+                            <RadzenStack Style="width: 100px" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">데이터</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@peer.SearchTerm</b></RadzenText>
+                            </RadzenStack>
+                            <RadzenStack Style="width: 150px;" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">컬럼명</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(peer.IsNull ? peer.RelatedTerm + '?' : peer.RelatedTerm)</b></RadzenText>
+                            </RadzenStack>
+                            <RadzenStack Style="width: 150px;" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">자료형</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@peer.DataType</b></RadzenText>
+                            </RadzenStack>
+                            @*<RadzenStack Style="width: 100px;" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">자료크기</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@peer.DataSize bit</b></RadzenText>
+                            </RadzenStack>*@
+                            <RadzenStack Style="width: 100px;" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">등록자</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@peer.Username</b></RadzenText>
+                            </RadzenStack>
+                            <RadzenStack Style="width: 100px;" Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Overline">등록일</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@Common.GetTimeElapsedText(peer.CreatedAt)</b></RadzenText>
+                            </RadzenStack>
+                            @if (peer.State.Equals("Pending") && isExamine && isOnline)
+                            {
+                                <RadzenStack Style="width: 100px" Orientation="Orientation.Horizontal" Gap="1rem">
+                                    <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Approval)))" Icon="check" ButtonStyle="ButtonStyle.Primary"/>
+                                    <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Disapproval)))" Icon="close" ButtonStyle="ButtonStyle.Danger"/>
+                                </RadzenStack>
+                            }
+                            else
+                            {
+                                <RadzenStack Style="width: 100px" Orientation="Orientation.Horizontal" Gap="1rem">
+                                    @* <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Approval)))" Icon="build" ButtonStyle="ButtonStyle.Warning" /> *@
+                                    <RadzenButton Click="@(() => OnPeerDelete.InvokeAsync(peer.PeerId))" Icon="delete" ButtonStyle="ButtonStyle.Danger"/>
+                                </RadzenStack>
+                            }
+                            @* <RadzenStack Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Body1"><b>74_EagleRed</b></RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Gap="0rem">
+                                <RadzenText TextStyle="TextStyle.Body1"><b>Product</b></RadzenText>
+                                </RadzenStack> *@
+                        </RadzenStack>
+                    </RadzenCard>
+                }
+            }
+            else
+            {
+                <RadzenText Style="color: var(--rz-base-500)">없음</RadzenText>
+            }
+        }
+        else if (!isOnline)
+        {
+            if (peers?.Count() > 0)
+            {
+                foreach (PeerModel peer in peers)
+                {
+                    <RadzenCard Style="height: 79px; display: flex; margin-bottom: 1rem; opacity: 0.5; padding: 0;" Variant="@variant">
+                            <RadzenStack Style="width:100%;" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Gap="1rem">
+                                <RadzenStack Style="width: 50px;" Gap="0rem">
+                                    @if (peer.State.Equals("Pending"))
+                                    {
+                                        <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Warning" />
+                                    }
+                                    else if (peer.State.Equals("Approval"))
+                                    {
+                                        <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Success" />
+                                    }
+                                    else if (peer.State.Equals("Disapproval"))
+                                    {
+                                        <RadzenBadge Style="height: 79px;" BadgeStyle="BadgeStyle.Danger" />
+                                    }
+                                </RadzenStack>
+                                <RadzenStack Style="width: 100px" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">데이터</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@peer.SearchTerm</b></RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Style="width: 150px;" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">컬럼명</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@(peer.IsNull ? peer.RelatedTerm + '?' : peer.RelatedTerm)</b></RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Style="width: 150px;" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">자료형</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@peer.DataType</b></RadzenText>
+                                </RadzenStack>
+                                @*<RadzenStack Style="width: 100px;" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">자료크기</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@peer.DataSize bit</b></RadzenText>
+                                </RadzenStack>*@
+                                <RadzenStack Style="width: 100px;" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">등록자</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@peer.Username</b></RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Style="width: 100px;" Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Overline">등록일</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@Common.GetTimeElapsedText(peer.CreatedAt)</b></RadzenText>
+                                </RadzenStack>
+                                @if (peer.State.Equals("Pending") && isExamine && isOnline)
+                                {
+                                    <RadzenStack Style="width: 100px" Orientation="Orientation.Horizontal" Gap="1rem">
+                                        <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Approval)))" Icon="check" ButtonStyle="ButtonStyle.Primary" />
+                                        <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Disapproval)))" Icon="close" ButtonStyle="ButtonStyle.Danger" />
+                                    </RadzenStack>
+                                }
+                                else
+                                {
+                                    <RadzenStack Style="width: 100px" Orientation="Orientation.Horizontal" Gap="1rem">
+                                        @* <RadzenButton Click="@(() => OnPeerUpdate.InvokeAsync((peer.PeerId, PeerType.Approval)))" Icon="build" ButtonStyle="ButtonStyle.Warning" /> *@
+                                        @*<RadzenButton Click="@(() => OnPeerDelete.InvokeAsync(peer.PeerId))" Icon="delete" ButtonStyle="ButtonStyle.Danger" />*@
+                                    </RadzenStack>
+                                }
+                                @* <RadzenStack Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>74_EagleRed</b></RadzenText>
+                                    </RadzenStack>
+                                    <RadzenStack Gap="0rem">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>Product</b></RadzenText>
+                                    </RadzenStack> *@
+                            </RadzenStack>
+                        </RadzenCard>
+                }
+            }
+            else
+            {
+                <RadzenText Style="color: var(--rz-base-500)">없음</RadzenText>
+            }
+        }
+</div>
+
+@code {
+    Variant variant = Variant.Outlined;
+
+    [Parameter]
+    public bool isExamine { get; set; }
+    [Parameter]
+    public bool isOnline { get; set; }
+    [Parameter]
+    public IList<PeerModel> peers { get; set; }
+    [Parameter]
+    public EventCallback<(int PeerId, PeerType PeerType)> OnPeerUpdate { get; set; }
+    [Parameter]
+    public EventCallback<int> OnPeerDelete { get; set; }
+}

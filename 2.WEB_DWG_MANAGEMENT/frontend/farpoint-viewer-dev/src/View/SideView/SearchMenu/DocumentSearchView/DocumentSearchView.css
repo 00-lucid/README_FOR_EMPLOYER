@@ -1,0 +1,86 @@
+.DocumentSearchView {
+    --DocumentSearchResultWidth: 482px;
+    position: absolute;
+    top: 0px;
+    width: var(--DocumentSearchResultWidth);
+    height: 100%;
+    background-color: var(--Background-Normal);
+}
+
+.DocumentSearchView .ListView {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 2px;
+    bottom: 10px;
+    overflow-y: scroll;
+    border-collapse: collapse;
+}
+.DocumentSearchView .ListView::-webkit-scrollbar {
+    /*display: none;*/
+    width: 8px;
+}
+.DocumentSearchView .ListView::-webkit-scrollbar-thumb {
+    background-color: var(--Scroll-Stroke);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+.DocumentSearchView .ListView::-webkit-scrollbar-track {
+    background-color: var(--Scroll-Background);
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 5px white;
+}
+
+.DocumentSearchView .ListView table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.DocumentSearchView .ListView tr {
+    height: 40px;
+    color: var(--Text-Normal);
+}
+
+.DocumentSearchView .ListView td {
+    padding: 10px 0 10px 0;
+    font-size: 13px;
+}
+
+.DocumentSearchView .ListView th {
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.DocumentSearchView .ListView tbody tr:nth-child(odd) {
+    background-color: var(--Table-Row-Highlight);
+}
+.DocumentSearchView .ListView tbody tr:hover {
+    background-color: var(--Table-Row-Hover);
+}
+.DocumentSearchView .ListView tbody tr:active {
+    background-color: var(--Table-Row-Active);
+}
+
+.DocumentSearchView .ListView td:first-child {
+    border-top-left-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+
+.DocumentSearchView .ListView td:last-child {
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+.DocumentSearchView .ListView .Header .First {
+    width: 200px;
+}
+.DocumentSearchView .ListView .Header .Third {
+    width: 40px;
+}
+.DocumentSearchView .ListView .RowItem .First {
+    padding-left: 10px;
+}
+.DocumentSearchView .ListView .RowItem .Third {
+    text-align: center;
+}

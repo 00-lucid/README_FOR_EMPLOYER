@@ -1,0 +1,167 @@
+.DarkTheme {
+    --Markup-Popup-Background: #f4f6fc;
+    --Markup-Popup-Color: black;
+    --Markup-Popup-ColorPicker-Button-hover: #dde6e5;
+    --input-Border-Line: #5e6467;
+    --input-Background: #e7edf1;
+}
+
+.LightTheme {
+    --Markup-Popup-Background: #494d4f;
+    --Markup-Popup-Color: white;
+    --Markup-Popup-ColorPicker-Button-hover: #414344;
+    --input-Border-Line: #e6e8ef;
+    --input-Background: white;
+}
+.markupPopup {
+    min-width: 100px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    background-color: var(--Markup-Popup-Background);
+    color: var(--image-stroke-color);
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 2px 10px 4px rgba(0, 0, 0, 0.17);
+}
+
+.markup-one {
+    display: flex;
+    justify-content: center;
+}
+
+.span {
+    display: flex;
+    flex-direction: column;
+    margin-right: 30px;
+}
+
+.span div {
+    display: flex;
+    align-items: center;
+    height: 44px;
+}
+
+.span div:nth-child(1) {
+}
+
+.span div:nth-child(2) {
+    margin-top: 16px;
+}
+
+.span div:nth-child(3) {
+    margin-top: 14px;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+}
+
+.input input {
+    padding: 0 10px;
+    height: 40px;
+    margin-bottom: 20px;
+    cursor: text;
+    color: #6c757d;
+    border: solid 1px var(--input-Border-Line);
+    border-radius: 8px;
+    background: var(--input-Background);
+}
+
+.input input::-webkit-inner-spin-button {
+    appearance: none;
+}
+
+.input-colorPicker-font {
+    display: flex;
+    align-items: flex-end;
+    cursor: "pointer";
+}
+
+.markup-cloud-space {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+
+.markup-cloud-space div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+}
+
+.markup-cloud-space div:hover {
+    background-color: var(--Markup-Popup-ColorPicker-Button-hover);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.color-picker {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 360px;
+    bottom: 15px;
+    border-radius: 6px;
+    padding: 15px;
+    background-color: var(--Markup-Popup-Background);
+    color: var(--Markup-Popup-Color);
+    font-size: 14px;
+}
+
+.picker-one {
+    display: flex;
+    justify-content: space-between;
+}
+
+.saturation {
+    width: 170px;
+    height: 170px;
+    position: relative;
+    border: 1px solid var(--input-Border-Line);
+}
+
+.hue {
+    height: 170px;
+    width: 20px;
+    position: relative;
+    border: 1px solid var(--input-Border-Line);
+}
+
+.picker-two {
+    display: flex;
+    margin-top: 20px;
+    justify-content: space-between;
+}
+
+.fix-color {
+    width: 128px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.picker-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.picker-button div {
+    width: 120px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.picker-button div:hover {
+    background-color: var(--Markup-Popup-ColorPicker-Button-hover);
+}

@@ -1,0 +1,39 @@
+.picture-box-container {
+    display: flex;
+    border-radius: 0.325rem;
+    height: 4rem;
+    width: 22%;
+    /* 스크롤바 크기로 인한 부자연스러움 해결을 위해 4%의 여유 공간을 둔다 */
+    margin: 1%;
+    background-color: white;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform 0.4s ease-in-out;
+}
+
+.picture-box-container:hover {
+    transform: scale(1.5);
+}
+
+.picture-box-skeleton {
+    display: flex;
+    border-radius: 0.325rem;
+    height: 4rem;
+    width: 4rem;
+    margin: 1%;
+    background-color: #eee;
+    justify-content: center;
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.6);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

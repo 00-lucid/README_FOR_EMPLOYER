@@ -1,0 +1,73 @@
+/* 전체 카드 스타일 */
+.h-card-image {
+    aspect-ratio: 3 / 2; /* 3:2 비율 유지 */
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* 내용이 아래쪽에 위치하도록 설정 */
+    align-items: center;
+    background-color: var(--light-color);
+    color: var(--text-color);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+
+    /* 이미지, 푸터 등을 겹쳐 배치하기 위해 relative로 설정 */
+    position: relative;
+}
+
+/* 실제 이미지를 화면 가득 표시하기 위한 스타일 */
+.h-card-image-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지를 채우면서 가로세로 비율 유지 */
+    z-index: 1;       /* 필요에 따라 조절 */
+}
+
+/* 호버 시 카드 효과 */
+.h-card-image:hover {
+    /*transform: translateY(-3px);*/
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 카드 하단 영역 (초기 상태) */
+.h-card-image-footer {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+    text-align: start;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+
+    /* 이미지 위에 푸터가 보이도록 z-index를 더 높게 설정 */
+    position: relative;
+    z-index: 2;
+}
+
+/* 마우스가 카드에 호버될 때, 푸터가 아래쪽으로 사라짐 */
+.h-card-image:hover .h-card-image-footer {
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+/* 타이틀 */
+.h-card-image-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #fff; /* 대비를 위해 흰색 폰트 사용 */
+}
+
+/* 서브타이틀 */
+.h-card-image-subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #fff; /* 대비를 위해 흰색 폰트 사용 */
+}

@@ -1,0 +1,56 @@
+/* disable dragging */
+*,
+*::after,
+*::before {
+    -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
+    cursor: default;
+}
+
+.App * {
+    /* font-size: 3px; */
+    /* color: red; */
+    margin: 0;
+    padding: 0;
+}
+
+/* disable selection */
+body {
+    user-select: none; /* supported by Chrome and Opera */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+body {
+    /* 브라우저 주소창이 가변적인 것을 금지 */
+    position: fixed;
+    /* disable scroll */
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'NanumBarunGothic';
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    src: url('./NanumBarunGothic.otf');
+}
+
+* {
+    font-family: NanumBarunGothic;
+    transition: margin 0.2s ease-out;
+}
+
+.App {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.App {
+    --SideMenuWidth: 80px;
+}

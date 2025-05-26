@@ -1,0 +1,114 @@
+.PrintSelectViewFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: visible;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    z-index: 50;
+}
+
+.PrintSelectView {
+    position: absolute;
+    left: calc((100% - 170px) / 2);
+    top: calc((100% - 210px) / 2);
+    width: 170px;
+    height: 210px;
+    background-color: var(--Dialogue-background);
+    border-radius: 6px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.21);
+    border: solid 1px rgba(0, 0, 0, 0.7);
+    padding-bottom: 10px;
+    pointer-events: all;
+    color: var(--Text-Normal);
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.PrintSelectView .Titlebar {
+    background-color: var(--Dialogue-Titlebar-background);
+    position: relative;
+    height: 30px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: 6px 0px 0px 0px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+}
+
+.PrintSelectView .Text {
+    top: 0px;
+    width: 100%;
+    text-align: center;
+}
+
+.PrintSelectView .CancelButton {
+    position: absolute;
+    top: 110px;
+    top: calc(70%);
+    left: 4%;
+    width: 74px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Titlebar-background);
+    display: flex;
+    align-items: center;
+    color: var(--Text-Normal);
+}
+.PrintSelectView .CancelButton:hover {
+    background-color: var(--Dialogue-Titlebar-background-Hover);
+}
+.PrintSelectView .CancelButton:active {
+    background-color: var(--Dialogue-Titlebar-background-Active);
+}
+
+.PrintSelectView .SaveButton {
+    position: absolute;
+    top: calc(70%);
+    right: calc(4%);
+    width: 74px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Background-Highlight);
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.PrintSelectView .DisabledSaveButton {
+    position: absolute;
+    top: 110px;
+    left: 196px;
+    width: 174px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--Dialogue-Button-Disable);
+    display: flex;
+    align-items: center;
+    color: var(--image-stroke-color);
+}
+
+.PrintSelectView .SaveButton:hover {
+    background-color: var(--Background-Highlight-Hover);
+}
+.PrintSelectView .SaveButton:active {
+    background-color: var(--Background-Highlight-Active);
+}
+
+.PrintSelectView .SelectedLabel {
+    color: var(--Text-Normal);
+}
+
+.PrintSelectView .NormalLabel {
+    color: var(--Text-Normal);
+}
+
+.PrintSelectView #InputView {
+    position: absolute;
+    top: 45px;
+    left: 15px;
+    width: 348px;
+    height: 40px;
+}

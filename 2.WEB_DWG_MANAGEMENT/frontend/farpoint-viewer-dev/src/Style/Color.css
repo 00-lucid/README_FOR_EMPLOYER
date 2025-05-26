@@ -1,0 +1,101 @@
+.DarkTheme {
+    /* Context */
+    --Text-Normal: #464646;
+    --Stroke-Normal: #464646;
+    --Background-Normal: #f4f6fc;
+    --Background-Normal-Hover: #e1e3e8;
+    --Background-Normal-Active: #d3d5db;
+    /* Toolbar */
+    --Menu-Toolbar-Background: #f4f6fc;
+    --Menu-Toolbar-DragLine: #c5cbcf;
+    --Menu-Toolbar-Drag-Background: #dfe6ea;
+    --Menu-Toolbar-Item-Hover: #dde6e5;
+    --Menu-Toolbar-Item-Active: #d5dadd;
+    --Menu-Toolbar-Item-Stroke: #444a4d;
+    --Markup-Toolbar-Background: rgba(230, 230, 230, 0.76);
+    --Markup-Toolbar-Border: #c5cacd;
+    --Markup-Toolbar-Hover: rgba(210, 210, 210, 0.56);
+    --Markup-Toolbar-Active: rgba(210, 210, 210);
+    /* Titlebar */
+    --Titlebar-Underline: #d5dadd;
+    --Titlebar-Icon-Fill: #dde3f3;
+    --Titlebar-Icon-Stroke: #5c616a;
+    --Titlebar-Shadow: 0 3px 12px 3px rgba(0, 0, 0, 0.67);
+    /* Banner */
+    --Banner-Text: #fff;
+    /* Dialogue */
+    --Dialogue-background: #f4f6fc;
+    --Dialogue-Titlebar-background: #d5d5d5;
+    --Dialogue-Titlebar-background-Hover: #c5c5c5;
+    --Dialogue-Titlebar-background-Active: #cacaca;
+    --Dialogue-Subtitlebar-background: #e5e5e5;
+    --Dialogue-Date-background: #d5d5d5;
+    --Dialogue-CheckBox-Stroke: #a3aeb9;
+    --Dialogue-CheckBox-Fill: #d5d5d5;
+    /* Common */
+    --image-stroke-color: #464646;
+    --toolbar-background: #f4f6fc;
+    --icon-type2-fill-color: #dde3f3;
+    --icon-type2-stroke-color: #5c616a;
+    --SaveMarkup-Text-color: #2a2c2d;
+    --foreground-active: #4a70f7;
+    --Dialogue-Button-Disable: #e5e7ea;
+    /* markup */
+    --icon-toolbar-background: #f4f6fc;
+    --icon-toolbar-drag: #dfe6ea;
+    --icon-toolbar-active: #d5dadd;
+    --icon-toolbar-foreground: #444a4d;
+    --markup-background-color: rgba(230, 230, 230, 0.76);
+    --markup-active-foreground: #d5dadd;
+}
+
+.LightTheme {
+    /* Context */
+    --Text-Normal: #fff;
+    --Stroke-Normal: #fff;
+    --Background-Normal: #3c3f41;
+    --Background-Normal-Hover: #5e6467;
+    --Background-Normal-Active: #2a2c2d;
+    /* Toolbar */
+    --Menu-Toolbar-Background: #494d4f;
+    --Menu-Toolbar-DragLine: #353535;
+    --Menu-Toolbar-Drag-Background: #3c3f41;
+    --Menu-Toolbar-Item-Hover: #414344;
+    --Menu-Toolbar-Item-Active: #393d3f;
+    --Menu-Toolbar-Item-Stroke: #fff;
+    --Markup-Toolbar-Background: rgba(73, 77, 79, 0.76);
+    --Markup-Toolbar-Border: #2b2d2e;
+    --Markup-Toolbar-Hover: rgba(80, 80, 80, 0.36);
+    --Markup-Toolbar-Active: rgba(80, 80, 80, 0.56);
+    /* Titlebar */
+    --Titlebar-Underline: #7b8185;
+    --Titlebar-Icon-Fill: #8b8d90;
+    --Titlebar-Icon-Stroke: #25272d;
+    --Titlebar-Shadow: 0 3px 10px 1px rgba(0, 0, 0, 0.73);
+    /* Banner */
+    --Banner-Text: #464646;
+    /* Dialogue */
+    --Dialogue-background: #3c3f41;
+    --Dialogue-Titlebar-background: #26282a;
+    --Dialogue-Titlebar-background-Hover: #5e6467;
+    --Dialogue-Titlebar-background-Active: #757575;
+    --Dialogue-Button-Disable: #5e6467;
+    --Dialogue-Subtitlebar-background: #4a4c4d;
+    --Dialogue-Date-background: #757575;
+    --Dialogue-CheckBox-Stroke: #8b8d90;
+    --Dialogue-CheckBox-Fill: #757575;
+    /* Common */
+    --image-stroke-color: #fff;
+    --toolbar-background: #3c3f41;
+    --icon-type2-fill-color: #8b8d90;
+    --icon-type2-stroke-color: #25272d;
+    --SaveMarkup-Text-color: #fff;
+    --foreground-active: #4a70f7;
+    /* markup */
+    --icon-toolbar-background: #3c3f41;
+    --icon-toolbar-drag: #26282a;
+    --icon-toolbar-active: black;
+    --icon-toolbar-foreground: #fff;
+    --markup-background-color: rgba(73, 77, 79, 0.76);
+    --markup-active-foreground: #2b2d2e;
+}
